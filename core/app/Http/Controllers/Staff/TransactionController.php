@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Staff;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Branch;
-use App\Models\Type;
 use DNS1D;
 use App\Models\CourierInfo;
 use App\Models\AdminNotification;
@@ -40,6 +39,7 @@ use App\Models\TransactionFacture;
 use App\Models\TransactionProduct;
 use Str;
 use App\Constants\Status;
+use App\Models\Type;
 
 class TransactionController extends Controller
 {
@@ -354,6 +354,267 @@ class TransactionController extends Controller
       
        
     }
+    public function update(Request $request){
+    
+        $request->validate([
+            'branch' => 'required|exists:branches,id',
+            'sender_name' => 'required|max:40',
+             'reference' =>'required|max:20',
+            'sender_phone' => 'string|max:40',
+            'sender_address' => 'max:255',
+            'receiver_name' => 'required|max:40',
+            //'receiver_email' => 'email|max:40',
+            'receiver_phone' => 'required|string|max:40',
+            'receiver_address' => 'max:255',
+            'deja_payer'=>'numeric',
+            // 'reference'=>'required',
+            'courierName.*' => 'required_with:quantity|exists:types,id',
+            'quantity.*' => 'required_with:courierName|integer|gt:0',
+            'amount' => 'required|array',
+            'amount.*' => 'numeric|gt:0',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $user = Auth::user();
+            $date_paiement = date('Y-m-d');
+            $sender_user = Client::where('contact', $request->sender_phone)->where('country_id',1)->first();
+           // dd($sender_user);
+            $id_sender = $sender_user->id;
+            //modifier nom expediteur
+             $sender = Client::where('id', $id_sender)->firstOrFail();
+             $sender->nom=strtoupper($request->sender_name);
+             $sender->save();
+             $sende_id = $sender_user->id;
+             //modifier expediteur complet nom et numero
+             $receiver_user = Client::where('contact', $request->receiver_phone)->first();
+             if(!isset($receiver_user))
+             {
+                $receiver = new Client();
+                $receiver->nom = strtoupper($request->receiver_name);
+                $receiver->contact = $request->receiver_phone;
+                if ($request->receiver_email) {
+                    $receiver->email = $request->receiver_email;
+                }
+                $receiver->save();
+                $receive_id = $receiver->id;
+             }else{
+                 $receiver = Client::where('id',$receiver_user->id)->firstOrFail();
+                 $receiver->nom =strtoupper($request->receiver_name);
+                 $receiver->save();
+                 $receive_id = $receiver_user->id;
+             }
+             
+            
+             //mise à jour transfert 
+            $courier = Transaction::where('id',$request->transfert_id)->firstOrFail();
+            $old_user= $courier->user_id ;
+
+            $courier->reftrans = $request->reference;
+            $courier->branch_id = $user->branch_id;
+            $courier->user_id = $user->id;
+            $courier->sender_id = $sende_id;
+            $courier->receiver_id = $receive_id;
+            $courier->receiver_branch_id = $request->branch;
+            //$courier->status = 0;
+            $courier->type_envoi=$request->envoi;//1 maritime 2 Aerien
+            $courier->save();
+            $id = $courier->id;
+           
+            //ENREGISTRER ACTIVITE
+            if($courier){
+                activity('Modificetion transaction')
+                ->performedOn($courier)
+                ->causedBy($user)
+                //->withProperties(['customProperty' => 'customValue'])
+                ->log('Modification Transaction '.$request->reference.' créé par ' . $user->username);
+            }
+           
+            //mise à jour adresse destinataire
+            $delete_adresse= RdvAdresse::where('rdv_id',$request->transfert_id)->delete();
+            $receiver_adresse= new RdvAdresse();
+            $receiver_adresse->client_id =$receive_id;
+            $receiver_adresse->rdv_id =$id;
+            $receiver_adresse->adresse =$request->receiver_address;
+            $receiver_adresse->save();
+            
+            $totalAmount = 0;
+            $delete_product =TransactionProduct::where('transaction_id',$request->transfert_id)->delete();
+           // dd( $request->courierName[0]);
+           $courierType = Type::where('id', $request->courierName[0])->where('status', 1)->firstOrFail();
+          dd( $courierType);
+
+            for ($i = 0; $i < count($request->courierName); $i++) {
+
+                $courierType = Type::where('id', $request->courierName[$i])->where('status', 1)->firstOrFail();
+              
+                if ($user->branch->country == 'CIV') {
+                    $totalAmount += ($request->quantity[$i] * $courierType->price) * 656;
+                } else {
+                    $totalAmount += $request->quantity[$i] * $courierType->price;
+                }
+                    $courierProduct = new TransactionProduct();
+                    $courierProduct->transaction_id = $courier->id;
+                    $courierProduct->type_cat_id = $courierType->cat_id;
+                    $courierProduct->qty = $request->quantity[$i];
+                    $courierProduct->fee = $request->amount[$i];
+                    $courierProduct->save();
+                
+                
+            }
+
+            dd($user->branch->country);
+            $courierPayment =TransactionFacture::where('transaction_id',$request->transfert_id)->firstOrFail();
+           
+            //SMS MODIFICATION 
+            if($courierPayment->sender_amount != $request->total_payer ){
+                $old_amount = $courierPayment->sender_amount ;
+                $new_amount = $request->total_payer;
+                
+                $prix_modif= new PrixModif();
+                $prix_modif->old_amount=$old_amount;
+                $prix_modif->new_amount=$new_amount;
+                $prix_modif->old_user=$old_user;
+                $prix_modif->new_user=$user->id;
+                $prix_modif->branch_id=$user->branch_id;
+                $prix_modif->transfert_id=$request->transfert_id;
+                $prix_modif->save();
+                //ENREGISTRER ACTIVITE
+                if($prix_modif){
+                    activity('Modification montant transfert')
+                    ->performedOn($prix_modif)
+                    ->causedBy($user)
+                    ->withProperties(['customProperty' => 'customValue'])
+                    ->log('Modification Montant Tranfert '.$request->reference.' par ' . $user->username);
+                }
+                $message="Modification Montant Transfert ".$request->reference." Ancien montant : ".$old_amount." Nouveau : ".$new_amount." par : ".$user->firstname." ".$user->lastname;
+
+               // $this->sendSms($message);
+                /// envoie email modification
+                $general = GeneralSetting::first();
+                $config = $general->mail_config;
+                $receiver_name = "Administrateur";
+                $subject = 'Modification Montant Transaction '.$request->reference;
+                $message = 'Le Montant de la transaction de Reference '.$request->reference.' a été modifié ce jour par '.$user->firstname.' '.$user->lastname.' Ancien Montant: '.$old_amount.' Nouveau Montant: '.$new_amount;   ;
+
+                try {
+                   // sendGeneralEmail('lbagate@yahoo.fr', $subject, $message, $receiver_name);
+                } catch (\Exception $exp) {
+                    // $notify[] = ['error', 'Invalid credential'];
+                    // return back()->withNotify($notify);
+                }
+
+               
+            }
+
+          
+            //FIN ALERTE
+            $courierPayment->amount= $request->total_payer;  
+                if ($user->branch->country == 'CIV') {
+                $courierPayment->sender_amount = $totalAmount;
+                $courierPayment->receiver_amount = $totalAmount / 656;
+            } else {
+                $courierPayment->sender_amount = $request->total_payer;
+                $courierPayment->receiver_amount = $request->total_payer * 656;
+            }
+           
+
+            $courierPayment->save();
+
+            $delete_trans_ref=TransfertRef::where('transaction_id',$request->transfert_id)->delete();
+            $q = DB::table('transaction_product')->where('transaction_id', $courier->id)->where('type_cat_id',1)->sum('qty');
+            if ($q == 1) {
+                $transfertRef = new TransfertRef();
+                $transfertRef->transfert_id = $courier->id;
+                $transfertRef->ref_souche_part = $courier->reference_souche;
+                $transfertRef->status = 0;
+                $transfertRef->save();
+            } else {
+                for ($i = 0; $i < $q; $i++) {
+                    $transfertRef = new TransfertRef();
+                    $transfertRef->transfert_id = $courier->id;
+                    $transfertRef->ref_souche_part = $courier->reference_souche . '-' . $i;
+                    $transfertRef->status = 0;
+                    $transfertRef->save();
+                }
+            }
+
+                      //AJOUTER PAIEMENT
+                      if($request->montant_payer > 0)
+                      {
+                          $date_paiement = date('Y-m-d');
+                          $status_payer= $request->total_payer - ($request->montant_payer + $request->deja_payer) ;
+                          if($status_payer < 0)
+                          {
+                              $notify[] = ['error', 'Montant payé incorrect'];
+                              return back()->withNotify($notify);
+                          }
+                          
+                          $payer = new Paiement();
+                          $payer->user_id = $user->id;
+                          $payer->branch_id = $user->branch_id;
+                          $payer->sender_branch_id = $user->branch_id;
+                          $payer->transaction_id = $courierPayment->id;
+                          $payer->refpaiement = getTrx();
+                          $payer->sender_payer = $request->montant_payer;
+                          $payer->receiver_payer = $request->montant_payer * 656;
+                          $payer->mode_paiement = $request->mode;
+                          $payer->date_paiement = $date_paiement;
+                          $payer->save();
+
+                          $sommeMontantsPayes = Paiement::where('transaction_id', 1)->sum('sender_payer');
+
+                          if($sommeMontantsPayes <  $request->total_payer)
+                          {
+                           $statusTrans = 1;
+                          }elseif($sommeMontantsPayes == $request->total_payer){
+                            $statusTrans = 2;
+                          }
+                          $transaction_update = Transaction::where('id', $transaction->id)->update(array('status' => $statusTrans));
+
+
+                         // $update = TransfertPaym::where('transfert_id', $courierPayment->id)->update(array('status' => $payer->status));
+          
+                          $adminNotification = new AdminNotification();
+                          $adminNotification->user_id = $user->id;
+                          $adminNotification->title = 'Paiement Frais Transaction ' . $user->username;
+                          $adminNotification->click_url = urlPath('admin.courier.info.details', $id);
+                          $adminNotification->save();
+          
+                          $branchtransaction = new BranchTransaction();
+                          $branchtransaction->branch_id = $user->branch_id;
+                          $branchtransaction->type = 'credit';
+                          $branchtransaction->amount = $request->montant_payer;
+                          $branchtransaction->reff_no = getTrx();
+                          $branchtransaction->operation_date= $date_paiement;
+                          $branchtransaction->type_transaction ='2';
+                          //$branchtransaction->rdv_id=$payment->rdv_id;
+                          $branchtransaction->created_by = $user->id;
+                          $branchtransaction->transaction_id = $request->refrdv;
+                          $branchtransaction->transaction_payment_id = $payer->id;
+                          
+                          $branchtransaction->save();
+                     }
+                    $adminNotification = new AdminNotification();
+                    $adminNotification->user_id = $user->id;
+                    $adminNotification->title = 'Transaction Modifié ' . $user->username;
+                    $adminNotification->click_url = urlPath('admin.courier.info.details', $id);
+                    $adminNotification->save();
+                    DB::commit();
+        
+                    $notify[] = ['success', 'Transaction modifiée avec succès'];
+                    return redirect()->route('staff.transactions.index')->withNotify($notify);
+
+        }catch (Exception $e) {
+
+            DB::rollback();
+        }
+        //dd('ok');
+      
+
+    }
+
+
     public function edit($id)
     {
         $courierInfo = Transaction::where('id', decrypt($id))->with('receiver_adresse')->first();

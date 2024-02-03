@@ -13,37 +13,39 @@
                                 <h5 class="card-header bg--primary  text-white">@lang('Information Client')</h5>
                                 <div class="card-body">
                                     <div class="row">
-                                        <div class="form-group col-lg-6">
-                                            <label for="sender_name" class="form-control-label font-weight-bold">@lang('Nom')</label>
-                                            <input type="text" class="form-control form-control-lg" id="sender_name" name="sender_name" value="{{$courierInfo->sender->nom}}" maxlength="40" required="">
+                                    <div class="form-group col-lg-6">
+                                            <label>@lang('Telephone')</label>
+                                            <input type="text" class="form-control" id="phone" value="{{$courierInfo->sender->contact}}" name="sender_phone" maxlength="40" required="">
+                                            <ul class="search-list" id="suggestions-list"></ul>
                                         </div>
 
                                         <div class="form-group col-lg-6">
-                                            <label for="sender_phone" class="form-control-label font-weight-bold">@lang('Telephone')</label>
-                                            <input type="text" class="form-control form-control-lg" id="phone" value="{{$courierInfo->sender->contact}}" name="sender_phone" maxlength="40" required="">
-                                            <ul id="suggestions-list"></ul>
+                                            <label>@lang('Nom')</label>
+                                            <input type="text" class="form-control" id="sender_name" name="sender_name" value="{{$courierInfo->sender->nom}}" maxlength="40" required="">
                                         </div>
+
+                                      
                                     </div>
 
                                     <div class="row">
                                         <div class="form-group col-lg-6 autocomplete">
-                                            <label for="sender_address" class="form-control-label font-weight-bold">@lang('Adresse')</label>
-                                            <input type="text" class="form-control form-control-lg" id="sender_address" name="sender_address" value="{{ optional($courierInfo->adresse)->adresse ?? 'N/A' }}" maxlength="255" required="">
+                                            <label>@lang('Adresse')</label>
+                                            <input type="text" class="form-control" id="sender_address" name="sender_address" value="{{ optional($courierInfo->adresse)->adresse ?? 'N/A' }}" maxlength="255" required="">
                                         </div>
 
 
                                         <div class="form-group col-lg-6">
-                                            <label for="sender_code_postal" class="form-control-label font-weight-bold">@lang('Code postal')</label>
+                                            <label>@lang('Code postal')</label>
                                             <input type="text" class="form-control form-control-lg" id="sender_code_postal" name="sender_code_postal" value="{{ optional($courierInfo->adresse)->code_postal ?? 'N/A' }}" maxlength="255" required="">
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-lg-6">
-                                            <label for="sender_address" class="form-control-label font-weight-bold">@lang('Date')</label>
+                                            <label>@lang('Date')</label>
                                             <input name="date" type="text" data-range="true" data-language="en" class="datepicker-here form-control" data-position='bottom right' placeholder="@lang('Date Rdv')" autocomplete="off" value="{{ date('d-m-Y', strtotime($courierInfo->date)) }}">
                                         </div>
                                         <div class="form-group col-lg-6">
-                                            <label for="sender_address" class="form-control-label font-weight-bold">@lang('Observation')</label>
+                                            <label >@lang('Observation')</label>
                                             <input name="observation" type="text" data-range="true" data-language="en" class="form-control" data-position='bottom right' placeholder="@lang('Observation')" autocomplete="off" value="{{ $courierInfo->observation }}">
                                         </div>
                                     </div>
@@ -56,20 +58,18 @@
                                 <div class="col-lg-12">
                                     <div class="card border--primary mt-3">
                                         <h5 class="card-header bg--primary  text-white">@lang('Information RDV')
-                                            <button type="button" class="btn btn-sm btn-outline-light float-right addUserData"><i class="la la-fw la-plus"></i>@lang('Ajouter')
-                                            </button>
+                                        <button type="button" class="btn btn-sm btn-outline-light float-end addUserData"><i
+                                            class="la la-fw la-plus"></i>@lang('Ajouter')
+                                    </button>
                                         </h5>
                                     </div>
 
                                     <div class="card-body">
                                         <div class="row addedField">
                                             @foreach($courierInfo->courierDetail as $courier)
-                                            <div class="col-md-12 user-data">
-                                                <div class="form-group">
-
-                                                    <div class="input-group mb-md-0 mb-4">
+                                            <div class="row single-item gy-2 user-data">
                                                         <div class="col-md-2">
-                                                            <select class="form-control form-control-lg" id="rdv_type_{{$courier->id}}" onChange="getType(this.value,{{$courier->id}});" name="rdvName[]">
+                                                            <select class="form-control selected_type" id="rdv_type_{{$courier->id}}" onChange="getType(this.value,{{$courier->id}});" name="rdvName[]">
                                                                 <option>@lang('Choisir')</option>
                                                                 <option value="1" {{ $courier->rdv_type_id == 1 ?  'selected' : '' }}>RECUP</option>
                                                                 <option value="2" {{ $courier->rdv_type_id == 2 ?  'selected' : '' }}>DEPOT</option>
@@ -85,35 +85,27 @@
                                                                 @endforeach
                                                             </select>
                                                         </div>
-                                                        <div class="col-md-3 mt-md-0 mt-2">
+                                                        <div class="col-md-3">
                                                             <div class="input-group mb-3">
                                                                 <input type="text" class="form-control form-control-lg currier_quantity_{{$courier->id}}" value="{{$courier->qty}}" name="quantity[]" onkeyup="courierQuantity({{$courier->id}})" aria-label="Qté" aria-describedby="basic-addon2" required="">
-                                                                <div class="input-group-append">
-                                                                    <span class="input-group-text" id="unit_{{$courier->id}}"><i class="las la-balance-scale"></i></span>
-                                                                </div>
+                                                                <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
+
                                                             </div>
                                                         </div>
 
-                                                        <div class="col-md-3 mt-md-0 mt-2">
+                                                        <div class="col-md-3 ">
                                                             <div class="input-group mb-3">
                                                                 <input type="text" id="amount" class="form-control form-control-lg currier_fee_{{$courier->id}}" value="{{getAmount($courier->fee)}}" name="amount[]" aria-label="Recipient's username" aria-describedby="basic-addon2" required="">
-                                                                <div class="input-group-append">
-                                                                    <span class="input-group-text" id="basic-addon2">{{$general->cur_text}}</span>
-                                                                </div>
+                                                                <span class="input-group-text">{{__($general->cur_text)}}</span>
                                                             </div>
                                                         </div>
-                                                        <div class="col-md-1 mt-md-0 mt-2 text-right">
-                                                            <span class="input-group-btn">
-                                                                <button class="btn btn--danger btn-lg removeBtnold w-100" type="button">
-                                                                    <i class="fa fa-times"></i>
-                                                                </button>
-                                                            </span>
-                                                        </div>
+                                                        <div class="col-md-1">
+                                                    <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
+                                                </div>
                                                     </div>
                                                 </div>
-                                            </div>
-
-                                        </div>
                                     </div>
                                     @endforeach
                                 </div>
@@ -123,14 +115,11 @@
 
 
                         </div>
+                        <button type="submit" class="btn btn--primary h-45 w-100 Submitbtn"> @lang('Modifier RDV')</button>
 
                     </div>
 
-                    <div class="form-group">
-                        <div class="md-6">
-                            <button type="submit" class="btn btn--primary btn-block"><i class="fa fa-fw fa-paper-plane"></i> @lang('Modifier RDV')</button>
-                        </div>
-                    </div>
+                   
                 </form>
             </div>
         </div>
@@ -139,7 +128,7 @@
 @endsection
 
 @push('breadcrumb-plugins')
-<a href="{{route('staff.rdv.list')}}" class="btn btn-sm btn--primary box--shadow1 text--small"><i class="las la-angle-double-left"></i> @lang('Retour')</a>
+<x-back route="{{route('staff.rdv.list')}}" />
 @endpush
 @push('script-lib')
 <script src="{{asset('assets/viseradmin/js/vendor/datepicker.min.js')}}"></script>
@@ -208,52 +197,44 @@
         });
         $('.addUserData').on('click', function() {
             id++;
-            let html = `<div class="col-md-12 user-data">
-                            <div class="form-group">
-                                <div class="input-group mb-md-0 mb-4">
+            let html = `<div class="row single-item gy-2 user-data">
+                            
                                 <div class="col-md-2">
-                                                            <select class="form-control form-control-lg" id="rdv_type_${id}" onChange="getType(this.value,${id});"  name="rdvName[]">
+                                                            <select class="form-control selected_type" id="rdv_type_${id}" onChange="getType(this.value,${id});"  name="rdvName[]">
                                                                 <option>@lang('Choisir')</option>
                                                                 <option value="1" >RECUP</option>
                                                                 <option value="2" >DEPOT</option>
                                                             </select>
                                                         </div>
                                     <div class="col-md-3">
-                                        <select class="form-control form-control-lg" id="courier_type_${id}" onchange="currierType(${id})" name="courierName[]" required="">
+                                        <select class="form-control select_${id}  selected_type" id="courier_type_${id}" onchange="currierType(${id})" name="courierName[]" required="">
                                             <option>@lang('Choisir Type')</option>
                                             @foreach($types as $type)
                                                 <option value="{{$type->id}}" data-unit="{{$type->unit->name}}" data-price={{ getAmount($type->price)}}>{{__($type->name)}}</option>
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="col-md-3 mt-md-0 mt-2">
+                                    <div class="col-md-3">
                                         <div class="input-group mb-3">
                                             <input type="text" class="form-control form-control-lg currier_quantity_${id}" disabled placeholder="@lang('Qté')" onkeyup="courierQuantity(${id})" name="quantity[]" aria-label="Qté" aria-describedby="basic-addon2" required="">
-                                            <div class="input-group-append">
-                                                <span class="input-group-text" id="unit_${id}"><i class="las la-balance-scale"></i></span>
-                                            </div>
+                                            <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
+
                                         </div>
                                     </div>
 
-                                    <div class="col-md-3 mt-md-0 mt-2">
+                                    <div class="col-md-3">
                                        <div class="input-group mb-3">
                                             <input type="text" id="amount" class="form-control form-control-lg currier_fee_${id}" disabled placeholder="@lang('Frais')" name="amount[]" aria-label="Frais" aria-describedby="basic-addon2" required="">
-                                            <div class="input-group-append">
-                                                <span class="input-group-text" id="basic-addon2">{{$general->cur_text}}</span>
-                                            </div>
+                                            <span class="input-group-text">{{__($general->cur_text)}}</span>
+
                                         </div>
                                     </div>
 
-                                    <div class="col-md-1 mt-md-0 mt-2 text-right">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn--danger btn-lg removeBtn w-100" type="button">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </span>
-                                    </div>
-
-                                </div>
-                            </div>
+                                    <div class="col-md-1">
+                    <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
                         </div>`;
             $('.addedField').append(html)
         });

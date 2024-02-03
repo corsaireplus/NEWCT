@@ -8,47 +8,56 @@
                         <thead>
                             <tr>
                                 <th><?php echo app('translator')->get('Date'); ?></th>
-                                <th><?php echo app('translator')->get('Chauffeur'); ?></th>
-                                <th><?php echo app('translator')->get('Status'); ?></th>
-                                <th><?php echo app('translator')->get('Chargeur'); ?></th>
+                                <th><?php echo app('translator')->get('Chauffeur - Chargeur'); ?></th>
                                 <th><?php echo app('translator')->get('Nb RDV'); ?></th>
-                                <th><?php echo app('translator')->get('M. Prevu'); ?></th>
-                                <th><?php echo app('translator')->get('M. Encaissé'); ?></th>
+                                <th><?php echo app('translator')->get('M. Prevu -M. Encaissé'); ?></th>
+                                <th><?php echo app('translator')->get('Status'); ?></th>
                                 <th><?php echo app('translator')->get('Action'); ?></th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php $__empty_1 = true; $__currentLoopData = $missions; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $key => $mission): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                             <tr>
-                                <td data-label="<?php echo app('translator')->get('Date'); ?>"><?php echo e(date('d-m-Y', strtotime($mission->date))); ?></td>
-                                <td data-label="<?php echo app('translator')->get('Chauffeur'); ?>"><?php echo e($mission->chauffeur->firstname); ?></td>
+                                <td><?php echo e(date('d-m-Y', strtotime($mission->date))); ?></td>
+                                <td><span>
+                                    <?php echo e($mission->chauffeur->firstname); ?>
 
-                                <td data-label="<?php echo app('translator')->get('Status'); ?>">
-                                    <?php if($mission->status == 0): ?>
-                                    <a href="<?php echo e(route('staff.mission.edit', encrypt($mission->idmission))); ?>"><span class="badge badge--success py-2 px-3"><?php echo app('translator')->get('En Cours'); ?></span></a>
-                                    <?php elseif($mission->status == 1): ?>
-                                    <a href="javascript:void(0)" class=" reopen" data-code="<?php echo e($mission->idmission); ?>"><span class="badge badge--danger py-2 px-3"><?php echo app('translator')->get('Terminé'); ?></span></a>
-                                    <?php elseif($mission->status == 2): ?>
-                                    <a href="<?php echo e(route('staff.mission.edit', encrypt($mission->idmission))); ?>"><span class="badge badge--danger py-2 px-3"><?php echo app('translator')->get('Terminé'); ?></span></a>
-                                    <?php endif; ?>
+                                        </span>
+                                   <br>
+                                   <?php echo e($mission->chargeur->firstname); ?>
+
                                 </td>
-                                <td data-label="<?php echo app('translator')->get('Chargeur'); ?>"><?php echo e($mission->chargeur->firstname); ?></td>
+
+                               
+                               
 
                                 <td data-label="<?php echo app('translator')->get('Nb RDV'); ?>"><?php echo e($mission->rdvs->count()); ?></td>
-                                        <td data-label="<?php echo app('translator')->get('Montant Prevu'); ?>"><span class="font-weight-bold"><?php echo e(getAmount($mission->rdvs->sum('montant'))); ?><?php echo e($general->cur_text); ?></span></td>
-                                        <td data-label="<?php echo app('translator')->get('Montant Encaissé'); ?>"><span class="font-weight-bold"><?php if($mission->rdvs->sum('encaisse') > 0 ): ?><?php echo e(getAmount($mission->rdvs->sum('encaisse'))); ?><?php echo e($general->cur_text); ?> <?php endif; ?></span></td>
-
-                                <td data-label="<?php echo app('translator')->get('Action'); ?>">
+                                        <td><span class="fw-bold d-block">
+                                             <?php echo e(getAmount($mission->rdvs->sum('montant'))); ?><?php echo e($general->cur_text); ?> </span>
+                                             <?php if($mission->rdvs->sum('encaisse') > 0 ): ?><?php echo e(getAmount( ($mission->rdvs->sum('encaisse') - ($mission->depenses) ))); ?><?php echo e($general->cur_text); ?> <?php endif; ?>
+                                            </td>
+                                    <td>
+                                    <?php if($mission->status == 0): ?>
+                                    <a href="<?php echo e(route('staff.mission.edit', encrypt($mission->idmission))); ?>"><span class="badge badge--success"><?php echo app('translator')->get('En Cours'); ?></span></a>
+                                    <?php elseif($mission->status == 1): ?>
+                                    <a href="javascript:void(0)" class=" reopen" data-code="<?php echo e($mission->idmission); ?>"><span class="badge badge--danger"><?php echo app('translator')->get('Terminé'); ?></span></a>
+                                    <?php elseif($mission->status == 2): ?>
+                                    <a href="<?php echo e(route('staff.mission.edit', encrypt($mission->idmission))); ?>"><span class="badge badge--danger"><?php echo app('translator')->get('Terminé'); ?></span></a>
+                                    <?php endif; ?>
+                                </td>
+                                <td>
 
                                     <?php if($mission->status == 0): ?>
-                                    <a href="<?php echo e(route('staff.mission.assigne', encrypt($mission->idmission))); ?>" title="" class="icon-btn btn--info ml-1 delivery" data-code="<?php echo e($mission->idmission); ?>"> Ajouter <?php echo app('translator')->get('RDV'); ?></a>
+                                    <a href="<?php echo e(route('staff.mission.assigne', encrypt($mission->idmission))); ?>" title="" data-code="<?php echo e($mission->idmission); ?>"class="btn btn-sm btn-outline--info"><i
+                                                    class="las la-file-invoice"></i> Ajouter <?php echo app('translator')->get('RDV'); ?></a>
                                     <?php if($mission->status == 0 && $mission->rdvs->count() == 0): ?>
                                     <a href="javascript:void(0)"  class="icon-btn btn--danger ml-1 deletePaiement" data-idmission="<?php echo e($mission->idmission); ?>"><i class="las la-trash"></i></a> 
                                     <?php endif; ?>
                                     <?php endif; ?>
                                     <?php if($mission->rdvs->count() > 0 && $mission->status == 0 ): ?>
-                                    <a href="<?php echo e(route('staff.mission.detailmission', encrypt($mission->idmission))); ?>" title="" class="icon-btn btn--success ml-1 " data-code="<?php echo e($mission->idmission); ?>"><?php echo app('translator')->get('Liste RDV'); ?></a>
-                                    <a href="javascript:void(0)" class="btn btn-sm btn--secondary box--shadow1 text--small sendSms"  data-idmission="<?php echo e(encrypt($mission->idmission)); ?>" data-contact="<?php echo e($mission->contact); ?>"><i class="las la-phone"></i><?php echo app('translator')->get('Sms'); ?></a>
+                                    <a href="<?php echo e(route('staff.mission.detailmission', encrypt($mission->idmission))); ?>" title="" class="icon-btn btn-outline--success" data-code="<?php echo e($mission->idmission); ?>"><?php echo app('translator')->get('Liste RDV'); ?></a>
+                                    <a href="javascript:void(0)" class="btn btn-sm btn-outline--secondary sendSms"  data-idmission="<?php echo e(encrypt($mission->idmission)); ?>" data-contact="<?php echo e($mission->contact); ?>"><i class="las la-phone"></i><?php echo app('translator')->get('Sms'); ?></a>
+                                    <a href="javascript:void(0)" class="btn btn-sm btn-outline--primary depense" data-idmission="<?php echo e($mission->idmission); ?>"><i class="las la-pen"></i><?php echo app('translator')->get('Depenses'); ?></a>
                                     <a href="javascript:void(0)" title="" class="icon-btn btn--danger ml-1 payment" data-code="<?php echo e($mission->idmission); ?>"><?php echo app('translator')->get('Finir'); ?></a>
                                     <?php endif; ?>
                                     
@@ -73,6 +82,57 @@
                 <?php echo e(paginateLinks($missions)); ?>
 
             </div>
+        </div>
+    </div>
+</div>
+<?php if (isset($component)) { $__componentOriginalc51724be1d1b72c3a09523edef6afdd790effb8b = $component; } ?>
+<?php $component = App\View\Components\ConfirmationModal::resolve([] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('confirmation-modal'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(App\View\Components\ConfirmationModal::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes([]); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc51724be1d1b72c3a09523edef6afdd790effb8b)): ?>
+<?php $component = $__componentOriginalc51724be1d1b72c3a09523edef6afdd790effb8b; ?>
+<?php unset($__componentOriginalc51724be1d1b72c3a09523edef6afdd790effb8b); ?>
+<?php endif; ?>
+<div class="modal fade" id="depenseBy" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="" lass="modal-title" id="exampleModalLabel"><?php echo app('translator')->get('Ajouter Depense'); ?></h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                        <span class="fa fa-times"></span>
+            </div>
+
+            <form action="<?php echo e(route('staff.transaction.store_depense')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('POST'); ?>
+                <div class="modal-body">
+                    <input type="hidden" name="idmission">
+                    <input type="hidden" name="cat_id" value="10">
+                    <p><?php echo app('translator')->get('Entrez Information Depense'); ?></p>
+                    <div class="form-group">
+                        
+
+                        <div class="form-group col-lg-6">
+                            <input type="numeric" class="form-control" name="montant" id="montant" placeholder="Montant Depense">
+                        </div>
+                      
+                        
+                            <label for="inputMessage"><?php echo app('translator')->get('Entrer Description'); ?></label>
+                            <textarea name="description" id="description" rows="4" class="form-control form-control-lg" placeholder="<?php echo app('translator')->get('Entrer Message'); ?>"><?php echo e(old('message')); ?></textarea>
+
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn--dark" data-bs-dismiss="modal"><?php echo app('translator')->get('Annuler'); ?></button>
+                        <button type="submit" class="btn btn--primary"><?php echo app('translator')->get('Enregistrer'); ?></button>
+                    </div>
+            </form>
         </div>
     </div>
 </div>
@@ -191,7 +251,41 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('breadcrumb-plugins'); ?>
-<a href="<?php echo e(route('staff.mission.create')); ?>" class="btn btn-sm btn--primary box--shadow1 text--small addUnit"><i class="fa fa-fw fa-paper-plane"></i><?php echo app('translator')->get('Creer Mission'); ?></a>
+<a href="<?php echo e(route('staff.mission.create')); ?>" >
+<button type="button" class="btn btn-outline--primary m-1">
+                                    <i class="fa la-plus"></i> <?php echo app('translator')->get('Creer Programme'); ?>
+                                </button>
+                                </a>
+    <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.search-form','data' => ['placeholder' => 'Recherche...']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('search-form'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['placeholder' => 'Recherche...']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
+    <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.date-filter','data' => ['placeholder' => 'Date Debut - Date Fin']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('date-filter'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['placeholder' => 'Date Debut - Date Fin']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
 <!-- <form action="<?php echo e(route('staff.rdv.search')); ?>" method="GET" class="form-inline float-sm-right bg--white mb-2 ml-0 ml-xl-2 ml-lg-0">
         <div class="input-group has_append  ">
             <input type="text" name="search" class="form-control" placeholder="<?php echo app('translator')->get('Contact Client'); ?>" value="<?php echo e($search ?? ''); ?>">
@@ -205,7 +299,12 @@
 <?php $__env->startPush('script'); ?>
 <script>
     "use strict";
-
+    $('.depense').on('click', function() {
+        var modal = $('#depenseBy');
+        modal.find('input[name=idmission]').val($(this).data('idmission'))
+        // modal.modal('show');
+        $('#depenseBy').modal('show');
+    });
     $('.payment').on('click', function() {
         var modal = $('#paymentBy');
         modal.find('input[name=code]').val($(this).data('code'))

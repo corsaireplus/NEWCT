@@ -47,9 +47,9 @@
                         <span class="menu-title"><?php echo app('translator')->get('Programmes'); ?></span>
                     </a>
                 </li>
-                <li class="sidebar-menu-item <?php echo e(menuActive('staff.transaction.index')); ?>">
-                    <a href="<?php echo e(route('staff.transaction.index')); ?>" class="nav-link"
-                       data-default-url="<?php echo e(route('staff.transaction.index')); ?>">
+                <li class="sidebar-menu-item <?php echo e(menuActive('staff.transactions.index')); ?>">
+                    <a href="<?php echo e(route('staff.transactions.index')); ?>" class="nav-link"
+                       data-default-url="<?php echo e(route('staff.transactions.index')); ?>">
                         <i class="menu-icon las la-sliders-h"></i>
                         <span class="menu-title"><?php echo app('translator')->get('Liste des Transactions'); ?></span>
                     </a>
@@ -74,6 +74,12 @@
                     <a href="<?php echo e(route('staff.courier.create')); ?>" class="nav-link ">
                         <i class="menu-icon las la-shipping-fast"></i>
                         <span class="menu-title"><?php echo app('translator')->get('Send Courier'); ?></span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item <?php echo e(menuActive('staff.courier.sent.queue')); ?>">
+                    <a href="<?php echo e(route('staff.courier.sent.queue')); ?>" class="nav-link ">
+                        <i class="menu-icon las la-hourglass-start"></i>
+                        <span class="menu-title"><?php echo app('translator')->get('Sent In Queue'); ?></span>
                     </a>
                 </li>
                 <li class="sidebar-menu-item sidebar-dropdown">

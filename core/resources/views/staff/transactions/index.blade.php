@@ -52,7 +52,7 @@
                         <table class="table table--light style--two">
                             <thead>
                                 <tr>
-                                    <th>@lang('Agence - Staff')</th>
+                                    <!-- <th>@lang('Agence - Staff')</th> -->
                                     <th>@lang('Expediteur - Contact')</th>
                                     <th>@lang('Montant - Reference')</th>
                                     <th>@lang('Creations Date')</th>
@@ -65,10 +65,10 @@
                             <tbody>
                                 @forelse($courierLists as $courierInfo)
                                     <tr>
-                                        <td>
+                                        <!-- <td>
                                             <span>{{ __($courierInfo->senderBranch->name) }}</span><br>
                                             {{ __($courierInfo->senderStaff->fullname) }}
-                                        </td>
+                                        </td> -->
                                         <td>
                                             <span>
                                                 @if ($courierInfo->sender)
@@ -112,7 +112,7 @@
                                                     <span class="badge badge--warning">@lang('En Entrepôt')</span>
                                                 @elseif ($courierInfo->status >= 1)
                                                     @if (auth()->user()->branch_id == $courierInfo->sender_branch_id)
-                                                        <span class="badge badge--warning">@lang('Dispatch')</span>
+                                                        <span class="badge badge--warning">@lang('Chargé')</span>
                                                     @else
                                                         <span class="badge badge--primary">@lang('Upcoming')</span>
                                                     @endif
@@ -127,19 +127,20 @@
                                             @endif
                                         </td>
                                         <td>
-                                            <a href="{{ route('staff.transaction.invoice', encrypt($courierInfo->id)) }}"
+                                            <a href="{{ route('staff.transactions.invoice', encrypt($courierInfo->id)) }}"
                                                 title="" class="btn btn-sm btn-outline--info"><i
                                                     class="las la-file-invoice"></i> @lang('Facture')</a>
-                                            <a href="{{ route('staff.transaction.details', encrypt($courierInfo->id)) }}"
+                                            <a href="{{ route('staff.transactions.details', encrypt($courierInfo->id)) }}"
                                                 title="" class="btn btn-sm btn-outline--primary"><i
                                                     class="las la-info-circle"></i> @lang('Details')</a>
                                             @if(auth()->user()->username == 'bagate' || auth()->user()->username == 'mouna') 
-
-                                              <a href="{{ route('staff.transaction.modifier', encrypt($courierInfo->id)) }}"
+                                                @if($courierInfo->ship_status != -1) 
+                                              <a href="{{ route('staff.transactions.modifier', encrypt($courierInfo->id)) }}"
                                                 class="btn btn-sm btn-outline--primary">
                                                 <i class="las la-pen"></i>@lang('Edit')
-                                            </a>
-                                            @if($courierInfo->status  == 0 && (auth()->user()->username == 'bagate')) 
+                                             </a>
+                                                @endif
+                                            @if($courierInfo->status  == 0 && (auth()->user()->username == 'bagate') && $courierInfo->ship_status != - 1) 
                                               <a href="javascript:void(0)"  class="icon-btn btn--danger ml-1 deletePaiement" data-refpaiement="{{$courierInfo->id}}"><i class="las la-trash"></i></a>
                                     
                                               @endif

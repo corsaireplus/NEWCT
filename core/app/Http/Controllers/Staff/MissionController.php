@@ -44,8 +44,8 @@ class MissionController extends Controller
       $emptyMessage = "No data found";
       $user = Auth::user();
      //$missions=Mission::orderBy('created_at','DESC')->with('chauffeur','chargeur','rdvs')->paginate(getPaginate());
-    $missions=Mission::orderBy('created_at', 'DESC')->with('chauffeur','chargeur','rdvs','rdvs.paymentInfo')->paginate(getPaginate());
-         
+    $missions=Mission::dateFilter()->searchable(['chauffeur:firstname','chauffeur:lastname','chargeur:firstname','chargeur:lastname'])->orderBy('created_at', 'DESC')->with('chauffeur','chargeur','rdvs','rdvs.paymentInfo')->withSum('depenses as depenses','montant')->paginate(getPaginate());
+       
         
 
          return view('staff.missions.index', compact('pageTitle','missions','emptyMessage'));
@@ -150,10 +150,11 @@ class MissionController extends Controller
               ->orderBy('rdvs.date','asc')
               ->paginate(getPaginate());
       */
-      $rdv_dispo = Rdv::with(['rdvDetail', 'client', 'adresse'])
+      $rdv_dispo = Rdv::dateFilter()->searchable(['adresse:adresse','adresse:code_postal','client:contact'])
                         ->where('status', '0')
                         ->whereNull('deleted_at')
                         ->orderBy('date', 'asc')
+                        ->with(['rdvDetail', 'client', 'adresse'])
                         ->paginate(getPaginate());
 
          
@@ -269,34 +270,49 @@ class MissionController extends Controller
             
          }
          public function storerdvmulti(Request $request){
-            $user = Auth::user();
-            try{
-               // $i= 0;
-               // $data=array();
-               // $rdv=array();
-               for($i =0 ; $i < count($request->ids) ;$i++ )
-               {
-                  $rdv=Rdv::find($request->ids[$i]);
-                  //$rdvs=DB::UPDATE("UPDATE `rdvs` SET `status`=1,`user_id`=[value-5],`chauf_id`=$request->idchauf WHERE `idrdv`='$request->ids[$i]'")
-                  $rdv->status='2';
-                  $rdv->mission_id =$request->idmission;
-                  $rdv->save();
+          
+            //dd($request);
+            $request->validate([
+               'id' => 'required'
+           ]);
+           $ids  = $request->id;
+           $id   = explode(',', $ids);
+           $user = auth()->user();           
+           $user = Auth::user();
+           Rdv::whereIn('idrdv', $id)->update(['status' => 2,'mission_id' => $request->idmission ]);
+           activity('assignation rdv à programme')
+           ->performedOn($rdv)
+           ->causedBy($user)
+           //->withProperties(['customProperty' => 'customValue'])
+           ->log('Rdv assigné au programme '.$request->idmission.' par ' . $user->username);
+         //   $rdv=Rdv::find($id);
+         //   $rdv->status='2';
+         //   $rdv->mission_id =$request->idmission;
+         //   $rdv->save();
+
+            // try{
+            //    // $i= 0;
+            //    // $data=array();
+            //    // $rdv=array();
+            //    for($i =0 ; $i < count($request->ids) ;$i++ )
+            //    {
+            //       $rdv=Rdv::find($request->ids[$i]);
+            //       //$rdvs=DB::UPDATE("UPDATE `rdvs` SET `status`=1,`user_id`=[value-5],`chauf_id`=$request->idchauf WHERE `idrdv`='$request->ids[$i]'")
+            //       $rdv->status='2';
+            //       $rdv->mission_id =$request->idmission;
+            //       $rdv->save();
                   
-                  activity('assignation rdv à programme')
-                  ->performedOn($rdv)
-                  ->causedBy($user)
-                  //->withProperties(['customProperty' => 'customValue'])
-                  ->log('Rdv assigné au programme '.$request->idmission.' par ' . $user->username);
-               }
-               // $i++;
+                 
+            //    }
+            //    // $i++;
                
-               $notify[] = ['success', 'Rdv Liste Ajoutée'];
-               return back()->withNotify($notify);
-            } catch (Throwable $e) {
-               report($e);
+            //    $notify[] = ['success', 'Rdv Liste Ajoutée'];
+            //    return back()->withNotify($notify);
+            // } catch (Throwable $e) {
+            //    report($e);
                
-               return false;
-            }
+            //    return false;
+            // }
             
             
          }

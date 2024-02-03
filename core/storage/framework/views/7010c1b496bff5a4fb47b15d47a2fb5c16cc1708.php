@@ -3,17 +3,17 @@
     <div class="col-lg-12 col-md-12 mb-30">
         <div class="card">
             <div class="card-body">
-                <form action="<?php echo e(route('staff.transfert.update')); ?>" method="POST">
+                <form action="<?php echo e(route('staff.transactions.updating')); ?>" method="POST">
                     <?php echo csrf_field(); ?>
-                    <!-- <input type="hidden" name="transfert_id" id="transfert_id" value="<?php echo e($courierInfo->id); ?>"> -->
+                    <input type="hidden" name="transfert_id" id="transfert_id" value="<?php echo e($courierInfo->id); ?>">
                     <div class="row">
                         <div class="col-lg-6">
-                        <div class="card border--primary mt-3">
-                                    <h5 class="card-header bg--primary  text-white"><?php echo app('translator')->get('Expediteur'); ?></h5>
+                            <div class="card border--primary mt-3">
+                                <h5 class="card-header bg--primary  text-white"><?php echo app('translator')->get('Expediteur'); ?></h5>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="form-group col-lg-6">
-                                            <label><?php echo app('translator')->get('Contact'); ?>*</label>
+                                            <label><?php echo app('translator')->get('Contact'); ?></label>
                                             <!--  suppression de disabled  sur l expediteur pour permtttre la modification du contact expediteur-->
                                             <input type="text" class="form-control" id="phone" value="<?php echo e($courierInfo->sender->contact); ?>" name="sende_phone" maxlength="40" disabled required="">
                                             <input type="hidden" name="sender_phone" id="sender_phone" value="<?php echo e($courierInfo->sender->contact); ?>">
@@ -22,8 +22,8 @@
 
                                         </div>
                                         <div class="form-group col-lg-6">
-                                            <label><?php echo app('translator')->get('Nom'); ?>*</label>
-                                            <input type="text" class="form-control" id="sender_name" name="sender_name" value="<?php echo e($courierInfo->sender->nom); ?>" placeholder="<?php echo app('translator')->get('Expediteur'); ?>" maxlength="40" required="">
+                                            <label><?php echo app('translator')->get('Nom'); ?></label>
+                                            <input type="text" class="form-control" id="sender_name" name="sender_name" value="<?php echo e($courierInfo->sender->nom); ?>" placeholder="<?php echo app('translator')->get(" Expediteur"); ?>" maxlength="40" required="">
                                         </div>
 
 
@@ -31,8 +31,8 @@
 
                                     <div class="row">
                                         <div class="form-group col-lg-6">
-                                            <label><?php echo app('translator')->get('Reference'); ?>*</label>
-                                            <input type="text" style="background-color : green; color: #ffffff" class="form-control" id="reference" name="reference" value="<?php echo e($courierInfo->reftrans); ?>" maxlength="40" required="">
+                                            <label><?php echo app('translator')->get('Reference'); ?></label>
+                                            <input type="text" style="background-color : green; color: #ffffff" class="form-control form-control-lg" id="reference" name="reference" value="<?php echo e($courierInfo->reftrans); ?>" maxlength="40" required="">
                                         </div>
                                         <div class="form-group col-lg-6">
                                             <label><?php echo app('translator')->get('Type Envoi'); ?></label>
@@ -50,7 +50,6 @@
                         </div>
 
 
-                        <?php if($courierInfo->reftrans): ?>
                         <div class="col-lg-6">
                             <div class="card border--primary mt-3">
                                 <h5 class="card-header bg--primary  text-white"><?php echo app('translator')->get('Destinataire'); ?></h5>
@@ -58,11 +57,11 @@
                                     <div class="row">
 
                                         <div class="form-group col-lg-6">
-                                            <label><?php echo app('translator')->get('Contact'); ?>*</label>
+                                            <label><?php echo app('translator')->get('Contact'); ?></label>
                                             <input type="text" class="form-control" id="receiver_phone" name="receiver_phone" value="<?php echo e($courierInfo->receiver->contact); ?>" required="">
                                         </div>
                                         <div class="form-group col-lg-6">
-                                            <label><?php echo app('translator')->get('Nom'); ?>*</label>
+                                            <label><?php echo app('translator')->get('Nom'); ?></label>
                                             <input type="text" class="form-control" id="receiver_name" name="receiver_name" value="<?php echo e($courierInfo->receiver->nom); ?>" maxlength="40" required="">
                                         </div>
                                     </div>
@@ -73,7 +72,7 @@
                                             <input type="text" class="form-control" id="receiver_address" name="receiver_address" <?php if($courierInfo->receiver_adresse != null): ?> value="<?php echo e($courierInfo->receiver_adresse->adresse); ?>" <?php else: ?> value="" placeholder="Entrer Adresse" <?php endif; ?> >
                                         </div>
                                         <div class="form-group col-lg-6">
-                                            <label><?php echo app('translator')->get('Destination'); ?>*</label>
+                                            <label><?php echo app('translator')->get('Destination'); ?></label>
                                             <select class="form-control" name="branch" id="branch" required="">
 
                                                 <?php $__currentLoopData = $branchs; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $branch): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -82,70 +81,25 @@
                                             </select>
                                         </div>
                                     </div>
-
-                                   
                                 </div>
                             </div>
                         </div>
-                        <?php endif; ?>
                     </div>
 
                     <div class="row mb-30">
                         <div class="col-lg-12">
                             <div class="card border--primary mt-3">
                                 <h5 class="card-header bg--primary  text-white"><?php echo app('translator')->get('Information Colis'); ?>
-
-                                    <button type="button" class="btn btn-sm btn-outline-light float-end addUserData"><i
-                                            class="la la-fw la-plus"></i><?php echo app('translator')->get('Ajouter Ligne'); ?>
+                                <button type="button" class="btn btn-sm btn-outline-light float-end addUserData"><i
+                                            class="la la-fw la-plus"></i><?php echo app('translator')->get('Ajouter'); ?>
                                     </button>
                                 </h5>
 
                                 <div class="card-body">
-                                    <!-- new row -->
-                                <div class="row" id="addedField">
-                                        <?php $__currentLoopData = $courierInfo->courierDetail; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $item): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                            <div class="row single-item gy-2">
-                                                <div class="col-md-3">
-                                                    <select class="form-control selected_type"  id="courier_type_<?php echo e($loop->index); ?>" onchange="currierType(<?php echo e($loop->index); ?>)" name="courierName[]" required>
-                                                        <!-- <option disabled selected value=""><?php echo app('translator')->get('Choisir Colis'); ?></option> -->
-                                                        <?php $__currentLoopData = $types; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                                                            <option value="<?php echo e($type->id); ?>" <?php if($item->type->id==$type->id): echo 'selected'; endif; ?>
-                                                              data-unit="<?php echo e($type->unit->name); ?>" data-price=<?php echo e(getAmount($type->price)); ?>"  >
-                                                                <?php echo e(__($type->name)); ?>
-
-                                                            </option>
-                                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                                        </select>
-                                                </div>
-                                               
-                                                <div class="col-md-4">
-                                                    <div class="input-group mb-3">
-                                                        <input type="number" class="form-control quantity currier_quantity_<?php echo e($item->id); ?>" value="<?php echo e($item->qty); ?>"  name="quantity[]" onkeyup="courierQuantity(<?php echo e($item->id); ?>)"  required>
-                                                        <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-4">
-                                                    <div class="input-group">
-                                                        <input type="text"  class="form-control single-item-amount currier_fee_<?php echo e($item->id); ?> montant" value="<?php echo e(getAmount($item->fee)); ?>" name="amount[]" required>
-                                                        <span class="input-group-text"><?php echo e(__($general->cur_text)); ?></span>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-1">
-                                                    <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
-                                                        <i class="fa fa-times"></i>
-                                                    </button>
-                                                </div>
-                                            </div>
- 						                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                                    </div>
-
                                     <div class="row addedField">
                                         <?php $__currentLoopData = $courierInfo->courierDetail; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courier): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
 
-                                        <div class="col-md-12 user-data">
-                                            <div class="form-group">
-
-                                                <div class="input-group mb-md-0 mb-4">
+                                        <div class="row single-item gy-2 user-data">
                                                     <div class="col-md-4">
                                                         <select class="form-control  form-control-lg" id="courier_type_0" onchange="currierType(0)" name="courierName[]">
                                                             <option id="opt_<?php echo e($courier->type->id); ?>" value="<?php echo e($courier->type->id); ?>" 'selected' data-unit="<?php echo e($courier->type->unit->name); ?>" data-price=<?php echo e(getAmount($courier->type->price)); ?>><?php echo e(__($courier->type->name)); ?></option>
@@ -155,29 +109,26 @@
                                                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                                         </select>
                                                     </div>
-                                                    <div class="col-md-3 mt-md-0 mt-2">
-                                                        <div class="input-group mb-3">
+                                                    <div class="col-md-3">
+                                                        <div class="input-group">
                                                             <input type="text" class="form-control form-control-lg quantity currier_quantity_<?php echo e($courier->id); ?>" value="<?php echo e($courier->qty); ?>" name="quantity[]" onkeyup="courierQuantity(<?php echo e($courier->id); ?>)" aria-label="Qté" aria-describedby="basic-addon2" required="">
-                                                            <div class="input-group-append">
-                                                                <span class="input-group-text" id="unit_<?php echo e($courier->id); ?>"><i class="las la-balance-scale"></i></span>
-                                                            </div>
+                                                            <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
+
                                                         </div>
                                                     </div>
 
-                                                    <div class="col-md-3 mt-md-0 mt-2">
+                                                    <div class="col-md-4">
                                                         <div class="input-group mb-3">
                                                             <input type="text" id="amount" class="form-control form-control-lg currier_fee_<?php echo e($courier->id); ?> montant" value="<?php echo e(getAmount($courier->fee)); ?>" name="amount[]" aria-label="Frais" aria-describedby="basic-addon2" required="">
-                                                            <div class="input-group-append">
-                                                                <span class="input-group-text" id="basic-addon2"><?php echo e($general->cur_text); ?></span>
-                                                            </div>
+                                                            <span class="input-group-text"><?php echo e(__($general->cur_text)); ?></span>
                                                             
                                                         </div>
                                                     </div>
-                                                    <span class="input-group-btn">
-                                                                <button class="btn btn--danger btn-lg removeBtnold w-100" type="button">
-                                                                    <i class="fa fa-times"></i>
-                                                                </button>
-                                                            </span>
+                                                    <div class="col-md-1">
+                                                    <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
+                                                </div>
                                                 </div>
                                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
                                             </div>
@@ -190,26 +141,29 @@
                     <div class="row mb-30">
                         <div class="col-lg-12">
                             <div class="card border--primary mt-3">
-                                <h5 class="card-header bg--primary  text-white"><?php echo app('translator')->get('Information Paiement'); ?></h5>
+                                <h5 class="card-header bg--primary  text-white"><?php echo app('translator')->get('Information Paiement'); ?>
+
+                                </h5>
+
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="form-group col-lg-6">
                                             <label><?php echo app('translator')->get('TOTAL A PAYER'); ?></label>
-                                            <input type="text" style="background-color :red; color :#ffffff" class="form-control" id="total_paye" value="<?php echo e(old('total_paye')); ?>" name="total_payer" placeholder="<?php echo app('translator')->get(" Total a Payer"); ?>" maxlength="40" required="">
+                                            <input type="text" style="background-color :red; color :#ffffff" class="form-control form-control-lg" id="total_paye" value="<?php echo e(old('total_paye')); ?>" name="total_payer" placeholder="<?php echo app('translator')->get(" Total a Payer"); ?>" maxlength="40" required="">
                                         </div>
                                         <div class="form-group col-lg-6">
                                             <label><?php echo app('translator')->get('DEJA PAYER'); ?></label>
-                                            <input type="text" class="form-control" disabled id="deja_paye" value="<?php echo e($deja_payer); ?>" name="deja_paye" maxlength="40" required="">
+                                            <input type="text" class="form-control form-control-lg" disabled id="deja_paye" value="<?php echo e($deja_payer); ?>" name="deja_paye" maxlength="40" required="">
                                             <input type="hidden" name="deja_payer" id="deja_payer" value="<?php echo e($deja_payer); ?>">
 
                                         </div>
                                         <div class="form-group col-lg-6">
                                             <label><?php echo app('translator')->get('MONTANT PAYER'); ?></label>
-                                            <input type="text" style="background-color : green; color :#ffffff" class="form-control" id="montant_payer" name="montant_payer" value="<?php echo e(old('montant_payer')); ?>" placeholder="<?php echo app('translator')->get(" Montant Payer "); ?>" maxlength="40" required="">
+                                            <input type="text" style="background-color : green; color :#ffffff" class="form-control form-control-lg" id="montant_payer" name="montant_payer" value="<?php echo e(old('montant_payer')); ?>" placeholder="<?php echo app('translator')->get(" Montant Payer "); ?>" maxlength="40" required="">
                                         </div>
                                         <div class="form-group col-lg-6">
                                             <label><?php echo app('translator')->get('MODE PAIEMENT'); ?></label>
-                                            <select class="form-control" id="mode" name="mode" required>
+                                            <select class="form-control form-control-lg" id="mode" name="mode" required>
 
                                                 <option value="1">ESPECE</option>
                                                 <option value="2">CHEQUE</option>
@@ -221,20 +175,16 @@
                                     <div class="row">
                                         <div class="form-group col-lg-12">
                                             <label for="inputMessage"><?php echo app('translator')->get('Note'); ?></label>
-                                            <textarea name="message" id="observation" rows="6" class="form-control" placeholder="<?php echo app('translator')->get('Observation ou Note'); ?>"><?php echo e(old('message')); ?></textarea>
+                                            <textarea name="message" id="observation" rows="6" class="form-control form-control-lg" placeholder="<?php echo app('translator')->get('Observation ou Note'); ?>"><?php echo e(old('message')); ?></textarea>
                                         </div>
                                     </div>
-                                    <div class="form-group">
-                                        <button type="submit" class="btn btn--primary h-45 w-100 Submitbtn"> <?php echo app('translator')->get('Modifier Transaction'); ?></button>
+                                    <button type="submit" class="btn btn--primary h-45 w-100 Submitbtn"> <?php echo app('translator')->get('Submit'); ?></button>
 
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="form-group">
-                            <button type="submit" class="btn btn--primary btn-block"><i class="fa fa-fw fa-paper-plane"></i> <?php echo app('translator')->get('Enregistrer Transfert'); ?></button>
-                         </div> -->
+                   
                 </form>
             </div>
         </div>
@@ -373,37 +323,43 @@
     }
 
     $(document).ready(function() {
-        let length=$("#addedField").find('.single-item').length;
+        let id = 100;
         $('.addUserData').on('click', function() {
             id++;
-            let html = `
-            <div class="row single-item gy-2">
-                <div class="col-md-3">
-                    <select class="form-control selected_type" name="items[${length}][type]" required>
-                        <option disabled selected value=""><?php echo app('translator')->get('Choisir Colis'); ?></option>
-                            <?php $__currentLoopData = $types; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
-                            <option value="<?php echo e($type->id); ?>" data-unit="<?php echo e($type->unit->name); ?>" data-price=<?php echo e(getAmount($type->price)); ?> ><?php echo e(__($type->name)); ?></option>
-                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
-                    </select>
-                </div>
-                <div class="col-md-4">
-                    <div class="input-group mb-3">
-                        <input type="number" class="form-control quantity" placeholder="<?php echo app('translator')->get('Quantity'); ?>" disabled name="items[${length}][quantity]"  required>
-                        <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
-                    </div>
-                </div>
-                <div class="col-md-4">
-                    <div class="input-group">
-                        <input type="text"  class="form-control single-item-amount" placeholder="<?php echo app('translator')->get('Enter Price'); ?>" name="items[${length}][amount]" required readonly>
-                        <span class="input-group-text"><?php echo e(__($general->cur_text)); ?></span>
-                    </div>
-                </div>
-                <div class="col-md-1">
-                    <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
-                        <i class="fa fa-times"></i>
-                    </button>
-                </div>
-            </div>`;
+            let html = `<div class="row single-item gy-2 user-data">
+                            
+                                    <div class="col-md-4">
+                                        <select class="form-control select2-basic_${id} selected_type" id="courier_type_${id}" onchange="currierType(${id})" name="courierName[]" required="">
+                                            <option><?php echo app('translator')->get('Choisir'); ?></option>
+                                            <?php $__currentLoopData = $types; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                                <option value="<?php echo e($type->id); ?>" data-unit="<?php echo e($type->unit->name); ?>" data-price=<?php echo e(getAmount($type->price)); ?>><?php echo e(__($type->name)); ?></option>
+                                            <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="input-group">
+                                            <input type="text" class="form-control form-control-lg currier_quantity_${id}" placeholder="<?php echo app('translator')->get('Qté'); ?>" disabled="" onkeyup="courierQuantity(${id})" name="quantity[]" aria-label="Recipient's username" aria-describedby="basic-addon2" required="">
+                                            <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-4">
+                                       <div class="input-group mb-3">
+                                            <input type="text" id="amount" class="form-control form-control-lg currier_fee_${id} montant" placeholder="<?php echo app('translator')->get('Frais'); ?>" onkeyup="changeMontant(${id})" name="amount[]" aria-label="Recipient's username" aria-describedby="basic-addon2" required="">
+                                            <span class="input-group-text"><?php echo e(__($general->cur_text)); ?></span>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-1">
+                                        <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
+                                            <i class="fa fa-times"></i>
+                                        </button>
+                                      </div>
+
+                              
+                        </div>`;
             $('.addedField').append(html)
             $('.select2-basic_' + id).select2({});
         });

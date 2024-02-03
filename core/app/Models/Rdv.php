@@ -5,11 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\Searchable;
+use App\Traits\GlobalStatus;
 
 class Rdv extends Model
 {
+    use Searchable, GlobalStatus;
     use HasFactory;
     use SoftDeletes;
+
     protected $dates = ['deleted_at'];
     protected $table = "rdvs";
     protected $primaryKey = 'idrdv';
@@ -64,5 +68,15 @@ class Rdv extends Model
 
     public function depot(){
         return $this->hasOne(Paiement::class,'rdv_id','idrdv');
+    }
+
+    public function scopeQueue()
+    {
+        return $this->where('mission_id','!=',NULL)->where('status', 0);
+    }
+
+    public function scopeNextrdv()
+    {
+        return $this->where('status', 0);
     }
 }

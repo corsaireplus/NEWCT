@@ -413,9 +413,9 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-back route="{{ route('staff.transaction.index') }}" />
+    <x-back route="{{ route('staff.transactions.index') }}" />
 
-    <a href="{{ route('staff.transaction.invoice', encrypt($courierInfo->id)) }}" title=""
+    <a href="{{ route('staff.transactions.invoice', encrypt($courierInfo->id)) }}" title=""
         class="btn btn-sm btn-outline--info">
         <i class="las la-file-invoice"></i>
         @lang('Facture')

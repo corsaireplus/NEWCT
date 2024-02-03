@@ -87,13 +87,13 @@ Route::middleware('auth')->group(function () {
             });
 
             //TRANSACTIONS
-            Route::controller('TransactionController')->name('transaction.')->prefix('transaction')->group(function(){
+            Route::controller('TransactionController')->name('transactions.')->prefix('transactions')->group(function(){
                 Route::post('store','transactionStore')->name('store');
                 Route::get('/','index')->name('index');
                 Route::get('invoice/{id}','invoice')->name('invoice');
                 Route::get('details/{id}','details')->name('details');
                 Route::get('modifier/{id}','edit')->name('modifier');
-                Route::post('update/{id}','update')->name('update');
+                Route::post('updating','update')->name('updating');
 
             });
 

@@ -150,10 +150,19 @@ class BilanController extends Controller
       $ajoutdepense->date = $date_depense;
       $ajoutdepense->montant =$request->montant;
       $ajoutdepense->description =$request->description;
-      $ajoutdepense->cat_id =$request->cat_id;
+      if($request->idmission){
+      $ajoutdepense->mission_id =$request->idmission;
+      $ajoutdepense->cat_id =10;
+      }else{
+        $ajoutdepense->cat_id =$request->cat_id;
+      }
       $ajoutdepense->save();
-
+      if($request->idmission){
+      $notify[] = ['success', 'Depense Enregistrée'];
+      return back()->withNotify($notify);
+      }else{
       return redirect()->route('staff.transaction.depense');
+      }
 
 
     }

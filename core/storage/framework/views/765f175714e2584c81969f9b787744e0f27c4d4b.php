@@ -9,7 +9,7 @@
                             <i class="las la-hourglass-start f-size--56"></i>
                         </div>
                         <div class="col-8 text-end">
-                            <span class="text-white text--small"><?php echo app('translator')->get(' Send in Queue'); ?></span>
+                            <span class="text-white text--small"><?php echo app('translator')->get(' RDV en Cours'); ?></span>
                             <h2 class="text-white"><?php echo e($sentInQueue); ?></h2>
                         </div>
                     </div>
@@ -25,7 +25,7 @@
                             <i class="las la-history f-size--56"></i>
                         </div>
                         <div class="col-8 text-end">
-                            <span class="text-white text--small"><?php echo app('translator')->get('Upcoming Courier'); ?></span>
+                            <span class="text-white text--small"><?php echo app('translator')->get('Colis en Entrepot'); ?></span>
                             <h2 class="text-white"><?php echo e($upcomingCourier); ?></h2>
                         </div>
                     </div>
@@ -41,8 +41,8 @@
                             <i class="las la-dolly f-size--56"></i>
                         </div>
                         <div class="col-8 text-end">
-                            <span class="text-white text--small"><?php echo app('translator')->get('Total Shipping Courier'); ?></span>
-                            <h2 class="text-white"><?php echo e($dispatchCourier); ?></h2>
+                            <span class="text-white text--small"><?php echo app('translator')->get('Prochain RDV'); ?></span>
+                            <h2 class="text-white"><?php echo e($sentInNext); ?></h2>
                         </div>
                     </div>
                 </div>
@@ -112,7 +112,7 @@
                             <i class="las la-university f-size--56"></i>
                         </div>
                         <div class="col-8 text-end">
-                            <span class="text-white text--small"><?php echo app('translator')->get(' Total Branch'); ?></span>
+                            <span class="text-white text--small"><?php echo app('translator')->get(' Total Agences'); ?></span>
                             <h2 class="text-white"><?php echo e($branchCount); ?></h2>
                         </div>
                     </div>

@@ -51,7 +51,7 @@
                         <table class="table table--light style--two">
                             <thead>
                                 <tr>
-                                    <th><?php echo app('translator')->get('Agence - Staff'); ?></th>
+                                    <!-- <th><?php echo app('translator')->get('Agence - Staff'); ?></th> -->
                                     <th><?php echo app('translator')->get('Expediteur - Contact'); ?></th>
                                     <th><?php echo app('translator')->get('Montant - Reference'); ?></th>
                                     <th><?php echo app('translator')->get('Creations Date'); ?></th>
@@ -64,11 +64,11 @@
                             <tbody>
                                 <?php $__empty_1 = true; $__currentLoopData = $courierLists; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courierInfo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                     <tr>
-                                        <td>
+                                        <!-- <td>
                                             <span><?php echo e(__($courierInfo->senderBranch->name)); ?></span><br>
                                             <?php echo e(__($courierInfo->senderStaff->fullname)); ?>
 
-                                        </td>
+                                        </td> -->
                                         <td>
                                             <span>
                                                 <?php if($courierInfo->sender): ?>
@@ -118,7 +118,7 @@
                                                     <span class="badge badge--warning"><?php echo app('translator')->get('En Entrepôt'); ?></span>
                                                 <?php elseif($courierInfo->status >= 1): ?>
                                                     <?php if(auth()->user()->branch_id == $courierInfo->sender_branch_id): ?>
-                                                        <span class="badge badge--warning"><?php echo app('translator')->get('Dispatch'); ?></span>
+                                                        <span class="badge badge--warning"><?php echo app('translator')->get('Chargé'); ?></span>
                                                     <?php else: ?>
                                                         <span class="badge badge--primary"><?php echo app('translator')->get('Upcoming'); ?></span>
                                                     <?php endif; ?>
@@ -133,19 +133,20 @@
                                             <?php endif; ?>
                                         </td>
                                         <td>
-                                            <a href="<?php echo e(route('staff.transaction.invoice', encrypt($courierInfo->id))); ?>"
+                                            <a href="<?php echo e(route('staff.transactions.invoice', encrypt($courierInfo->id))); ?>"
                                                 title="" class="btn btn-sm btn-outline--info"><i
                                                     class="las la-file-invoice"></i> <?php echo app('translator')->get('Facture'); ?></a>
-                                            <a href="<?php echo e(route('staff.transaction.details', encrypt($courierInfo->id))); ?>"
+                                            <a href="<?php echo e(route('staff.transactions.details', encrypt($courierInfo->id))); ?>"
                                                 title="" class="btn btn-sm btn-outline--primary"><i
                                                     class="las la-info-circle"></i> <?php echo app('translator')->get('Details'); ?></a>
                                             <?php if(auth()->user()->username == 'bagate' || auth()->user()->username == 'mouna'): ?> 
-
-                                              <a href="<?php echo e(route('staff.transaction.modifier', encrypt($courierInfo->id))); ?>"
+                                                <?php if($courierInfo->ship_status != -1): ?> 
+                                              <a href="<?php echo e(route('staff.transactions.modifier', encrypt($courierInfo->id))); ?>"
                                                 class="btn btn-sm btn-outline--primary">
                                                 <i class="las la-pen"></i><?php echo app('translator')->get('Edit'); ?>
-                                            </a>
-                                            <?php if($courierInfo->status  == 0 && (auth()->user()->username == 'bagate')): ?> 
+                                             </a>
+                                                <?php endif; ?>
+                                            <?php if($courierInfo->status  == 0 && (auth()->user()->username == 'bagate') && $courierInfo->ship_status != - 1): ?> 
                                               <a href="javascript:void(0)"  class="icon-btn btn--danger ml-1 deletePaiement" data-refpaiement="<?php echo e($courierInfo->id); ?>"><i class="las la-trash"></i></a>
                                     
                                               <?php endif; ?>

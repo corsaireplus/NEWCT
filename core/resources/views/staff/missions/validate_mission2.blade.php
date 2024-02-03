@@ -2,35 +2,6 @@
 @section('panel')
 <div class="row mb-none-30">
     <div class="col-xl-3 col-lg-5 col-md-5 col-sm-12">
-        <!-- <div class="card b-radius--10 overflow-hidden box--shadow1">
-            <div class="card-body">
-                <h5 class="mb-20 text-muted">@lang('Staff')</h5>
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-
-                        <span class="font-weight-bold">{{__($courierInfo->senderStaff->fullname)}}</span>
-                    </li>
-
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-
-                        <span class="font-weight-bold">{{__($courierInfo->senderStaff->email)}}</span>
-                    </li>
-
-
-
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        @lang('Status')
-                        @if($courierInfo->senderStaff->status == 1)
-                        <span class="badge badge-pill bg--success">@lang('Active')</span>
-                        @elseif($courierInfo->senderStaff->status == 0)
-                        <span class="badge badge-pill bg--danger">@lang('Banned')</span>
-                        @endif
-                    </li>
-                </ul>
-            </div>
-        </div> -->
-
-
         <div class="card b-radius--10 overflow-hidden mt-30 box--shadow1">
             <div class="card-body">
                 <h5 class="mb-20 text-muted">@lang('Chauffeur')</h5>
@@ -50,9 +21,9 @@
         </div>
 
     </div>
-<div class="clearfix"></div>
+
     <div class="col-xl-9 col-lg-7 col-md-7 col-sm-12 mt-10">
-        <form action="{{route('staff.transaction.store')}}" method="POST">
+        <form action="{{route('staff.transactions.store')}}" method="POST">
             @csrf
             <div class="row mb-30">
                 <div class="col-lg-6 mt-2">
@@ -64,12 +35,7 @@
 
                                     <span>{{__($courierInfo->client->nom)}}</span>
                                     <input type="hidden" name="sender_id" id="sender_id" value="{{$courierInfo->client->id}}">
-                                </li>
-
-                                <!-- <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
-
-                                    <span>{{__($courierInfo->sender->email)}}</span>
-                                </li> -->
+                                    </li>
 
                                 <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
 
@@ -93,12 +59,6 @@
                                     <input type="hidden" name="refrdv" id="refrdv" value="{{$courierInfo->code}}">
 
                                 </li>
-                                <!-- <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
-
-                                    <span>Chauffeur : {{__($courierInfo->mission->chauffeur->firstname)}}</span>
-
-
-                                </li> -->
                             </ul>
                         </div>
                     </div>
@@ -108,66 +68,73 @@
                     <div class="card border--dark">
                         <h5 class="card-header bg--dark">@lang('Destinataire')</h5>
                         <div class="card-body">
-                            <ul class="list-group">
-                                
-                                <!-- <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"> -->
-                                    <input type="text" style="background-color : green; color: #ffffff" class="form-control form-control-lg" id="reference" name="reference" value="{{old('reference')}}" placeholder="@lang(" Reference Souche")" maxlength="40">
-                                <!-- </li> -->
-                                <!-- <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"> -->
+                                      <div class="row">
+                                            <div class="form-group col-lg-12">
+                                               
+                                                <input type="text" class="form-control" name="reference" id="reference" placeholder="@lang(" Reference Souche")"
+                                                 value="{{old('reference')}}"   style="background-color : green; color: #ffffff"
+                                                    >
+                                            </div>
+                                            <div class="form-group col-lg-12">
+                                                
+                                                <input type="text" class="form-control" id="receiver_phone" name="receiver_phone" placeholder="@lang(" Téléphone")" 
+                                                    value="{{ old('receiver_customer_phone') }}" id="receiver_phone"
+                                                    >
+                                            </div>
+                                            <div class="form-group col-lg-12">
+                                                
+                                                <input type="text" class="form-control"
+                                                id="receiver_name" name="receiver_name" value="{{old('receiver_name')}}" placeholder="@lang(" Nom Destinataire")" >
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            
+                                            <div class="form-group col-lg-6">
+                                                <input type="text" class="form-control"d="receiver_adresse" name="receiver_adrresse" value="{{old('receiver_adresse')}}" placeholder="@lang(" Adresse")" >
+                                             </div>
 
-                                    <input type="text" class="form-control form-control-lg" id="receiver_phone" name="receiver_phone" placeholder="@lang(" Téléphone")" value="{{old('receiver_phone')}}">
-                                <!-- </li> -->
-                                <!-- <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"> -->
-                                    <input type="text" class="form-control form-control-lg" id="receiver_name" name="receiver_name" value="{{old('receiver_name')}}" placeholder="@lang(" Nom Destinataire")" maxlength="40">
-                                <!-- </li> -->
-
-                                <!-- <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold"> -->
-
-                                    <input type="text" class="form-control form-control-lg" id="receiver_adresse" name="receiver_adrresse" value="{{old('receiver_adresse')}}" placeholder="@lang(" Adresse")">
-
-                                <!-- </li> -->
-
-                                <!-- <li> -->
-                                    <select class="form-control form-control-lg" name="branch" id="branch" required="">
-
-                                        @foreach($branchs as $branch)
-                                        <option value="{{$branch->id}}">{{__($branch->name)}}</option>
-                                        @endforeach
-                                    </select>
-                                <!-- </li> -->
-
-                            </ul>
+                                                <div class="form-group col-lg-6">
+                                                    <select class="form-control" name="branch" id="branch" required="">
+                                                        @foreach($branchs as $branch)
+                                                        <option value="{{$branch->id}}">{{__($branch->name)}}</option>
+                                                        @endforeach
+                                                    </select>  
+                                                </div>
+                                            </div>
+                                  
+                            
                         </div>
                     </div>
                 </div>
+
             </div>
     </div>
-</div>
+
 <div class="row mb-none-30">
     <div class="col-lg-12">
         <div class="card border--dark">
-            <h5 class="card-header bg--dark">@lang('Information Envoi') <button type="button" class="btn btn-sm btn-outline-light float-right addUserData"><i class="la la-fw la-plus"></i>@lang('Ajouter')
-                </button></h5>
+            <h5 class="card-header bg--dark">@lang('Information Envoi') 
+            <button type="button"
+                                            class="btn btn-sm btn-outline-light float-end addUserData"><i
+                                                class="la la-fw la-plus"></i>@lang('Ajouter')
+                                        </button>
+            </h5>
 
             <div class="card-body">
                 <div class="row addedField">
                 @foreach($courierInfo->courierDetail as $courier)
-                    <div class="col-md-12 user-data">
-                        <div class="form-group">    
-                            <div class="input-group mb-md-0 mb-4">
-                                <div class="col-md-2 mt-md-0 mt-2">
-                                    <select class="form-control form-control-lg" id="rdv_type_{{$courier->id}}" name="rdvName[]" onChange="getType(this.value,{{$courier->id}});">
+                    <div class="row single-item gy-2user-data">
+                        
+                                <div class="col-md-2">
+                                    <select class="form-control selected_type" id="rdv_type_{{$courier->id}}" name="rdvName[]" onChange="getType(this.value,{{$courier->id}});">
                                         <option>@lang('Choisir')</option>
-
                                         <option value="1" {{ $courier->rdv_type_id == 1 ?  'selected' : '' }}>ENVOI</option>
                                         <option value="2" {{ $courier->rdv_type_id == 2 ?  'selected' : '' }}>DEPOT</option>
                                         <option value="0" {{ $courier->rdv_type_id == 0 ?  'selected' : '' }}>FRAIS</option>
-
-
                                     </select>
                                 </div>
-                                <div class="col-md-3 mt-md-0 mt-2">
-                                    <select class="form-control select2 form-control-lg" id="courier_type_{{$courier->id}}" onchange="currierType({{$courier->id}})" name="courierName[]">
+                                <div class="col-md-3">
+                                    <select class="form-control select2 fselected_type" id="courier_type_{{$courier->id}}" onchange="currierType({{$courier->id}})" name="courierName[]">
                                     <option id="opt_{{$courier->type->id}}" value="{{$courier->type->id}}" 'selected'  data-unit="{{$courier->type->unit->name}}" data-price={{ getAmount($courier->type->price)}}>{{__($courier->type->name)}}</option>
 
                                     @foreach($types as $type)
@@ -176,31 +143,28 @@
 
                                     </select>
                                 </div>
-                                <div class="col-md-3 mt-md-0 mt-2">
-                                    <div class="input-group mb-2">
+                                <div class="col-md-3">
+                                    <div class="input-group">
                                         <input type="text" class="form-control form-control-lg quantity currier_quantity_{{$courier->id}}" value="{{$courier->qty}}" name="quantity[]" onkeyup="courierQuantity({{$courier->id}})" aria-label="Qté" aria-describedby="basic-addon2" required="">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text" id="unit_{{$courier->id}}"><i class="las la-balance-scale"></i></span>
-                                        </div>
+                                        <span class="input-group-text unit"><i
+                                                                        class="las la-balance-scale"></i></span>
                                     </div>
                                 </div>
 
-                                <div class="col-md-3 mt-md-0 mt-2">
-                                    <div class="input-group mb-2">
+                                <div class="col-md-3">
+                                    <div class="input-group mb-3">
                                         <input type="text" id="amount" class="form-control form-control-lg currier_fee_{{$courier->id}} montant" value="{{getAmount($courier->fee)}}" name="amount[]" aria-label="Frais" aria-describedby="basic-addon2" required="">
-                                        <div class="input-group-append">
-                                            <span class="input-group-text" id="basic-addon2">{{$general->cur_text}}</span>
-                                        </div>
+                                        <span
+                                                                    class="input-group-text">{{ __($general->cur_text) }}</span>
                                     </div>
                                 </div>
-                                <span class="input-group-btn">
-                                            <button class="btn btn--danger btn-lg removeBtnold w-100" type="button">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </span>
-                            </div>
-                           
-                        </div>
+                                <div class="col-md-1">
+                                                            <button class="btn btn--danger w-100 removeBtn w-100 h-45"
+                                                                type="button">
+                                                                <i class="fa fa-times"></i>
+                                                            </button>
+                                                        </div>
+                            
                     </div>
                     @endforeach
                 </div>
@@ -218,17 +182,16 @@
             <div class="card-body">
                 <div class="row">
                     <div class="form-group col-lg-4">
-                        <label for="sender_phone" class="form-control-label font-weight-bold">@lang('TOTAL A PAYER')</label>
-                        <input type="text" style="background-color :red; color :#ffffff" class="form-control form-control-lg" id="total_paye" value="{{old('total_paye')}}" name="total_payer" placeholder="@lang(" Total a Payer")" maxlength="40" required="">
+                        <label>@lang('TOTAL A PAYER')</label>
+                        <input type="text" style="background-color :red; color :#ffffff" class="form-control" id="total_paye" value="{{old('total_paye')}}" name="total_payer" placeholder="@lang(" Total a Payer")" maxlength="40" required="">
                     </div>
                     <div class="form-group col-lg-4">
-                        <label for="sender_name" class="form-control-label font-weight-bold">@lang('MONTANT PAYER')</label>
-                        <input type="text" style="background-color : green; color :#ffffff" class="form-control form-control-lg" id="montant_payer" name="montant_payer" value="{{old('montant_payer')}}" placeholder="@lang(" Montant Payer ")" maxlength="40" required="">
+                        <label>@lang('MONTANT PAYER')</label>
+                        <input type="text" style="background-color : green; color :#ffffff" class="form-control" id="montant_payer" name="montant_payer" value="{{old('montant_payer')}}" placeholder="@lang(" Montant Payer ")" maxlength="40" required="">
                     </div>
                     <div class="form-group col-lg-4">
-                        <label for="sender_name" class="form-control-label font-weight-bold">@lang('MODE PAIEMENT')</label>
-                        <select class="form-control form-control-lg" id="mode" name="mode" required>
-                          
+                        <label>@lang('MODE PAIEMENT')</label>
+                        <select class="form-control" id="mode" name="mode" required>
                             <option value="1">ESPECE</option>
                             <option value="2">CHEQUE</option>
                             <option value="3">CARTE BANCAIRE</option>
@@ -242,13 +205,12 @@
                         <textarea name="message" id="observation" rows="6" class="form-control form-control-lg" placeholder="@lang('Observation ou Note')">{{old('message')}}</textarea>
                     </div>
                 </div>
-                <div class="form-group">
-                    <button type="submit" class="btn btn--primary btn-block"><i class="fa fa-fw fa-paper-plane"></i> @lang('Enregistrer envoi')</button>
-                </div>
+                <button type="submit" class="btn btn--primary h-45 w-100 Submitbtn"> @lang('Submit')</button>
             </div>
         </div>
     </div>
-
+</div>
+</div>
 </div>
 
 @endsection
@@ -370,34 +332,31 @@
         let id = 100;
         $('.addUserData').on('click', function() {
             id++;
-            let html = `<div class="col-md-12 user-data">
-                            <div class="form-group">
-                                <div class="input-group mb-md-0 mb-4">
-                                <div class="col-md-3 mt-md-0 mt-2">
-                                        <select class="form-control form-control-lg" id="rdv_type_${id}"  name="rdvName[]"  onChange="getType(this.value,${id});" required="">
+            let html = `<div class="row single-item gy-2 user-data">
+                            
+                                <div class="col-md-2">
+                                        <select class="form-control selected_type" id="rdv_type_${id}"  name="rdvName[]"  onChange="getType(this.value,${id});" required="">
                                             <option>@lang('Choisir')</option>
                                                <option value="1" >ENVOI</option>
                                                <option value="0" >FRAIS</option>
                                                 <option value="2" >DEPOT</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3 mt-md-0 mt-2">
-                                        <select class="form-control select_${id} form-control-lg" id="courier_type_${id}" onchange="currierType(${id})" name="courierName[]" required="">
+                                    <div class="col-md-3">
+                                        <select class="form-control select_${id} selected_type" id="courier_type_${id}" onchange="currierType(${id})" name="courierName[]" required="">
                                             <option>@lang('Choisir')</option>
-                                            
                                         </select>
                                     </div>
-                                    <div class="col-md-3 mt-md-0 mt-2">
-                                        <div class="input-group mb-2">
+                                    <div class="col-md-3">
+                                        <div class="input-group">
                                             <input type="text" class="form-control form-control-lg quantity currier_quantity_${id}" placeholder="@lang('Qté')" disabled="" onkeyup="courierQuantity(${id})" name="quantity[]" aria-label="Qté" aria-describedby="basic-addon2" required="">
-                                            <div class="input-group-append">
-                                                <span class="input-group-text" id="unit_${id}"><i class="las la-balance-scale"></i></span>
-                                            </div>
+                                            <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
+
                                         </div>
                                     </div>
                                     
-                                    <div class="col-md-2 mt-md-0 mt-2">
-                                       <div class="input-group mb-2">
+                                    <div class="col-md-3">
+                                       <div class="input-group mb-3">
                                             <input type="text" id="amount" class="form-control form-control-lg currier_fee_${id}  montant" placeholder="@lang('Frais')" onkeyup="changeMontant(${id})" name="amount[]" aria-label="Frais" aria-describedby="basic-addon2" required="" >
                                             <div class="input-group-append">
                                                 <span class="input-group-text" id="basic-addon2">{{$general->cur_text}}</span>
@@ -405,16 +364,13 @@
                                         </div>
                                     </div>
 
-                                    <div class="col-md-1 mt-md-0 mt-2 text-right">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn--danger btn-lg removeBtn w-100" type="button">
-                                                <i class="fa fa-times"></i>
-                                            </button>
-                                        </span>
-                                    </div>
+                                    <div class="col-md-1">
+                        <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
+                            <i class="fa fa-times"></i>
+                        </button>
+                    </div>
 
-                                </div>
-                            </div>
+                             
                         </div>`;
             $('.addedField').append(html)
 

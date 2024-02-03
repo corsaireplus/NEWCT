@@ -10,9 +10,12 @@
                             <thead>
                                 <tr>
                                     <th>
-                                @if($rdv_dispo->count() > 0)
+                                <!-- @if($rdv_dispo->count() > 0)
                             <input type="checkbox" id="chk_all_multiple">
-                              @endif
+                              @endif -->
+                            
+                                    <input type="checkbox" class="checkAll"> @lang('Tout Choisir')
+                                </th>
                             </th>
                                     <th>@lang('Date')</th>
                                     <th>@lang('Observation')</th>
@@ -23,15 +26,18 @@
                                     <!-- <th>@lang('Contact')</th> -->
                                     <!-- <th>@lang('RDV')</th> -->
                                   <!-- <th>@lang('Montant')</th> -->
-                                    <th>@lang('Choisir')</th>
+                                    <!-- <th>@lang('Choisir')</th> -->
                                 </tr>
                             </thead>
                             <tbody>
                             @forelse($rdv_dispo as $rdv)
                                 <tr>
-                                <td data-label="@lang('Selection')">
+                                <td>
+                                <input type="checkbox" name="ids[]" class="childCheckBox" data-id="{{ $rdv->idrdv }}">
+                                </td>
+                                <!-- <td data-label="@lang('Selection')">
                     <input type="checkbox" name="ids[]" value="{{ $rdv->idrdv }}" class="checkboxmultiple" id="chk{{ $rdv->idrdv }}" onclick='checkcheckboxmultiple();'>
-                           </td>
+                           </td> -->
                                     <td data-label="@lang('Date')">
                                         <span class="font-weight-bold">{{date('d-m-Y', strtotime($rdv->date))}}</span>
                                     </td>
@@ -60,7 +66,7 @@
                                     </td>
 
                                    
-                                <td data-label="@lang('Choisir')">
+                                <!-- <td data-label="@lang('Choisir')">
                                     <a href="javascript:void(0)"  class="icon-btn btn--primary ml-1 editBrach"
                                           data-idmission="{{$mission->idmission}}"
                                             data-idrdv="{{$rdv->idrdv}}"
@@ -68,20 +74,26 @@
                                             data-idchauf="{{$mission->chauffeur_idchauffeur}}"
                                         ><i class="las la-edit"></i></a>
                                     </td>
-                                </tr>
+                                </tr> -->
                             @empty
                                 <tr>
                                     <td class="text-muted text-center" colspan="100%">{{__($emptyMessage) }}</td>
                                 </tr>
                             @endforelse
+                            <tr class="d-none dispatch">
+                                    <td colspan="8">
+                                        <button class="btn btn-sm btn--primary h-45 w-100 " id="dispatch_all"> <i
+                                                class="las la-arrow-circle-right "></i> @lang('Ajouter Au Programme')</button>
+                                    </td>
+                                </tr>
 
                             </tbody>
                             <tfoot>
               <tr>
                 <th>
-                @if($rdv_dispo->count() > 0)
+                <!-- @if($rdv_dispo->count() > 0)
                 <a href="javascript:void(0)" id="bulk_multiple" data-toggle="modal" data-target="#bulkModalmultiple" disabled class="icon-btn btn--primary ml-1 "><i class="las la-edit"></i></a>
-                @endif
+                @endif -->
                 </th>
                             </tfoot>
                         </table>
@@ -159,7 +171,9 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <a href="{{route('staff.mission.index')}}" class="btn btn-sm btn--primary box--shadow1 text--small"><i class="las la-angle-double-left"></i> @lang('Retour')</a>
+    <x-back route="{{route('staff.mission.index')}}" />
+    <x-search-form placeholder="Recherche..." />
+    <x-date-filter placeholder="Date Debut - Date Fin" />
 @endpush
 @push('script-lib')
         <script src="//code.jquery.com/jquery.js"></script>
@@ -279,5 +293,59 @@
             
         ]
     });
+</script>
+<script>
+     (function($) {
+            "use strict";
+            $(".childCheckBox").on('change', function(e) {
+                let totalLength = $(".childCheckBox").length;
+                let checkedLength = $(".childCheckBox:checked").length;
+                if (totalLength == checkedLength) {
+                    $('.checkAll').prop('checked', true);
+                } else {
+                    $('.checkAll').prop('checked', false);
+                }
+                if (checkedLength) {
+                    $('.dispatch').removeClass('d-none')
+                } else {
+                    $('.dispatch').addClass('d-none')
+                }
+            });
+
+            $('.checkAll').on('change', function() {
+                if ($('.checkAll:checked').length) {
+                    $('.childCheckBox').prop('checked', true);
+                } else {
+                    $('.childCheckBox').prop('checked', false);
+                }
+                $(".childCheckBox").change();
+            });
+            $('#dispatch_all').on('click', function() {
+                let ids = [];
+                $('.childCheckBox:checked').each(function() {
+                    ids.push($(this).attr('data-id'))
+                })
+                let id = ids.join(',')
+                let idmission = "{{$mission->idmission}}";
+                let idchauf = "{{$mission->chauffeur_idchauffeur}}";
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "{{route('staff.mission.storerdvmulti')}}",
+                    data: {
+                        id: id,
+                        idmission :idmission,
+                        idchauf : idchauf
+                    },
+                    success: function(data) {
+                        notify('success', 'Rdv Ajouté au programme!')
+                        location.reload();
+                    }
+                })
+            });
+
+        })(jQuery)
 </script>
 @endpush

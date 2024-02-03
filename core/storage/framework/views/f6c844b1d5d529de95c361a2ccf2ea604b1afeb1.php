@@ -37,7 +37,7 @@
                                 <td ><?php echo e(date('d-m-Y', strtotime($rdvliste->date))); ?></td>
                                 <?php if($rdvliste->observation !== NULL): ?>
                                 <td ><?php echo e($rdvliste->observation); ?></td>
-                                <?php else: ?> <td "></td> <?php endif; ?>
+                                <?php else: ?> <td></td> <?php endif; ?>
                                 <td ><?php echo e($rdvliste->client->nom); ?></td>
                                 <td ><?php echo e($rdvliste->client->contact); ?></td>
                                 <?php if($rdvliste->adresse): ?>
@@ -111,7 +111,11 @@
     </div>
 <?php $__env->stopSection(); ?>
 <?php $__env->startPush('breadcrumb-plugins'); ?>
-<a href="<?php echo e(route('staff.rdv.create')); ?>" class="btn btn-sm btn--primary box--shadow1 text--small addUnit"><i class="fa fa-fw fa-paper-plane"></i><?php echo app('translator')->get('Creer RDV'); ?></a>
+<a href="<?php echo e(route('staff.rdv.create')); ?>" >
+<button type="button" class="btn btn-outline--primary m-1 payment">
+                                    <i class="fa la-plus"></i> <?php echo app('translator')->get('Creer RDV'); ?>
+                                </button>
+                                </a>
 <!-- <form action="<?php echo e(route('staff.rdv.search')); ?>" method="GET" class="form-inline float-sm-right bg--white mb-2 ml-0 ml-xl-2 ml-lg-0">
     <div class="input-group has_append  ">
         <input type="text" name="search" class="form-control" placeholder="<?php echo app('translator')->get('Contact Client'); ?>" value="<?php echo e($search ?? ''); ?>">

@@ -10,12 +10,12 @@
                        
 
                         <div class="form-group col-md-6">
-                            <label for="website">@lang('Date Programme')</label>
+                            <label>@lang('Date Programme')</label>
                             <input type="date" name="date" value="{{old('Date Programme')}}" data-language="en" class="form-control datepicker-here form-control-lg" placeholder="@lang('Date Programme')" required="">
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="priority">@lang('Chauffeur')</label>
-                            <select name="id_chauffeur" class="form-control form-control-lg select3" required="">
+                            <label>@lang('Chauffeur')</label>
+                            <select name="id_chauffeur" class="form-control select3" required="">
                                 @foreach($chauffeur as $type)
                                 <option value="{{$type->id}}">{{ $type->firstname}} {{$type->lastname}}</option>
                                 @endforeach
@@ -117,7 +117,7 @@
 @endsection
 
 @push('breadcrumb-plugins')
-<a href="{{route('staff.mission.index')}}" class="btn btn-sm btn--primary box--shadow1 text--small"><i class="las la-angle-double-left"></i> @lang('Retour')</a>
+<x-back route="{{route('staff.mission.index')}}" />
 @endpush
 @push('script-lib')
 <script src="{{ asset('assets/viseradmin/js/vendor/datepicker.min.js') }}"></script>

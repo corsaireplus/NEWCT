@@ -47,9 +47,9 @@
                         <span class="menu-title">@lang('Programmes')</span>
                     </a>
                 </li>
-                <li class="sidebar-menu-item {{menuActive('staff.transaction.index')}}">
-                    <a href="{{route('staff.transaction.index')}}" class="nav-link"
-                       data-default-url="{{ route('staff.transaction.index') }}">
+                <li class="sidebar-menu-item {{menuActive('staff.transactions.index')}}">
+                    <a href="{{route('staff.transactions.index')}}" class="nav-link"
+                       data-default-url="{{ route('staff.transactions.index') }}">
                         <i class="menu-icon las la-sliders-h"></i>
                         <span class="menu-title">@lang('Liste des Transactions')</span>
                     </a>
@@ -74,6 +74,12 @@
                     <a href="{{ route('staff.courier.create') }}" class="nav-link ">
                         <i class="menu-icon las la-shipping-fast"></i>
                         <span class="menu-title">@lang('Send Courier')</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item {{ menuActive('staff.courier.sent.queue') }}">
+                    <a href="{{ route('staff.courier.sent.queue') }}" class="nav-link ">
+                        <i class="menu-icon las la-hourglass-start"></i>
+                        <span class="menu-title">@lang('Sent In Queue')</span>
                     </a>
                 </li>
                 <li class="sidebar-menu-item sidebar-dropdown">

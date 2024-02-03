@@ -10,7 +10,7 @@
                             <i class="las la-hourglass-start f-size--56"></i>
                         </div>
                         <div class="col-8 text-end">
-                            <span class="text-white text--small">@lang(' Send in Queue')</span>
+                            <span class="text-white text--small">@lang(' RDV en Cours')</span>
                             <h2 class="text-white">{{ $sentInQueue }}</h2>
                         </div>
                     </div>
@@ -19,14 +19,14 @@
         </div><!-- dashboard-w1 end -->
         <div class="col-xxl-4 col-sm-6">
             <div class="card bg--cyan has-link box--shadow2">
-                <a href="{{ route('staff.courier.upcoming') }}" class="item-link"></a>
+                <a href="{{ route('staff.transactions.index') }}" class="item-link"></a>
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-4">
                             <i class="las la-history f-size--56"></i>
                         </div>
                         <div class="col-8 text-end">
-                            <span class="text-white text--small">@lang('Upcoming Courier')</span>
+                            <span class="text-white text--small">@lang('Colis en Entrepot')</span>
                             <h2 class="text-white">{{ $upcomingCourier }}</h2>
                         </div>
                     </div>
@@ -42,8 +42,8 @@
                             <i class="las la-dolly f-size--56"></i>
                         </div>
                         <div class="col-8 text-end">
-                            <span class="text-white text--small">@lang('Total Shipping Courier')</span>
-                            <h2 class="text-white">{{ $dispatchCourier }}</h2>
+                            <span class="text-white text--small">@lang('Prochain RDV')</span>
+                            <h2 class="text-white">{{ $sentInNext }}</h2>
                         </div>
                     </div>
                 </div>
@@ -113,7 +113,7 @@
                             <i class="las la-university f-size--56"></i>
                         </div>
                         <div class="col-8 text-end">
-                            <span class="text-white text--small">@lang(' Total Branch')</span>
+                            <span class="text-white text--small">@lang(' Total Agences')</span>
                             <h2 class="text-white">{{ $branchCount }}</h2>
                         </div>
                     </div>

@@ -9,9 +9,12 @@
                             <thead>
                                 <tr>
                                     <th>
-                                <?php if($rdv_dispo->count() > 0): ?>
+                                <!-- <?php if($rdv_dispo->count() > 0): ?>
                             <input type="checkbox" id="chk_all_multiple">
-                              <?php endif; ?>
+                              <?php endif; ?> -->
+                            
+                                    <input type="checkbox" class="checkAll"> <?php echo app('translator')->get('Tout Choisir'); ?>
+                                </th>
                             </th>
                                     <th><?php echo app('translator')->get('Date'); ?></th>
                                     <th><?php echo app('translator')->get('Observation'); ?></th>
@@ -22,15 +25,18 @@
                                     <!-- <th><?php echo app('translator')->get('Contact'); ?></th> -->
                                     <!-- <th><?php echo app('translator')->get('RDV'); ?></th> -->
                                   <!-- <th><?php echo app('translator')->get('Montant'); ?></th> -->
-                                    <th><?php echo app('translator')->get('Choisir'); ?></th>
+                                    <!-- <th><?php echo app('translator')->get('Choisir'); ?></th> -->
                                 </tr>
                             </thead>
                             <tbody>
                             <?php $__empty_1 = true; $__currentLoopData = $rdv_dispo; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $rdv): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
                                 <tr>
-                                <td data-label="<?php echo app('translator')->get('Selection'); ?>">
+                                <td>
+                                <input type="checkbox" name="ids[]" class="childCheckBox" data-id="<?php echo e($rdv->idrdv); ?>">
+                                </td>
+                                <!-- <td data-label="<?php echo app('translator')->get('Selection'); ?>">
                     <input type="checkbox" name="ids[]" value="<?php echo e($rdv->idrdv); ?>" class="checkboxmultiple" id="chk<?php echo e($rdv->idrdv); ?>" onclick='checkcheckboxmultiple();'>
-                           </td>
+                           </td> -->
                                     <td data-label="<?php echo app('translator')->get('Date'); ?>">
                                         <span class="font-weight-bold"><?php echo e(date('d-m-Y', strtotime($rdv->date))); ?></span>
                                     </td>
@@ -62,7 +68,7 @@
                                     </td>
 
                                    
-                                <td data-label="<?php echo app('translator')->get('Choisir'); ?>">
+                                <!-- <td data-label="<?php echo app('translator')->get('Choisir'); ?>">
                                     <a href="javascript:void(0)"  class="icon-btn btn--primary ml-1 editBrach"
                                           data-idmission="<?php echo e($mission->idmission); ?>"
                                             data-idrdv="<?php echo e($rdv->idrdv); ?>"
@@ -70,20 +76,26 @@
                                             data-idchauf="<?php echo e($mission->chauffeur_idchauffeur); ?>"
                                         ><i class="las la-edit"></i></a>
                                     </td>
-                                </tr>
+                                </tr> -->
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <tr>
                                     <td class="text-muted text-center" colspan="100%"><?php echo e(__($emptyMessage)); ?></td>
                                 </tr>
                             <?php endif; ?>
+                            <tr class="d-none dispatch">
+                                    <td colspan="8">
+                                        <button class="btn btn-sm btn--primary h-45 w-100 " id="dispatch_all"> <i
+                                                class="las la-arrow-circle-right "></i> <?php echo app('translator')->get('Ajouter Au Programme'); ?></button>
+                                    </td>
+                                </tr>
 
                             </tbody>
                             <tfoot>
               <tr>
                 <th>
-                <?php if($rdv_dispo->count() > 0): ?>
+                <!-- <?php if($rdv_dispo->count() > 0): ?>
                 <a href="javascript:void(0)" id="bulk_multiple" data-toggle="modal" data-target="#bulkModalmultiple" disabled class="icon-btn btn--primary ml-1 "><i class="las la-edit"></i></a>
-                <?php endif; ?>
+                <?php endif; ?> -->
                 </th>
                             </tfoot>
                         </table>
@@ -162,7 +174,51 @@
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('breadcrumb-plugins'); ?>
-    <a href="<?php echo e(route('staff.mission.index')); ?>" class="btn btn-sm btn--primary box--shadow1 text--small"><i class="las la-angle-double-left"></i> <?php echo app('translator')->get('Retour'); ?></a>
+    <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.back','data' => ['route' => ''.e(route('staff.mission.index')).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('back'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['route' => ''.e(route('staff.mission.index')).'']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
+    <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.search-form','data' => ['placeholder' => 'Recherche...']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('search-form'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['placeholder' => 'Recherche...']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
+    <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.date-filter','data' => ['placeholder' => 'Date Debut - Date Fin']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('date-filter'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['placeholder' => 'Date Debut - Date Fin']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
 <?php $__env->stopPush(); ?>
 <?php $__env->startPush('script-lib'); ?>
         <script src="//code.jquery.com/jquery.js"></script>
@@ -283,5 +339,60 @@
         ]
     });
 </script>
+<script>
+     (function($) {
+            "use strict";
+            $(".childCheckBox").on('change', function(e) {
+                let totalLength = $(".childCheckBox").length;
+                let checkedLength = $(".childCheckBox:checked").length;
+                if (totalLength == checkedLength) {
+                    $('.checkAll').prop('checked', true);
+                } else {
+                    $('.checkAll').prop('checked', false);
+                }
+                if (checkedLength) {
+                    $('.dispatch').removeClass('d-none')
+                } else {
+                    $('.dispatch').addClass('d-none')
+                }
+            });
+
+            $('.checkAll').on('change', function() {
+                if ($('.checkAll:checked').length) {
+                    $('.childCheckBox').prop('checked', true);
+                } else {
+                    $('.childCheckBox').prop('checked', false);
+                }
+                $(".childCheckBox").change();
+            });
+            $('#dispatch_all').on('click', function() {
+                let ids = [];
+                $('.childCheckBox:checked').each(function() {
+                    ids.push($(this).attr('data-id'))
+                })
+                let id = ids.join(',')
+                let idmission = "<?php echo e($mission->idmission); ?>";
+                let idchauf = "<?php echo e($mission->chauffeur_idchauffeur); ?>";
+                $.ajax({
+                    type: "POST",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    url: "<?php echo e(route('staff.mission.storerdvmulti')); ?>",
+                    data: {
+                        id: id,
+                        idmission :idmission,
+                        idchauf : idchauf
+                    },
+                    success: function(data) {
+                        notify('success', 'Rdv Ajouté au programme!')
+                        location.reload();
+                    }
+                })
+            });
+
+        })(jQuery)
+</script>
 <?php $__env->stopPush(); ?>
+
 <?php echo $__env->make('staff.layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /Applications/MAMP/htdocs/NEWCT/core/resources/views/staff/missions/create_mission.blade.php ENDPATH**/ ?>

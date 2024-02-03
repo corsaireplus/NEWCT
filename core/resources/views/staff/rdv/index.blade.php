@@ -38,7 +38,7 @@
                                 <td >{{date('d-m-Y', strtotime($rdvliste->date))}}</td>
                                 @if($rdvliste->observation !== NULL)
                                 <td >{{$rdvliste->observation}}</td>
-                                @else <td "></td> @endif
+                                @else <td></td> @endif
                                 <td >{{$rdvliste->client->nom}}</td>
                                 <td >{{$rdvliste->client->contact}}</td>
                                 @if($rdvliste->adresse)
@@ -111,7 +111,11 @@
     </div>
 @endsection
 @push('breadcrumb-plugins')
-<a href="{{route('staff.rdv.create')}}" class="btn btn-sm btn--primary box--shadow1 text--small addUnit"><i class="fa fa-fw fa-paper-plane"></i>@lang('Creer RDV')</a>
+<a href="{{route('staff.rdv.create')}}" >
+<button type="button" class="btn btn-outline--primary m-1 payment">
+                                    <i class="fa la-plus"></i> @lang('Creer RDV')
+                                </button>
+                                </a>
 <!-- <form action="{{route('staff.rdv.search')}}" method="GET" class="form-inline float-sm-right bg--white mb-2 ml-0 ml-xl-2 ml-lg-0">
     <div class="input-group has_append  ">
         <input type="text" name="search" class="form-control" placeholder="@lang('Contact Client')" value="{{ $search ?? '' }}">

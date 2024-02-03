@@ -1,24 +1,23 @@
-@extends('staff.layouts.app')
-@section('panel')
+<?php $__env->startSection('panel'); ?>
 <div class="row mb-none-30">
     <div class="col-lg-12 col-md-12 mb-30">
         <div class="card">
             <div class="card-body">
-                <form action="{{route('staff.rdv.store')}}" method="POST">
-                    @csrf
+                <form action="<?php echo e(route('staff.rdv.store')); ?>" method="POST">
+                    <?php echo csrf_field(); ?>
                     <div class="row">
                         <div class="col-lg-12">
                             <div class="card border--primary mt-3">
-                                <h5 class="card-header bg--primary  text-white">@lang('Information Client')</h5>
+                                <h5 class="card-header bg--primary  text-white"><?php echo app('translator')->get('Information Client'); ?></h5>
                                 <div class="card-body">
                                     <div class="row">
                                         <div class="form-group col-lg-6">
-                                            <label>@lang('Telephone')</label>
-                                            <input type="text" class="form-control" id="phone" value="{{old('sender_phone')}}" name="sender_phone" placeholder="@lang(" Telephone")" maxlength="40" required="">
+                                            <label><?php echo app('translator')->get('Telephone'); ?></label>
+                                            <input type="text" class="form-control" id="phone" value="<?php echo e(old('sender_phone')); ?>" name="sender_phone" placeholder="<?php echo app('translator')->get(" Telephone"); ?>" maxlength="40" required="">
                                         </div>
                                         <div class="form-group col-lg-6">
-                                            <label>@lang('Nom')</label>
-                                            <input type="text" class="form-control" id="sender_name" name="sender_name" value="{{old('sender_name')}}" placeholder="@lang(" Nom & Prenom")" maxlength="40" required="">
+                                            <label><?php echo app('translator')->get('Nom'); ?></label>
+                                            <input type="text" class="form-control" id="sender_name" name="sender_name" value="<?php echo e(old('sender_name')); ?>" placeholder="<?php echo app('translator')->get(" Nom & Prenom"); ?>" maxlength="40" required="">
                                         </div>
 
 
@@ -26,8 +25,8 @@
 
                                     <div class="row">
                                         <div class="form-group col-lg-6 autocomplete">
-                                            <label>@lang('Adresse')</label>
-                                            <input type="text" class="form-control" id="sender_address" name="sender_address" value="{{old('sender_address')}}" placeholder="@lang(" Adresse")" maxlength="255" required="">
+                                            <label><?php echo app('translator')->get('Adresse'); ?></label>
+                                            <input type="text" class="form-control" id="sender_address" name="sender_address" value="<?php echo e(old('sender_address')); ?>" placeholder="<?php echo app('translator')->get(" Adresse"); ?>" maxlength="255" required="">
                                             <ul  id="suggestions-list"></ul>
 
                                         </div>
@@ -36,18 +35,18 @@
 
 
                                         <div class="form-group col-lg-6">
-                                            <label>@lang('Code postal')</label>
-                                            <input type="text" class="form-control" id="sender_code_postal" name="sender_code_postal" value="{{old('sender_address')}}" placeholder="@lang(" Code Postal")" maxlength="255" required="">
+                                            <label><?php echo app('translator')->get('Code postal'); ?></label>
+                                            <input type="text" class="form-control" id="sender_code_postal" name="sender_code_postal" value="<?php echo e(old('sender_address')); ?>" placeholder="<?php echo app('translator')->get(" Code Postal"); ?>" maxlength="255" required="">
                                         </div>
                                     </div>
                                     <div class="row">
                                         <div class="form-group col-lg-6">
-                                            <label>@lang('Date')</label>
-                                            <input name="date" type="text" data-range="true" data-language="en" class="datepicker-here form-control" data-position='bottom right' placeholder="@lang('Date Rdv')" autocomplete="off" value="{{ @$dateSearch }}">
+                                            <label><?php echo app('translator')->get('Date'); ?></label>
+                                            <input name="date" type="text" data-range="true" data-language="en" class="datepicker-here form-control" data-position='bottom right' placeholder="<?php echo app('translator')->get('Date Rdv'); ?>" autocomplete="off" value="<?php echo e(@$dateSearch); ?>">
                                         </div>
                                         <div class="form-group col-lg-6">
-                                            <label>@lang('Observation')</label>
-                                            <input name="observation" type="text" data-range="true" data-language="en" class="form-control" data-position='bottom right' placeholder="@lang('Observation')" autocomplete="off" value="{{ @$observation }}">
+                                            <label><?php echo app('translator')->get('Observation'); ?></label>
+                                            <input name="observation" type="text" data-range="true" data-language="en" class="form-control" data-position='bottom right' placeholder="<?php echo app('translator')->get('Observation'); ?>" autocomplete="off" value="<?php echo e(@$observation); ?>">
                                         </div>
                                     </div>
 
@@ -57,10 +56,10 @@
                         </div>
                         <div class="col-lg-12">
                             <div class="card border--primary mt-3">
-                                <h5 class="card-header bg--primary  text-white">@lang('Information RDV')
+                                <h5 class="card-header bg--primary  text-white"><?php echo app('translator')->get('Information RDV'); ?>
                                     
                                     <button type="button" class="btn btn-sm btn-outline-light float-end addUserData"><i
-                                            class="la la-fw la-plus"></i>@lang('Ajouter')
+                                            class="la la-fw la-plus"></i><?php echo app('translator')->get('Ajouter'); ?>
                                     </button>
                                 </h5>
                                 <div class="card-body">
@@ -69,7 +68,7 @@
                                             <div class="row single-item gy-2">
                                                 <div class="col-md-3">
                                                     <select class="form-control rdvtype selected_type" id="rdv_type_0" name="rdvName[]" onChange="getType(this.value,0);">
-                                                        <option>@lang('Choisir Type')</option>
+                                                        <option><?php echo app('translator')->get('Choisir Type'); ?></option>
                                                         <option value="1">RECUP</option>
                                                         <option value="2">DEPOT</option>
                                                     </select>
@@ -81,7 +80,7 @@
                                                 </div>
                                                 <div class="col-md-3 mt-md-0 mt-2">
                                                     <div class="input-group mb-3">
-                                                        <input type="text" class="form-control  currier_quantity_0" placeholder="@lang('Qté')"  name="quantity[]" onkeyup="courierQuantity(0)" aria-label="objet" aria-describedby="basic-addon2" required="">
+                                                        <input type="text" class="form-control  currier_quantity_0" placeholder="<?php echo app('translator')->get('Qté'); ?>"  name="quantity[]" onkeyup="courierQuantity(0)" aria-label="objet" aria-describedby="basic-addon2" required="">
                                                         <span class="input-group-text unit"><i
                                                                         class="las la-balance-scale"></i></span>
                                                     </div>
@@ -89,8 +88,8 @@
 
                                                 <div class="col-md-3 mt-md-0 mt-2">
                                                     <div class="input-group mb-3">
-                                                        <input type="text" id="amount" class="form-control  currier_fee_0" placeholder="@lang('Prix')"  name="amount[]" aria-label="Prix Objet" aria-describedby="basic-addon2" required="">
-                                                        <span class="input-group-text">{{ __($general->cur_text) }}</span>
+                                                        <input type="text" id="amount" class="form-control  currier_fee_0" placeholder="<?php echo app('translator')->get('Prix'); ?>"  name="amount[]" aria-label="Prix Objet" aria-describedby="basic-addon2" required="">
+                                                        <span class="input-group-text"><?php echo e(__($general->cur_text)); ?></span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -99,7 +98,7 @@
                                     <div class="row">
                                         <div class="col-md-12 user-data">
                                             <div class="form-group">
-                                                <button type="submit" class="btn btn--primary h-45 w-100 Submitbtn"> @lang('Enregistrer RDV')</button>
+                                                <button type="submit" class="btn btn--primary h-45 w-100 Submitbtn"> <?php echo app('translator')->get('Enregistrer RDV'); ?></button>
 
                                             </div>
                                         </div>
@@ -116,22 +115,36 @@
     </div>
 </div>
 </div>
-@endsection
+<?php $__env->stopSection(); ?>
 
-@push('breadcrumb-plugins')
-<x-back route="{{route('staff.rdv.list')}}" />
-@endpush
+<?php $__env->startPush('breadcrumb-plugins'); ?>
+<?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.back','data' => ['route' => ''.e(route('staff.rdv.list')).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('back'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['route' => ''.e(route('staff.rdv.list')).'']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
+<?php $__env->stopPush(); ?>
 
 
 
-@push('script-lib')
-<script src="{{asset('assets/viseradmin/js/vendor/datepicker.min.js')}}"></script>
-<script src="{{asset('assets/viseradmin/js/vendor/datepicker.en.js')}}"></script>
-@endpush
-@push('style-lib')
-    <link  rel="stylesheet" href="{{asset('assets/viseradmin/css/vendor/datepicker.min.css')}}">
-@endpush
-@push('script')
+<?php $__env->startPush('script-lib'); ?>
+<script src="<?php echo e(asset('assets/viseradmin/js/vendor/datepicker.min.js')); ?>"></script>
+<script src="<?php echo e(asset('assets/viseradmin/js/vendor/datepicker.en.js')); ?>"></script>
+<?php $__env->stopPush(); ?>
+<?php $__env->startPush('style-lib'); ?>
+    <link  rel="stylesheet" href="<?php echo e(asset('assets/viseradmin/css/vendor/datepicker.min.css')); ?>">
+<?php $__env->stopPush(); ?>
+<?php $__env->startPush('script'); ?>
 <script>
     
     $(document).ready(function() {
@@ -148,7 +161,7 @@
             if (query != '' && query.length == 10) {
                 var _token = $('input[name="_token"]').val();
                 $.ajax({
-                    url: "{{ route('staff.rdv.fetch') }}",
+                    url: "<?php echo e(route('staff.rdv.fetch')); ?>",
                     method: "POST",
                     data: {
                         query: query,
@@ -208,13 +221,13 @@
     }
 
     function getType(val, id) {
-        var base_url = "{{ url('/') }}";
+        var base_url = "<?php echo e(url('/')); ?>";
         $.ajax({
 
             type: 'POST',
             url: base_url + '/staff/mission/get_type',
             data: {
-                _token: "{{ csrf_token() }}",
+                _token: "<?php echo e(csrf_token()); ?>",
                 id: val,
             },
 
@@ -249,19 +262,19 @@
                           
                                 <div class="col-md-2">
                                                             <select class="form-control rdvtype selected_type" id="rdv_type_${id}"  name="rdvName[]" onChange="getType(this.value,${id});">
-                                                                <option>@lang('Choisir Type')</option>
+                                                                <option><?php echo app('translator')->get('Choisir Type'); ?></option>
                                                                 <option value="1" >RECUP</option>
                                                                 <option value="2" >DEPOT</option>
                                                             </select>
                                                         </div>
                                     <div class="col-md-3">
                                         <select class="form-control select_${id} selected_type" id="courier_type_${id}" onchange="currierType(${id})" name="courierName[]" required="">
-                                            <option>@lang('Choisir Objet')</option>    
+                                            <option><?php echo app('translator')->get('Choisir Objet'); ?></option>    
                                         </select>
                                     </div>
                                     <div class="col-md-3">
                                         <div class="input-group mb-3">
-                                            <input type="text" class="form-control currier_quantity_${id}" placeholder="@lang('Qté')"  onkeyup="courierQuantity(${id})" name="quantity[]" aria-label="Qté" aria-describedby="basic-addon2" required="">
+                                            <input type="text" class="form-control currier_quantity_${id}" placeholder="<?php echo app('translator')->get('Qté'); ?>"  onkeyup="courierQuantity(${id})" name="quantity[]" aria-label="Qté" aria-describedby="basic-addon2" required="">
                                             <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
 
                                         </div>
@@ -269,8 +282,8 @@
 
                                     <div class="col-md-3">
                                        <div class="input-group">
-                                            <input type="text" id="amount" class="form-control currier_fee_${id}" placeholder="@lang('Prix')" name="amount[]" aria-label="Frais" aria-describedby="basic-addon2" required="" >
-                                            <span class="input-group-text">{{__($general->cur_text)}}</span>
+                                            <input type="text" id="amount" class="form-control currier_fee_${id}" placeholder="<?php echo app('translator')->get('Prix'); ?>" name="amount[]" aria-label="Frais" aria-describedby="basic-addon2" required="" >
+                                            <span class="input-group-text"><?php echo e(__($general->cur_text)); ?></span>
 
                                         </div>
                                     </div>
@@ -300,7 +313,7 @@
     var $suggestionsList = $('#suggestions-list');
     var $codePostalInput = $('#sender_code_postal');
     var suggestions;
-    var base_url = "{{ url('/') }}";
+    var base_url = "<?php echo e(url('/')); ?>";
    // var $suggestionsList = $('#suggestions-list');
 
     // Fonction pour mettre à jour la liste de suggestions
@@ -366,7 +379,7 @@
 
 //     $(document).ready(function () {
 //     var $adresseInput = $('#sender_address');
-//     var base_url = "{{ url('/') }}";
+//     var base_url = "<?php echo e(url('/')); ?>";
 
 //     $adresseInput.select2({
 //         ajax: {
@@ -414,7 +427,7 @@
 //        /// var clientId =client_Id.value;
 //         var $adresseInput = $('#sender_address');
 //         var $clientAddressesSelect = $('#clientAddresses');
-//         var base_url = "{{ url('/') }}";
+//         var base_url = "<?php echo e(url('/')); ?>";
 
        
 
@@ -497,4 +510,6 @@
 
 
 
-@endpush
+<?php $__env->stopPush(); ?>
+
+<?php echo $__env->make('staff.layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /Applications/MAMP/htdocs/NEWCT/core/resources/views/staff/rdv/create.blade.php ENDPATH**/ ?>

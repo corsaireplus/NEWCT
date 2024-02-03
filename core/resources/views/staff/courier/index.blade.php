@@ -81,7 +81,7 @@
                                     <h5 class="card-header bg--primary  text-white">@lang('Receiver Information')</h5>
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="form-group col-lg-6">
+                                            <div class="form-group col-lg-12">
                                                 <label>@lang('Email')</label>
                                                 <input type="email" class="form-control" name="receiver_customer_email"
                                                     value="{{ old('receiver_customer_email') }}" id="receiver_email"

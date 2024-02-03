@@ -116,5 +116,9 @@ class Transaction extends Model
     // {
     //     return $this->belongsTo(User::class, 'receiver_staff_id');
     // }
+    public function scopeUpcoming()
+    {
+        return $this->where('branch_id', auth()->user()->branch_id)->where('ship_status',0);
+    }
 
 }

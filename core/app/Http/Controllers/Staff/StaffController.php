@@ -10,6 +10,8 @@ use App\Models\CourierPayment;
 use App\Rules\FileTypeValidate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Transaction;
+use App\Models\Rdv;
 
 class StaffController extends Controller
 {
@@ -21,15 +23,18 @@ class StaffController extends Controller
         $branchCount     = Branch::active()->count();
         $cashCollection  = CourierPayment::where('receiver_id', $user->id)->where('status', Status::PAID)->sum('final_amount');
         $dispatchCourier = CourierInfo::dispatched()->count();
-        $sentInQueue     = CourierInfo::queue()->count();
+        $sentInQueue     = Rdv::queue()->count(); // RDV en cours
+        $sentInNext     = Rdv::nextrdv()->count(); //prochain RDV
+
         $deliveryInQueue = CourierInfo::deliveryQueue()->count();
-        $upcomingCourier = CourierInfo::upcoming()->count();
+        $upcomingCourier = Transaction::upcoming()->count(); //derniers colis
         $totalSent       = CourierInfo::where('sender_staff_id', $user->id)->whereIn('status', [Status::COURIER_DISPATCH, Status::COURIER_DELIVERYQUEUE, Status::COURIER_DELIVERED])->count();
         $totalDelivery   = CourierInfo::where('receiver_staff_id', $user->id)->where('status', Status::COURIER_DELIVERED)->count();
 
         $courierDelivery = CourierInfo::upcoming()->orderBy('id', 'DESC')->with('senderBranch', 'receiverBranch', 'senderStaff', 'receiverStaff', 'paymentInfo')->take(5)->get();
         $totalCourier    = CourierInfo::where('sender_branch_id', $user->branch_id)->orWhere('receiver_branch_id', $user->branch_id)->count();
-        return view('staff.dashboard', compact('pageTitle', 'branchCount', 'deliveryInQueue', 'totalSent', 'upcomingCourier', 'sentInQueue', 'dispatchCourier', 'cashCollection', 'totalDelivery', 'courierDelivery', 'totalCourier'));
+
+        return view('staff.dashboard', compact('pageTitle', 'branchCount', 'deliveryInQueue', 'totalSent', 'upcomingCourier', 'sentInQueue', 'dispatchCourier', 'cashCollection', 'totalDelivery', 'courierDelivery', 'totalCourier','sentInNext'));
     }
 
     public function branchList()

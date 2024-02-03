@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\Searchable;
+use App\Traits\GlobalStatus;
 
 class Mission extends Model
 {
     use SoftDeletes;
+    use Searchable, GlobalStatus;
     protected $dates = ['deleted_at'];
     protected $table = "missions";
     protected $primaryKey = 'idmission';
@@ -34,6 +37,10 @@ class Mission extends Model
     }
     public function rdvs(){
         return $this->hasMany(Rdv::class,'mission_id');
+    }
+
+    public function depenses(){
+        return $this->hasMany(Depense::class,'mission_id');
     }
 
 }
