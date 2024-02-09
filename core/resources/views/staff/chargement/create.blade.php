@@ -1,20 +1,12 @@
 @extends('staff.layouts.app')
 @section('panel')
-<div class="row">
+<div class="row mb-none-30">
     <div class="col-lg-12">
         <div class="card b-radius--10 ">
             <div class="card-body">
                 <form action="{{route('staff.container.store')}}" method="post" enctype="multipart/form-data" onsubmit="return submitUserForm();">
                     @csrf
                     <div class="row">
-                        <!-- <div class="form-group">
-    <input type="text" name="country_name" id="country_name" class="form-control form-control-lg" placeholder="Enter Country Name" />
-    <div id="countryList" class="form-group">
-    </div>
-   </div>
-   {{ csrf_field() }}
-  </div>                             -->
-
                         <div class="form-group col-md-6">
                             <label for="website">@lang('Date Depart')</label>
                             <input type="text" name="date" value="{{old('Date Depart')}}" data-language="en" class="form-control datepicker-here  form-control-lg" placeholder="@lang('Date Depart')" required="">
@@ -40,7 +32,7 @@
                         </div>
                     </div>
                     <div class="row">
-                    <div class="form-group col-md-6">
+                      <div class="form-group col-md-6">
                             <label for="priority">@lang('Destination')</label>
                             <select name="desti_id" class="form-control form-control-lg">
                                 @foreach($branch as $type)
@@ -51,11 +43,6 @@
 
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row form-group">
-
-                        </div>
-                    </div>
 
                     <div class="form-group">
                         <button type="submit" class="btn btn--primary btn-block" id="recaptcha"><i class="fa fa-fw fa-paper-plane"></i> @lang('Enregistrer')</button>
@@ -65,16 +52,14 @@
         </div>
     </div>
 </div>
-
-
 @endsection
 
 @push('breadcrumb-plugins')
 <a href="{{route('staff.container.liste')}}" class="btn btn-sm btn--primary box--shadow1 text--small"><i class="las la-angle-double-left"></i> @lang('Retour')</a>
 @endpush
 @push('script-lib')
-<script src="{{ asset('assets/staff/js/vendor/datepicker.min.js') }}"></script>
-<script src="{{ asset('assets/staff/js/vendor/datepicker.en.js') }}"></script>
+<script src="{{ asset('assets/viseradmin/js/vendor/datepicker.min.js') }}"></script>
+<script src="{{ asset('assets/viseradmin/js/vendor/datepicker.en.js') }}"></script>
 @endpush
 @push('script')s
 <script>

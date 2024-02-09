@@ -1,35 +1,19 @@
 @extends('staff.layouts.app')
 @section('panel')
 <div class="row mb-none-30">
-    <div class="col-xl-3 col-lg-5 col-md-5 col-sm-12">
-        <div class="card b-radius--10 overflow-hidden mt-30 box--shadow1">
-            <div class="card-body">
-                <h5 class="mb-20 text-muted">@lang('Chauffeur')</h5>
-                <ul class="list-group">
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
+    <div class="col-lg-12 col-md-12 mb-30">
+        <div class="card">
+            <form action="{{route('staff.transactions.store',encrypt($courierInfo->id))}}" method="POST">
+                <div class="card-body">
+                    @csrf
+                    
 
-                        <span class="font-weight-bold">{{__($courierInfo->mission->chauffeur->firstname)}}</span>
-                    </li>
-
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-
-                        <span class="font-weight-bold">{{__($courierInfo->mission->chauffeur->mobile)}}</span>
-                    </li>
-
-                </ul>
-            </div>
-        </div>
-
-    </div>
-
-    <div class="col-xl-9 col-lg-7 col-md-7 col-sm-12 mt-10">
-        <form action="{{route('staff.transactions.store')}}" method="POST">
-            @csrf
-            <div class="row mb-30">
-                <div class="col-lg-6 mt-2">
-                    <div class="card border--dark">
-                        <h5 class="card-header bg--dark">@lang('Expediteur')</h5>
-                        <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <div class="card border--primary mt-3">
+                                <h5 class="card-header bg--primary  text-white">@lang('Expediteur')</h5>
+                               
+                                    <div class="card-body">
                             <ul class="list-group">
                                 <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
 
@@ -41,13 +25,18 @@
 
                                     <span>{{__($courierInfo->client->contact)}}</span>
                                 </li>
-                                @if($courierInfo->adresse->adresse)
+                                @if($courierInfo->adresse)
                                 <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
                                     <span>{{__($courierInfo->adresse->adresse)}}</span>
                                 </li>
+                                @else
+                                <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
+
+                                <span>N/A</span>
+                                </li>
                                 @endif
                                 <li class="list-group-item d-flex justify-content-between align-items-center font-weight-bold">
-                                    @if($courierInfo->adresse->code_postal)
+                                    @if($courierInfo->adresse)
                                     <span>{{__($courierInfo->adresse->code_postal)}}</span>
                                     @else
                                     <span>Aucun Code Postal </span>
@@ -60,14 +49,14 @@
 
                                 </li>
                             </ul>
+                            </div>
+                            </div>
                         </div>
-                    </div>
-                </div>
-
-                <div class="col-lg-6 mt-2">
-                    <div class="card border--dark">
-                        <h5 class="card-header bg--dark">@lang('Destinataire')</h5>
-                        <div class="card-body">
+            
+                        <div class="col-lg-6">
+                            <div class="card border--primary mt-3">
+                                <h5 class="card-header bg--primary  text-white">@lang('Destinataire')</h5>
+                                <div class="card-body">
                                       <div class="row">
                                             <div class="form-group col-lg-12">
                                                
@@ -78,13 +67,11 @@
                                             <div class="form-group col-lg-12">
                                                 
                                                 <input type="text" class="form-control" id="receiver_phone" name="receiver_phone" placeholder="@lang(" Téléphone")" 
-                                                    value="{{ old('receiver_customer_phone') }}" id="receiver_phone"
-                                                    >
+                                                    value="{{ old('receiver_customer_phone') }}" id="receiver_phone">
                                             </div>
                                             <div class="form-group col-lg-12">
                                                 
-                                                <input type="text" class="form-control"
-                                                id="receiver_name" name="receiver_name" value="{{old('receiver_name')}}" placeholder="@lang(" Nom Destinataire")" >
+                                                <input type="text" class="form-control" id="receiver_name" name="receiver_name" value="{{old('receiver_name')}}" placeholder="@lang(" Nom Destinataire")" >
                                             </div>
                                         </div>
                                         <div class="row">
@@ -103,84 +90,79 @@
                                             </div>
                                   
                             
+                                      </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-            </div>
-    </div>
-
-<div class="row mb-none-30">
-    <div class="col-lg-12">
-        <div class="card border--dark">
-            <h5 class="card-header bg--dark">@lang('Information Envoi') 
-            <button type="button"
-                                            class="btn btn-sm btn-outline-light float-end addUserData"><i
-                                                class="la la-fw la-plus"></i>@lang('Ajouter')
-                                        </button>
-            </h5>
-
-            <div class="card-body">
-                <div class="row addedField">
-                @foreach($courierInfo->courierDetail as $courier)
-                    <div class="row single-item gy-2user-data">
-                        
-                                <div class="col-md-2">
-                                    <select class="form-control selected_type" id="rdv_type_{{$courier->id}}" name="rdvName[]" onChange="getType(this.value,{{$courier->id}});">
-                                        <option>@lang('Choisir')</option>
-                                        <option value="1" {{ $courier->rdv_type_id == 1 ?  'selected' : '' }}>ENVOI</option>
-                                        <option value="2" {{ $courier->rdv_type_id == 2 ?  'selected' : '' }}>DEPOT</option>
-                                        <option value="0" {{ $courier->rdv_type_id == 0 ?  'selected' : '' }}>FRAIS</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <select class="form-control select2 fselected_type" id="courier_type_{{$courier->id}}" onchange="currierType({{$courier->id}})" name="courierName[]">
-                                    <option id="opt_{{$courier->type->id}}" value="{{$courier->type->id}}" 'selected'  data-unit="{{$courier->type->unit->name}}" data-price={{ getAmount($courier->type->price)}}>{{__($courier->type->name)}}</option>
-
-                                    @foreach($types as $type)
-                                        <option id="{$type->id}}" value="{{$type->id}}"  data-unit="{{$type->unit->name}}" data-price={{ getAmount($type->price)}}>{{__($type->name)}}</option>
-                                        @endforeach
-
-                                    </select>
-                                </div>
-                                <div class="col-md-3">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control form-control-lg quantity currier_quantity_{{$courier->id}}" value="{{$courier->qty}}" name="quantity[]" onkeyup="courierQuantity({{$courier->id}})" aria-label="Qté" aria-describedby="basic-addon2" required="">
-                                        <span class="input-group-text unit"><i
-                                                                        class="las la-balance-scale"></i></span>
+                    <div class="row mb-30">
+                        <div class="col-lg-12">
+                            <div class="card border--primary mt-3">
+                                <h5 class="card-header bg--primary text-white">@lang('Information Envoi')
+                                    <button type="button" class="btn btn-sm btn-outline-light float-end addUserData"><i
+                                            class="la la-fw la-plus"></i>@lang('Ajouter')
+                                    </button>
+                                </h5>
+                                <div class="card-body">
+                                    <div class="row" id="addedField">
+                                        @foreach ($courierInfo->courierDetail as $item)
+                                            <div class="row single-item gy-2">
+                                            <div class="col-md-2">
+                                                    <select class="form-control " id="rdv_type_{{$item->id}}" name="items[{{ $loop->index}}][rdvName]"  onChange="getType(this.value,{{$item->id}});">
+                                                        <option>@lang('Choisir')</option>
+                                                        <option value="1" {{ $item->rdv_type_id == 1 ?  'selected' : '' }}>ENVOI</option>
+                                                        <option value="2" {{ $item->rdv_type_id == 2 ?  'selected' : '' }}>DEPOT</option>
+                                                        <option value="0" {{ $item->rdv_type_id == 0 ?  'selected' : '' }}>FRAIS</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <select class="form-control selected_type" id="courier_type_{{$item->id}}" onchange="currierType({{$item->id}})" name="items[{{ $loop->index}}][courierName]" required>
+                                                        <option disabled selected value="">@lang('Select Courier/Parcel Type')</option>
+                                                        @foreach($types as $type)
+                                                            <option value="{{$type->id}}" @selected($item->type->id==$type->id)
+                                                                data-unit="{{$type->unit->name}}" data-price="{{ getAmount($type->price)}}"  >
+                                                                {{__($type->name)}}
+                                                            </option>
+                                                            @endforeach
+                                                        </select>
+                                                </div>
+                                               
+                                                <div class="col-md-3">
+                                                    <div class="input-group mb-3">
+                                                        <input type="number" class="form-control quantity currier_quantity_{{$item->id}}" value="{{ $item->qty }}" onkeyup="courierQuantity({{$item->id}})"  name="items[{{ $loop->index }}][quantity]"  required>
+                                                        <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="input-group">
+                                                        <input id="amount" type="text"  class="form-control single-item-amount currier_fee_{{$item->id}} montant" value="{{getAmount($item->fee)}}"  name="items[{{ $loop->index }}][amount]" required>
+                                                        <span class="input-group-text">{{__($general->cur_text)}}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-1">
+                                                    <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
+                                                        <i class="fa fa-times"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+ 						                @endforeach
+                                    </div>
+                                    <div class="border-line-area">
+                                        <h6 class="border-line-title">@lang('Liste des Transactions')</h6>
                                     </div>
                                 </div>
-
-                                <div class="col-md-3">
-                                    <div class="input-group mb-3">
-                                        <input type="text" id="amount" class="form-control form-control-lg currier_fee_{{$courier->id}} montant" value="{{getAmount($courier->fee)}}" name="amount[]" aria-label="Frais" aria-describedby="basic-addon2" required="">
-                                        <span
-                                                                    class="input-group-text">{{ __($general->cur_text) }}</span>
-                                    </div>
-                                </div>
-                                <div class="col-md-1">
-                                                            <button class="btn btn--danger w-100 removeBtn w-100 h-45"
-                                                                type="button">
-                                                                <i class="fa fa-times"></i>
-                                                            </button>
-                                                        </div>
-                            
+                            </div>
+                        </div>
                     </div>
-                    @endforeach
-                </div>
-            </div>
-        </div>
-
-    </div>
-    <div class="clearfix"></div>
-    <div class="col-lg-12">
-        <div class="card border--primary mt-3">
-            <h5 class="card-header bg--primary  text-white">@lang('Information Paiement')
-
-            </h5>
-
-            <div class="card-body">
-                <div class="row">
+                    <div class="row mb-30">
+                        <div class="col-lg-12">
+                            <div class="card border--primary mt-3">
+                                <h5 class="card-header bg--primary text-white">@lang('Information Paiement')
+                                   
+                                </h5>
+                                <div class="card-body">
+                                <div class="row">
                     <div class="form-group col-lg-4">
                         <label>@lang('TOTAL A PAYER')</label>
                         <input type="text" style="background-color :red; color :#ffffff" class="form-control" id="total_paye" value="{{old('total_paye')}}" name="total_payer" placeholder="@lang(" Total a Payer")" maxlength="40" required="">
@@ -195,6 +177,7 @@
                             <option value="1">ESPECE</option>
                             <option value="2">CHEQUE</option>
                             <option value="3">CARTE BANCAIRE</option>
+                            <option value="3">VIREMENT</option>
                         </select>
                     </div>
 
@@ -205,19 +188,31 @@
                         <textarea name="message" id="observation" rows="6" class="form-control form-control-lg" placeholder="@lang('Observation ou Note')">{{old('message')}}</textarea>
                     </div>
                 </div>
-                <button type="submit" class="btn btn--primary h-45 w-100 Submitbtn"> @lang('Submit')</button>
-            </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn--primary h-45 w-100 Submitbtn"> @lang('Submit')</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>
-</div>
-</div>
 
 @endsection
-
 @push('breadcrumb-plugins')
-<a href="{{ route('staff.mission.detailmission', encrypt($courierInfo->mission_id)) }}" class="btn btn-sm btn--primary box--shadow1 text--small"><i class="la la-fw la-backward"></i>@lang('Retour')</a>
+    <x-back route="{{ route('staff.mission.detailmission', encrypt($courierInfo->mission_id)) }}" />
+ @endpush   
+@push('script-lib')
+    <script src="{{asset('assets/viseradmin/js/vendor/datepicker.min.js')}}"></script>
+    <script src="{{asset('assets/viseradmin/js/vendor/datepicker.en.js')}}"></script>
 @endpush
+
+@push('style-lib')
+    <link  rel="stylesheet" href="{{asset('assets/viseradmin/css/vendor/datepicker.min.css')}}">
+@endpush
+
 @push('script')
 <script>
     "use strict";
@@ -270,9 +265,8 @@
             });
         }
     });
-</script>
-<script>
-    function currierType(id) {
+
+     function currierType(id) {
         let unit = $("#courier_type_" + id).find(':selected').data('unit');
         let price = $("#courier_type_" + id).find(':selected').data('price');
         $("#unit_" + id).html(unit);
@@ -328,62 +322,174 @@
         });
         $("#total_paye").val(sum);
     }
-    $(document).ready(function() {
-        let id = 100;
-        $('.addUserData').on('click', function() {
-            id++;
-            let html = `<div class="row single-item gy-2 user-data">
-                            
-                                <div class="col-md-2">
-                                        <select class="form-control selected_type" id="rdv_type_${id}"  name="rdvName[]"  onChange="getType(this.value,${id});" required="">
+
+
+</script>
+<script>
+    "use strict";
+    (function ($) {
+
+
+        $('.addUserData').on('click', function () {
+            let length=$("#addedField").find('.single-item').length;
+            let html = `
+            <div class="row single-item gy-2">
+            <div class="col-md-2">
+            <select class="form-control" id="rdv_type_${length}"  name="items[${length}][rdvName]"  onChange="getType(this.value,${length});" required="">
                                             <option>@lang('Choisir')</option>
                                                <option value="1" >ENVOI</option>
                                                <option value="0" >FRAIS</option>
                                                 <option value="2" >DEPOT</option>
                                         </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <select class="form-control select_${id} selected_type" id="courier_type_${id}" onchange="currierType(${id})" name="courierName[]" required="">
-                                            <option>@lang('Choisir')</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="input-group">
-                                            <input type="text" class="form-control form-control-lg quantity currier_quantity_${id}" placeholder="@lang('Qté')" disabled="" onkeyup="courierQuantity(${id})" name="quantity[]" aria-label="Qté" aria-describedby="basic-addon2" required="">
-                                            <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
+            </div>
+                <div class="col-md-3">
+                    <select class="form-control select_${length} select2 selected_type" id="courier_type_${length}" onchange="currierType(${length})" name="items[${length}][courierName]" required>
+                        <option disabled selected value="">@lang('Choisir')</option>
+                           
+                    </select>
+                </div>
 
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="col-md-3">
-                                       <div class="input-group mb-3">
-                                            <input type="text" id="amount" class="form-control form-control-lg currier_fee_${id}  montant" placeholder="@lang('Frais')" onkeyup="changeMontant(${id})" name="amount[]" aria-label="Frais" aria-describedby="basic-addon2" required="" >
-                                            <div class="input-group-append">
-                                                <span class="input-group-text" id="basic-addon2">{{$general->cur_text}}</span>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-1">
-                        <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
-                            <i class="fa fa-times"></i>
-                        </button>
+                <div class="col-md-3">
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control quantity currier_quantity_${length}" placeholder="@lang('Quantité')" onkeyup="courierQuantity(${length})" disabled name="items[${length}][quantity]"  required>
+                        <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
                     </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <input type="text" id="amount"  class="form-control single-item-amount currier_fee_${length}  montant"  onkeyup="changeMontant(${length})" placeholder="@lang('Prix')"  name="items[${length}][amount]" required>
+                        <span class="input-group-text">{{__($general->cur_text)}}</span>
+                    </div>
+                </div>
+                <div class="col-md-1">
+                    <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
+                        <i class="fa fa-times"></i>
+                    </button>
+                </div>
+            </div>`;
+            $('#addedField').append(html)
 
-                             
-                        </div>`;
-            $('.addedField').append(html)
-
-        $(".select_"+id).select2({
+             $(".select_"+id).select2({
             allowClear:true,
             tags:true,
             placeholder:""});
 
         });
 
-        $(document).on('click', '.removeBtn', function() {
-            $(this).closest('.user-data').remove();
+        $('#addedField').on('change', '.selected_type', function (e) {
+            let unit = $(this).find('option:selected').data('unit');
+            let parent = $(this).closest('.single-item');
+            $(parent).find('.quantity').attr('disabled', false);
+            $(parent).find('.unit').html(`${unit || '<i class="las la-balance-scale"></i>'}`);
+            calculation();
         });
-    });
+
+        $('#addedField').on('click', '.removeBtn', function (e) {
+            let length=$("#addedField").find('.single-item').length;
+            if(length <= 1){
+                notify('warning',"@lang('At least one item required')");
+            }else{
+                $(this).closest('.single-item').remove();
+            }
+            $('.discount').trigger('change');
+            calculation();
+        });
+
+        let discount=0;
+
+        $('.discount').on('input change',function (e) {
+            this.value = this.value.replace(/^\.|[^\d\.]/g, '');
+             discount=parseFloat($(this).val() || 0);
+             if(discount >=100){
+                discount=100;
+                notify('warning',"@lang('Discount can not bigger than 100 %')");
+                $(this).val(discount);
+             }
+            calculation();
+        });
+
+        $('#addedField').on('input', '.quantity', function (e) {
+            this.value = this.value.replace(/^\.|[^\d\.]/g, '');
+
+            let quantity = $(this).val();
+            if (quantity <= 0) {
+                quantity = 0;
+            }
+            quantity=parseFloat(quantity);
+
+            let parent   = $(this).closest('.single-item');
+            let price    = parseFloat($(parent).find('.selected_type option:selected').data('price') || 0);
+            let subTotal = price*quantity;
+
+            $(parent).find('.single-item-amount').val(subTotal.toFixed(2));
+
+
+            var sum = 0;
+                // or $( 'input[name^="ingredient"]' )
+                $('.montant').each(function(i, e) {
+                    var v = parseInt($(e).val());
+                    if (!isNaN(v))
+                        sum += v;
+                    console.log('total apres ' + sum);
+                });
+                $("#total_paye").val(sum);
+        });
+
+        function calculation ( ) {
+            let items    = $('#addedField').find('.single-item');
+            let subTotal = 0;
+
+            $.each(items, function (i, item) {
+                let price = parseFloat($(item).find('.selected_type option:selected').data('price') || 0);
+                let quantity = parseFloat($(item).find('.quantity').val() || 0);
+                subTotal+=price*quantity;
+            });
+
+            subTotal=parseFloat(subTotal);
+
+            let discountAmount = (subTotal/100)*discount;
+            let total          = subTotal-discountAmount;
+
+            $('.subtotal').text(subTotal.toFixed(2));
+            $('.total').text(total.toFixed(2));
+        };
+
+        $('.date').datepicker({
+            language  : 'en',
+            dateFormat: 'yyyy-mm-dd',
+            minDate   : new Date()
+        });
+
+
+
+       
+
+
+    })(jQuery);
 </script>
+@endpush
+
+@push('style')
+    <style>
+        .border-line-area {
+            position: relative;
+            text-align: center;
+            z-index: 1;
+        }
+        .border-line-area::before {
+            position: absolute;
+            content: '';
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: #e5e5e5;
+            z-index: -1;
+        }
+        .border-line-title {
+            display: inline-block;
+            padding: 3px 10px;
+            background-color: #fff;
+        }
+    </style>
 @endpush

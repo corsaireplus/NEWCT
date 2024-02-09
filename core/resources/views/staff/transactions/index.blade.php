@@ -141,7 +141,7 @@
                                              </a>
                                                 @endif
                                             @if($courierInfo->status  == 0 && (auth()->user()->username == 'bagate') && $courierInfo->ship_status != - 1) 
-                                              <a href="javascript:void(0)"  class="icon-btn btn--danger ml-1 deletePaiement" data-refpaiement="{{$courierInfo->id}}"><i class="las la-trash"></i></a>
+                                              <a href="javascript:void(0)"  class="icon-btn btn--danger ml-1 deleteTransaction" data-refpaiement="{{$courierInfo->trans_id}}"><i class="las la-trash"></i></a>
                                     
                                               @endif
                                             @endif
@@ -165,6 +165,32 @@
             </div>
         </div>
     </div>
+    <div id="branchModel" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">@lang('SUPPRIMER ENVOI')</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+   
+                <form action="{{route('staff.transactions.delete')}}" method="POST">
+                    @csrf
+                    <input type="hidden" name="refpaiement" id="refpaiement" >
+                    <div class="modal-body">
+                    <p>@lang('Êtes vous sûr de vouloir Supprimer cet envoi ?')</p>
+                </div>
+
+                   
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('Annuler')</button>
+                        <button type="submit" class="btn btn--danger">@lang('Supprimer')</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection
 
 @push('style-lib')
@@ -177,6 +203,15 @@
 @endpush
 
 @push('script')
+<script>
+    "use strict";
+    $('.deleteTransaction').on('click', function() {
+        var modal = $('#branchModel');
+        modal.find('input[name=refpaiement]').val($(this).data('refpaiement'))
+        modal.modal('show');
+    });
+    
+</script>
     <script>
         (function($) {
             "use strict";

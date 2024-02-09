@@ -125,8 +125,8 @@
                                     <thead>
                                         <tr>
                                             <th><?php echo app('translator')->get('Description'); ?></th>
-                                            <th><?php echo app('translator')->get('Frais'); ?></th>
                                             <th><?php echo app('translator')->get('Qté'); ?></th>
+                                             <th><?php echo app('translator')->get('Frais'); ?></th>
                                             <th><?php echo app('translator')->get('Sous-total'); ?></th>
                                         </tr>
                                     </thead>
@@ -134,10 +134,8 @@
                                         <?php $__currentLoopData = $courierInfo->products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courierProductInfo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                             <tr>
                                                 <td><?php echo e(__($courierProductInfo->type->name)); ?></td>
-                                                <td><?php echo e(showAmount($courierProductInfo->fee)); ?> <?php echo e($general->cur_sym); ?></td>
-                                                <td><?php echo e($courierProductInfo->qty); ?>
-
-                                                    <?php echo e(__(@$courierProductInfo->type->unit->name)); ?></td>
+                                                <td><?php echo e($courierProductInfo->qty); ?><?php echo e(__(@$courierProductInfo->type->unit->name)); ?></td>
+                                                <td><?php echo e(showAmount($courierProductInfo->fee/$courierProductInfo->qty)); ?> <?php echo e($general->cur_sym); ?></td>
                                                 <td><?php echo e(showAmount($courierProductInfo->fee)); ?> <?php echo e($general->cur_sym); ?></td>
                                             </tr>
                                         <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -149,7 +147,7 @@
                 </div>
             </div>
 
-            <div class="row mb-30">
+            <!-- <div class="row mb-30">
                 <div class="col-lg-12 mt-2">
                     <div class="card border--dark">
                         <h5 class="card-header bg--dark"><?php echo app('translator')->get('Facture Information'); ?></h5>
@@ -226,7 +224,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="row mb-30">
                 <div class="col-lg-12 mt-2">
                     <div class="card border--dark">
@@ -330,7 +328,7 @@
                                         <?php else: ?>
                                         <td>N/A</td>
                                         <?php endif; ?>
-                                        <td>                                            <a href="<?php echo e(route('staff.transaction.recu', encrypt($payment->refpaiement))); ?>"><span class="badge badge--primary"><?php echo app('translator')->get('reçu'); ?></span></a>
+                                        <td>                                            <a href="<?php echo e(route('staff.transaction.recutrans', encrypt($payment->refpaiement))); ?>"><span class="badge badge--primary"><?php echo app('translator')->get('reçu'); ?></span></a>
 
                                     </tr>
 
@@ -387,23 +385,39 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="" lass="modal-title" id="exampleModalLabel"><?php echo app('translator')->get('Payment Confirmation'); ?></h5>
+                    <h5 class="" lass="modal-title" id="exampleModalLabel"><?php echo app('translator')->get('Ajouter Paiement'); ?></h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="las la-times"></i>
                     </button>
                 </div>
-                <form action="<?php echo e(route('staff.courier.payment')); ?>" method="POST">
-                    <?php echo csrf_field(); ?>
-                    <?php echo method_field('POST'); ?>
+                <form action="<?php echo e(route('staff.transactions.payment')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('POST'); ?>
+                <div class="modal-body">
                     <input type="hidden" name="code">
-                    <div class="modal-body">
-                        <p><?php echo app('translator')->get('Are you sure to collect this amount?'); ?></p>
+                    <p><?php echo app('translator')->get('Entrer les Informations de paiement'); ?></p>
+                    <div class="form-group">
+                        <div class="form-group col-lg-6">
+                            <select class="form-control form-control-lg" id="mode" name="mode">
+                                <option><?php echo app('translator')->get('Choisir Mode'); ?></option>
+                                <option value="1">ESPECE</option>
+                                <option value="2">CHEQUE</option>
+                                <option value="3">CARTE BANCAIRE</option>
+                                <option value="4">VIREMENT</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-lg-6">
+                            <input type="numeric" class="form-control form-control-lg" name="montant_payer" id="montant_payer" placeholder="Montant Payer">
+                        </div>
+
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal"><?php echo app('translator')->get('No'); ?></button>
-                        <button type="submit" class="btn btn--primary"><?php echo app('translator')->get('Yes'); ?></button>
+                   <div class="modal-footer">
+                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal"><?php echo app('translator')->get('Annuler'); ?></button>
+                        <button type="submit" class="btn btn--primary"><?php echo app('translator')->get('Payer'); ?></button>
                     </div>
-                </form>
+            </form>
+                
             </div>
         </div>
     </div>
@@ -438,14 +452,14 @@
 
 <?php $__env->startPush('breadcrumb-plugins'); ?>
     <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.back','data' => ['route' => ''.e(route('staff.transactions.index')).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.back','data' => ['route' => ''.e(url()->previous()).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('back'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['route' => ''.e(route('staff.transactions.index')).'']); ?>
+<?php $component->withAttributes(['route' => ''.e(url()->previous()).'']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
@@ -467,7 +481,7 @@
 
     <?php if($courierInfo->status <= 1 ): ?>
             <button class="btn btn-sm btn-outline--success payment"
-                data-code="<?php echo e($courierInfo->code); ?>"><i class="las la-credit-card"></i>
+                data-code="<?php echo e($courierInfo->trans_id); ?>"><i class="las la-credit-card"></i>
                 <?php echo app('translator')->get('Payer'); ?></button>
     <?php endif; ?>
 

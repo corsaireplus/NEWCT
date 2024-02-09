@@ -12,6 +12,8 @@
                                 <th>
                                     @if($colis_dispo->count() > 0)
                                     <input type="checkbox" id="chk_all_multiple">
+                                    @else
+                                    <input type="checkbox" id="chk_all_multiple">
                                     @endif
                                 </th>
                                 <th>@lang('Date')</th>
@@ -24,6 +26,44 @@
                             </tr>
                         </thead>
                         <tbody>
+                        @forelse($trans_dispo as $rdv)
+                        
+                            @if($rdv->transfertDetail->count() > 0)
+                            <tr>
+                                <td data-label="@lang('Selection')">
+                                    <input type="checkbox" name="transids[]" value="{{ $rdv->id }}" class="checkboxmultiple" id="chk{{ $rdv->id }}" onclick='checkcheckboxmultiple();'>
+                                </td>
+                                <td data-label="@lang('Date')">
+                                    <span>{{date('d-m-Y', strtotime($rdv->created_at))}}</span>
+                                </td>
+                                <td data-label="@lang('Reference Colis')">
+                                <span class="font-weight-bold"> {{$rdv->reftrans}} {{$rdv->trans_id}}   </span>
+                                </td>
+                                <td data-label="@lang('Nb Colis')">
+                                <span> {{$rdv->transfertDetail->count()}}    </span>
+                                </td>
+                                <td data-label="@lang('Nb Colis Charge')">
+                                    @if($rdv->transfertDetail->count() > 1)
+                                    <input value="" name="{{$rdv->id}}" id="{{$rdv->id}}" data-nb="{{$rdv->id}}" type="number"/>
+                                    @else
+                                    <input type="hidden" name="{{$rdv->id}}" id="{{$rdv->id}}" data-nb="{{$rdv->id}}" value="1"/>
+                                    @endif
+                                </td>
+                                <td data-label="@lang('Expediteur')">
+                                    <span>{{$rdv->sender->nom}}</span>
+                                </td>
+                                <td data-label="@lang('Contact')">
+                                    {{$rdv->sender->contact}}
+
+                                </td>
+                                <td data-label="@lang('Choisir')">
+                                    <a href="javascript:void(0)" class="icon-btn btn--primary ml-1 editTrans" data-idmission="{{$mission->idcontainer}}" data-transid="{{$rdv->id}}" data-idchauf="{{$mission->chauffeur_idchauffeur}}"><i class="las la-edit"></i></a>
+                                </td>
+                            </tr>
+                            @endif
+                            @empty
+                            @endforelse
+                            
                             @forelse($colis_dispo as $rdv)
                             @if($rdv->transfertDetail->count() > 0)
                             <tr>
@@ -58,11 +98,14 @@
                                 </td>
                             </tr>
                             @endif
+
+                            
                             @empty
                             <tr>
                                 <td class="text-muted text-center" colspan="100%">{{__($emptyMessage) }}</td>
                             </tr>
                             @endforelse
+                            
 
                         </tbody>
                         <tfoot>
@@ -94,15 +137,16 @@
             <form action="{{route('staff.container.storecolis')}}" method="POST">
                 @csrf
                 <input type="hidden" name="idrdv" id="idrdv">
+                <input type="hidden" name="transid" id="transid">
                 <input type="hidden" name="idchauf" id="idchauf">
                 <input type="hidden" name="idmission" id="idmission">
                 <input type="hidden" name="nbcolis" id="nbcolis">
  
 
-                <div class="modal-footer">
-                    <button type="button" class="btn btn--secondary" data-dismiss="modal">@lang('Annuler')</button>
-                    <button type="submit" class="btn btn--success"><i class="fa fa-fw fa-paper-plane"></i>@lang('Ajouter Colis')</button>
-                </div>
+                 <div class="modal-footer">
+                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('Annuler')</button>
+                        <button type="submit" class="btn btn--primary">@lang('Ajouter Colis')</button>
+                  </div>
             </form>
         </div>
     </div>
@@ -155,7 +199,20 @@
         var id = $(this).data('idrdv');
         var inp =  $('#'+id).val();
         console.log(inp);
+        modal.find('input[id=transid]').val($(this).data('transid'));
         modal.find('input[id=idrdv]').val($(this).data('idrdv'));
+        modal.find('input[id=idchauf]').val($(this).data('idchauf'));
+        modal.find('input[id=idmission]').val($(this).data('idmission'));
+        modal.find('input[id=nbcolis]').val(inp);
+        $('#branchModel').modal('show');
+    });
+
+    $('.editTrans').on('click', function() {
+        var modal = $('#branchModel');
+        var id = $(this).data('transid');
+        var inp =  $('#'+id).val();
+        console.log(inp);
+        modal.find('input[id=transid]').val($(this).data('transid'));
         modal.find('input[id=idchauf]').val($(this).data('idchauf'));
         modal.find('input[id=idmission]').val($(this).data('idmission'));
         modal.find('input[id=nbcolis]').val(inp);
@@ -180,6 +237,18 @@
                 // favorite.push($(this).val());
                 var inp =  $('#'+$(this).val()).val();
                 $("#bulk_multi_hidden").append('<input type=hidden name=ids[] value=' + $(this).val() + '>');
+                $("#bulk_multi_hidden").append('<input type=hidden name=transids[] value=' + $(this).val() + '>');
+                $("#bulk_multi_hidden").append('<input type=hidden name=nbcolis[] value=' + inp + '>');
+
+            });
+            // console.log(favorite);
+        }
+        if ($("input[name='transids[]']:checked").length > 0) {
+            // var favorite = [];
+            $.each($("input[name='transids[]']:checked"), function() {
+                // favorite.push($(this).val());
+                var inp =  $('#'+$(this).val()).val();
+                $("#bulk_multi_hidden").append('<input type=hidden name=transids[] value=' + $(this).val() + '>');
                 $("#bulk_multi_hidden").append('<input type=hidden name=nbcolis[] value=' + inp + '>');
 
             });

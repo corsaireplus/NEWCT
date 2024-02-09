@@ -58,12 +58,20 @@ class Rdv extends Model
         return $this->hasMany(Paiement::class, 'transfert_id');
     }
 
+    public function transpaiement(){
+        return $this->hasMany(Paiement::class, 'transaction_id');
+    }
+
     public function adresse(){
-        return $this->hasOne(RdvAdresse::class,'rdv_id','idrdv');
+        return $this->hasOne(RdvAdresse::class,'client_id','sender_idsender')->latest();
     }
 
     public function transfert(){
         return $this->hasOne(Transfert::class,'receiver_satff_id','idrdv');
+    }
+
+    public function transaction(){
+        return $this->hasOne(Transaction::class,'rdv_id','idrdv');
     }
 
     public function depot(){

@@ -110,7 +110,7 @@ class Transaction extends Model
     }
     public function products()
     {
-        return $this->hasMany(TransactionProduct::class, 'transaction_id', 'id');
+        return $this->hasMany(TransactionProduct::class, 'transaction_id', 'id')->with('type');
     }
     // public function receiverStaff()
     // {

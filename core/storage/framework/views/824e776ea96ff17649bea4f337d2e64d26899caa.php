@@ -6,7 +6,7 @@
                     <div class="d-flex justify-content-between">
                         <div class="fw-bold">
                         <address class="m-t-5 m-b-5">
-                            <strong class="text-inverse">CHALLENGES TRANSIT</strong><br>
+                            <strong class="text-inverse">CHALLENGE TRANSIT</strong><br>
                            
                             90 Rue Edouard Branly Montreuil<br>
                             Tél: 0179751616 - 0619645428<br>
@@ -55,7 +55,7 @@
                             <b><?php echo app('translator')->get('Transaction Id'); ?>:</b> <?php echo e($courierInfo->code); ?><br>
                             <b><?php echo app('translator')->get('Paiement Status'); ?>:</b>
                             <?php if($courierInfo->status == 2): ?>
-                                <span class="badge badge--success"><?php echo app('translator')->get('Pauyé'); ?></span>
+                                <span class="badge badge--success"><?php echo app('translator')->get('Payé'); ?></span>
                             <?php else: ?>
                                 <span class="badge badge--danger"><?php echo app('translator')->get('Non Payé'); ?></span>
                             <?php endif; ?>
@@ -97,8 +97,8 @@
                                     <tr>
                                         <th>#</th>
                                         <th><?php echo app('translator')->get('Description'); ?></th>
-                                        <th><?php echo app('translator')->get('Prix'); ?></th>
                                         <th><?php echo app('translator')->get('Qté'); ?></th>
+                                        <th><?php echo app('translator')->get('Prix'); ?></th>
                                         <th><?php echo app('translator')->get('Sous-total'); ?></th>
                                     </tr>
                                 </thead>
@@ -106,9 +106,9 @@
                                     <?php $__currentLoopData = $courierInfo->products; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courierProductInfo): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
                                         <tr>
                                             <td><?php echo e($loop->iteration); ?></td>
-                                            <td> <?php if($courierProductInfo->type_cat_id == 2): ?><?php echo e(__('DEPOT')); ?> <?php else: ?> <?php echo e(__('ENVOI')); ?> <?php endif; ?> <?php echo e(__(@$courierProductInfo->type->name)); ?></td>
-                                            <td><?php echo e(showAmount($courierProductInfo->fee)); ?> <?php echo e($general->cur_sym); ?></td>
+                                            <td><?php echo e(__(@$courierProductInfo->type->name)); ?></td>
                                             <td><?php echo e($courierProductInfo->qty); ?> <?php echo e(__(@$courierProductInfo->type->unit->name)); ?></td>
+                                            <td><?php echo e(showAmount($courierProductInfo->fee/$courierProductInfo->qty )); ?> <?php echo e($general->cur_sym); ?></td>
                                             <td><?php echo e(showAmount($courierProductInfo->fee)); ?> <?php echo e($general->cur_sym); ?></td>
                                         </tr>
                                     <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
@@ -157,11 +157,11 @@
                 <div class="col-sm-12">
                     <div class="float-sm-end">
                         <?php if(!$courierInfo->paymentInfo): ?>
-                            <td><?php echo app('translator')->get('Unpaid'); ?></td>
+                            <td><?php echo app('translator')->get('Non Payé'); ?></td>
                         <?php else: ?>
                             <?php if($courierInfo->status <= 1 ): ?>
                                 <button type="button" class="btn btn-outline--success m-1 payment"
-                                    data-code="<?php echo e($courierInfo->code); ?>">
+                                    data-code="<?php echo e($courierInfo->trans_id); ?>">
                                     <i class="fa fa-credit-card"></i> <?php echo app('translator')->get('Ajouter Paiement'); ?>
                                 </button>
                             <?php endif; ?>
@@ -181,30 +181,59 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="" lass="modal-title" id="exampleModalLabel"><?php echo app('translator')->get('Payment Confirmation'); ?></h5>
+                    <h5 class="" lass="modal-title" id="exampleModalLabel"><?php echo app('translator')->get('Ajouter Paiement'); ?></h5>
                     <button type="button" class="close" data-bs-dismiss="modal">
                         <i class="las la-times"></i> </button>
                 </div>
 
-                <form action="<?php echo e(route('staff.courier.payment')); ?>" method="POST">
-                    <?php echo csrf_field(); ?>
-                    <?php echo method_field('POST'); ?>
+               <form action="<?php echo e(route('staff.transactions.payment')); ?>" method="POST">
+                <?php echo csrf_field(); ?>
+                <?php echo method_field('POST'); ?>
+                <div class="modal-body">
                     <input type="hidden" name="code">
-                    <div class="modal-body">
-                        <p><?php echo app('translator')->get('Are you sure to collect this amount?'); ?></p>
+                    <p><?php echo app('translator')->get('Entrer les Informations de paiement'); ?></p>
+                    <div class="form-group">
+                        <div class="form-group col-lg-6">
+                            <select class="form-control form-control-lg" id="mode" name="mode">
+                                <option><?php echo app('translator')->get('Choisir Mode'); ?></option>
+                                <option value="1">ESPECE</option>
+                                <option value="2">CHEQUE</option>
+                                <option value="3">CARTE BANCAIRE</option>
+                                <option value="4">VIREMENT</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-lg-6">
+                            <input type="numeric" class="form-control form-control-lg" name="montant_payer" id="montant_payer" placeholder="Montant Payer">
+                        </div>
+
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal"><?php echo app('translator')->get('No'); ?></button>
-                        <button type="submit" class="btn btn--primary"><?php echo app('translator')->get('Yes'); ?></button>
+                   <div class="modal-footer">
+                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal"><?php echo app('translator')->get('Annuler'); ?></button>
+                        <button type="submit" class="btn btn--primary"><?php echo app('translator')->get('Payer'); ?></button>
                     </div>
-                </form>
+            </form>
             </div>
         </div>
     </div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('breadcrumb-plugins'); ?>
-
+ <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.back','data' => ['route' => ''.e(url()->previous()).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('back'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['route' => ''.e(url()->previous()).'']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startPush('script'); ?>

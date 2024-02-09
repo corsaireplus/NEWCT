@@ -39,7 +39,7 @@
                                 @if($rdvliste->observation !== NULL)
                                 <td >{{$rdvliste->observation}}</td>
                                 @else <td></td> @endif
-                                <td >{{$rdvliste->client->nom}}</td>
+                                <td >{{$rdvliste}}</td>
                                 <td >{{$rdvliste->client->contact}}</td>
                                 @if($rdvliste->adresse)
                                 <td >{{$rdvliste->adresse->code_postal}}</td>

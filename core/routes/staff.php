@@ -42,6 +42,10 @@ Route::middleware('auth')->group(function () {
                     Route::get('income', 'branchIncome')->name('income');
                 });
             });
+            // routes/web.php
+
+
+
             Route::controller('CourierController')->name('courier.')->prefix('courier')->group(function () {
                 Route::get('send', 'create')->name('create');
                 Route::post('store', 'store')->name('store');
@@ -94,8 +98,12 @@ Route::middleware('auth')->group(function () {
                 Route::get('details/{id}','details')->name('details');
                 Route::get('modifier/{id}','edit')->name('modifier');
                 Route::post('updating','update')->name('updating');
+                Route::post('payment','payment')->name('payment');
+                Route::post('delete','delete')->name('delete');
+                Route::get('newrdv/{id}','newrdv')->name('newrdv');
 
             });
+            Route::post('/open-modal', 'MissionController@openModal')->name('open-modal');
 
 
             //RDV
@@ -139,6 +147,7 @@ Route::middleware('auth')->group(function () {
             Route::get('mission/print/{id}','MissionController@print_mission')->name('mission.print');
             Route::post('mission/end','MissionController@EndMission')->name('mission.end');
             Route::post('mission/get_type','MissionController@getType')->name('mission.getType');
+            Route::get('bilanmission/{id}','MissionController@bilanMissionend')->name('mission.bilan');
              //ajouter Chauffeur
              Route::post('mission/store_chauffeur','MissionController@store_chauffeur')->name('mission.store_chauffeur');
               //liste des rdv terminés
@@ -203,6 +212,7 @@ Route::middleware('auth')->group(function () {
             Route::get('transaction/date/agencesearch', 'BilanController@agencebilanDateSearch')->name('transaction.date.agencesearch');
             Route::get('transaction/expense/date/search', 'BilanController@expenseDateSearch')->name('expense.date.search');
             Route::get('transaction/paiement/recu/{id}','BilanController@recupaiement')->name('transaction.recu');
+            Route::get('transaction/paiementtrans/recu/{id}','BilanController@recupaiementrans')->name('transaction.recutrans');
 
 
 

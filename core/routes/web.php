@@ -31,4 +31,12 @@ Route::controller('SiteController')->group(function () {
     Route::post('/order/tracking', 'findOrder')->name('order.tracking');
     Route::get('/{slug}', 'pages')->name('pages');
     Route::get('/', 'index')->name('home');
+
+   
+    Route::get('/rdvclient', 'SiteController@rdvclient')->name('rdvclient');
+    Route::post('rdvclient/fetch','SiteController@fetch')->name('rdvclient.fetch');
+    Route::post('rdvclient/get_type','SiteController@getType')->name('rdvclient.getType');
+    Route::post('/rdvclient', 'SiteController@rdvclientSubmit');
+    Route::get('/home/akwaba','SiteController@akwaba')->name('home.akwaba');
+    Route::get('/home/departs','SiteController@departs')->name('home.departs');
 });

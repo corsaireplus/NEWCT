@@ -66,6 +66,15 @@
                                                  @endif
                                         
                                         @endif
+                                         @if($rdv->transaction)
+                                            @if($rdv->transaction->status == 0 )
+                                            <a href="{{route('staff.transactions.details', encrypt($rdv->transaction->id))}}" title="" > <span class="badge badge--danger">{{ isset($rdv->transaction->reftrans) ? $rdv->transaction->reftrans : $rdv->transaction->trans_id }}</span></a>
+                                            @elseif($rdv->transaction->status == 1 )
+                                            <a href="{{route('staff.transactions.details', encrypt($rdv->transaction->id))}}" title="" > <span class="badge badge--warning">{{ isset($rdv->transaction->reftrans) ? $rdv->transaction->reftrans : $rdv->transaction->trans_id }}</span></a>
+                                            @elseif($rdv->transaction->status == 2)
+                                            <a href="{{route('staff.transactions.details', encrypt($rdv->transaction->id))}}" title="" > <span class="badge badge--success">{{ isset($rdv->transaction->reftrans) ? $rdv->transaction->reftrans : $rdv->transaction->trans_id }}</span></a>
+                                            @endif
+                                        @endif
                                         <a href="{{route('staff.rdv.detail', encrypt($rdv->idrdv))}}" title="" class="icon-btn btn--info ml-1 delivery" data-code="{{$rdv->idrdv}}"> Detail</a>
                                         <span class="badge badge-pill bg--success">@lang('Terminé')</span>
                                     @endif
@@ -97,6 +106,12 @@
 
 @endsection
 @push('breadcrumb-plugins')
+<x-back route="{{ url()->previous()  }}" />
+ <a href="{{ route('staff.transactions.newrdv', $mission_id) }}" title=""
+        class="btn btn-sm btn-outline--info">
+        <i class="las la-file-invoice"></i>
+        @lang('Ajouter RDV Dans ce Programme')
+    </a>
 <!-- <a href="javascript:void(0)" class="btn btn-sm btn--secondary box--shadow1 text--small sendSms" onclick="sendSms({{encrypt($mission->idmission)}},{{$mission->contact}})" data-idmission="{{encrypt($mission->idmission)}}" data-contact="{{$mission->contact}}"><i class="las la-phone"></i>@lang('Sms')</a> -->
 
 <!-- <a href="{{route('staff.mission.send_sms',encrypt($mission->idmission))}}" class="btn btn-sm btn--secondary box--shadow1 text--small"><i class="las la-phone"></i> @lang('Envoyer SMS')</a> -->

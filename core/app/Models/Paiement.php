@@ -20,6 +20,9 @@ class Paiement extends Model
     public function transfert(){
         return $this->belongsTo(Transfert::class,'transfert_id');
     }
+     public function transaction(){
+        return $this->belongsTo(Transaction::class,'transaction_id');
+    }
     
     public function branch()
     {

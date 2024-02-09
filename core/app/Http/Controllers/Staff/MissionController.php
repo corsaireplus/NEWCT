@@ -23,6 +23,8 @@ use App\Models\RdvProduct;
 use App\Models\Mission;
 use App\Models\MissionsRdvs;
 use App\Models\Client;
+use App\Models\Depense;
+use App\Models\DepenseCategorie;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Controllers\Staff\SmsController;
 
@@ -137,30 +139,12 @@ class MissionController extends Controller
          
          $emptyMessage = "Aucun Rdv";
          $mission=Mission::findOrFail(decrypt($id));
-         /*
-         $rdv_dispo=Rdv::with('rdvDetail')
-              ->join('rdv_payments','rdvs.idrdv','=','rdv_payments.rdv_id')
-              ->join('rdv_products','rdvs.idrdv','=','rdv_products.rdv_idrdv')
-              ->join('clients','rdvs.sender_idsender','=','clients.id')
-              ->join('rdv_adresse','rdvs.sender_idsender','=','rdv_adresse.client_id')
-              ->select('rdvs.idrdv','rdvs.date','rdv_adresse.code_postal','rdv_adresse.adresse','clients.contact')
-              ->where('rdvs.status','0')
-              ->where('rdvs.deleted_at',NULL)
-              ->orderBy('rdv_adresse.code_postal','desc')
-              ->orderBy('rdvs.date','asc')
-              ->paginate(getPaginate());
-      */
-      $rdv_dispo = Rdv::dateFilter()->searchable(['adresse:adresse','adresse:code_postal','client:contact'])
+         $rdv_dispo = Rdv::dateFilter()->searchable(['adresse:adresse','adresse:code_postal','client:contact'])
                         ->where('status', '0')
                         ->whereNull('deleted_at')
                         ->orderBy('date', 'asc')
                         ->with(['rdvDetail', 'client', 'adresse'])
                         ->paginate(getPaginate());
-
-         
-         // $rdv_dispo=Rdv::where('status',0)->with('paymentInfo','rdvDetail')->with('client')->with(['adresse' => function($query) {
-         //    $query->orderBy('code_postal', 'desc');
-         // }])->orderBy('date', 'ASC')->paginate(getPaginate());
          $pageTitle = "Assigner rdv à Programme du ".date('d-m-Y', strtotime($mission->date))."- Chauffeur : ".$mission->chauffeur->firstname;
          // dd($rdv_dispo);
          return view('staff.missions.create_mission', compact('pageTitle','rdv_dispo','mission','emptyMessage'));
@@ -219,21 +203,10 @@ class MissionController extends Controller
          $pageTitle = "Details Programme Chauffeur";
          $emptyMessage = "Aucun Rdv";
          $mission=Mission::findOrFail(decrypt($id));
-         //dd($mission->idmission);
-         $rdv_chauf=Rdv::with('client','adresse','transfert','depot','paymentInfo')->where('mission_id',$mission->idmission)->where('status','>=','2')->orderBy('order_list','ASC')->get();
-      //    $rdv_chauf=Rdv::with('rdvDetail','rdvDetail.type')
-      // ->join('rdv_payments','rdvs.idrdv','=','rdv_payments.rdv_id')
-      // ->join('rdv_products','rdvs.idrdv','=','rdv_products.rdv_idrdv')
-      // ->join('clients','rdvs.sender_idsender','=','clients.id')
-      // ->join('rdv_adresse','rdvs.sender_idsender','=','rdv_adresse.client_id')
-      // ->select('rdvs.idrdv','rdvs.date','rdv_adresse.code_postal','rdv_adresse.adresse','clients.contact','clients.nom')
-      // ->where('rdvs.status','2')
-      // ->where('rdvs.mission_id', $mission->idmission)
-      // ->where('rdvs.deleted_at',NULL)
-      // ->orderBy('rdv_adresse.code_postal','desc')
-      // ->paginate(getPaginate());
+         $mission_id = $id;
+         $rdv_chauf=Rdv::with('client','adresse','transfert','depot','paymentInfo','transaction')->where('mission_id',$mission->idmission)->where('status','>=','2')->orderBy('order_list','ASC')->get();
          $pageTitle = "Details Programme du ".date('d-m-Y', strtotime($mission->date))." - Chauffeur : ".$mission->chauffeur->firstname." - Chargeur: ".$mission->chargeur->firstname." ".$mission->contact;
-         return view('staff.missions.details_mission', compact('pageTitle','rdv_chauf','mission','emptyMessage'));
+         return view('staff.missions.details_mission', compact('pageTitle','rdv_chauf','mission','emptyMessage','mission_id'));
          
          
       }
@@ -242,7 +215,7 @@ class MissionController extends Controller
          $emptyMessage = "Aucun Rdv";
          $mission=Mission::where('status',1)->findOrFail(decrypt($id));
          //dd($mission->idmission);
-         $rdv_chauf=Rdv::with('client','adresse','transfert','depot','transfert.paymentInfo')->where('mission_id',$mission->idmission)->where('status','>=','2')->orderBy('date','ASC')->paginate(getPaginate());
+         $rdv_chauf=Rdv::with('client','adresse','transfert','depot','transaction','transfert.paymentInfo')->where('mission_id',$mission->idmission)->where('status','>=','2')->orderBy('date','ASC')->paginate(getPaginate());
          
          $pageTitle = "Details Programme terminé du ".date('d-m-Y', strtotime($mission->date))." - Chauffeur : ".$mission->chauffeur->firstname;
          return view('staff.missions.details_mission_end', compact('pageTitle','rdv_chauf','mission','emptyMessage'));
@@ -280,8 +253,9 @@ class MissionController extends Controller
            $user = auth()->user();           
            $user = Auth::user();
            Rdv::whereIn('idrdv', $id)->update(['status' => 2,'mission_id' => $request->idmission ]);
+         
            activity('assignation rdv à programme')
-           ->performedOn($rdv)
+          // ->performedOn($rdv)
            ->causedBy($user)
            //->withProperties(['customProperty' => 'customValue'])
            ->log('Rdv assigné au programme '.$request->idmission.' par ' . $user->username);
@@ -538,40 +512,68 @@ class MissionController extends Controller
        
             }
 
+            public function openModal(Request $request)
+               {
+                 // dd($request);
+                  $code = $request->input('code');
+                  //dd($request);
 
-//    function sendSms($client, $message,$idmission,$idrdv){
-//       $BASE_URL = "https://gygyrw.api.infobip.com";
-//       $API_KEY = "53ac56146d9ddda8f3396fb303fe5101-27968279-6a9d-4962-83a2-562d37ac649c";
+                  if($code == "sms"){
+                     $modalData="sms";
+                     $idmission = $request->input('idmission');
+                     $contact="null";
+                     return view('staff.modal.sms', compact('modalData','idmission','contact'));
+                  }elseif($code == "depense"){
 
-// $SENDER = "CHALLENGE TRANSIT";
-// $RECIPIENT =$client;
-// $MESSAGE_TEXT = $message;
- 
-// $configuration = (new Configuration())
-//     ->setHost($BASE_URL)
-//     ->setApiKeyPrefix('Authorization', 'App')
-//     ->setApiKey('Authorization', $API_KEY);
- 
-// $client = new Client();
- 
-// $sendSmsApi = new SendSMSApi($client, $configuration);
-// $destination = (new SmsDestination())->setTo($RECIPIENT);
-// $message = (new SmsTextualMessage())
-//     ->setFrom($SENDER)
-//     ->setText($MESSAGE_TEXT)
-//     ->setDestinations([$destination]);
- 
-// $request = (new SmsAdvancedTextualRequest())->setMessages([$message]);
- 
-// try {
-//     $smsResponse = $sendSmsApi->sendSmsMessage($request);
+                     $modalData="'Ajouter Depense'";
+                     $idmission = $request->input('idmission');
+                     $categorie = DepenseCategorie::where('branch_id',1)->get();
+                  
+                     return view('staff.modal.depense', compact('modalData','idmission','categorie'));
+                  }elseif($code == "fin"){
 
-//     //echo ("Response body: " . $smsResponse);
-// } catch (Throwable $apiException) {
-//    // echo("HTTP Code: " . $apiException->getCode() . "\n");
-//    }
-//    return;
-//    }
+                     $modalData="'Terminer'";
+                     $idmission = $request->input('idmission');
+                  
+                     return view('staff.modal.fin', compact('modalData','idmission'));
+                  }elseif($code == "delete"){
+
+                     $modalData="'Terminer'";
+                     $idmission = $request->input('idmission');
+                  
+                     return view('staff.modal.delete', compact('modalData','idmission'));
+                  }elseif($code == "reopen"){
+
+                     $modalData="'Terminer'";
+                     $idmission = $request->input('idmission');
+                  
+                     return view('staff.modal.reopen', compact('modalData','idmission'));
+                  }
+
+                  // Vous pouvez ajouter ici la logique nécessaire pour obtenir les données nécessaires
+                  // pour afficher le contenu du modal en fonction du code reçu.
+
+                  // Par exemple, si vous avez une base de données avec des modèles, vous pourriez faire quelque chose comme:
+                  // $modalData = ModalModel::where('code', $code)->first();
+                  $modalData="test";
+
+                  // Ensuite, renvoyez les données à la vue du modal.
+                  return view('staff.modal.modal', compact('modalData'));
+               }
+      public function bilanMissionend($id){
+         $pageTitle = "Bilan Programme Terminé";
+         $emptyMessage = "Aucun Rdv";
+         $mission=Mission::where('status',1)->findOrFail(decrypt($id));
+         //dd($mission->idmission);
+         $rdv_chauf=Rdv::with('client','adresse','transfert','depot','transaction.paiement','transfert.paymentInfo','transpaiement')->where('mission_id',$mission->idmission)->where('status','>=','2')->orderBy('date','ASC')->get();
+         $depenses =Depense::where('mission_id',decrypt($id))->with('categorie','staff')->orderBy('date','ASC')->get();
+         
+         $pageTitle = "Details Programme terminé du ".date('d-m-Y', strtotime($mission->date))." - Chauffeur : ".$mission->chauffeur->firstname;
+         return view('staff.missions.bilan_mission', compact('pageTitle','rdv_chauf','mission','emptyMessage','depenses'));
+         
+         
+      }
+
 
 
          }

@@ -38,7 +38,7 @@
                                 <?php if($rdvliste->observation !== NULL): ?>
                                 <td ><?php echo e($rdvliste->observation); ?></td>
                                 <?php else: ?> <td></td> <?php endif; ?>
-                                <td ><?php echo e($rdvliste->client->nom); ?></td>
+                                <td ><?php echo e($rdvliste); ?></td>
                                 <td ><?php echo e($rdvliste->client->contact); ?></td>
                                 <?php if($rdvliste->adresse): ?>
                                 <td ><?php echo e($rdvliste->adresse->code_postal); ?></td>

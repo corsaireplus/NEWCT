@@ -26,6 +26,10 @@ use App\Exports\EncoursParisExportMapping;
 use App\Exports\EncoursAbidjanExportMapping;
 use Maatwebsite\Excel\Facades\Excel;
 
+use App\Models\Transaction;
+use App\Models\TransactionProduct;
+use App\Models\Transactionfacture;
+
 
 class BilanController extends Controller
 {
@@ -42,6 +46,7 @@ class BilanController extends Controller
         ->where('sender_branch_id',$user->branch_id)
         ->where('user_id',$user->id)
         ->where('transfert_id','!=',NULL)
+        ->orWhere('transaction_id','!=',NULL)
         ->where('deleted_at',NULL)
         ->whereDate('created_at', Carbon::today())
         ->sum('sender_payer');
@@ -51,6 +56,7 @@ class BilanController extends Controller
         ->where('sender_branch_id','!=',$user->branch_id)
         ->where('user_id',$user->id)
         ->where('transfert_id','!=',NULL)
+        ->orWhere('transaction_id','!=',NULL)
         ->where('deleted_at',NULL)
         ->whereDate('created_at', Carbon::today())
         ->sum('receiver_payer');
@@ -76,11 +82,11 @@ class BilanController extends Controller
         ->whereDate('created_at', Carbon::today())
         ->sum('amount');
       
-    $transfertbranchSumReceiver=Paiement::where('branch_id',$user->branch_id)->where('user_id',$user->id)->where('transfert_id','!=',NULL)->whereDay('created_at', '=', date('d'))->sum('receiver_payer');
+    $transfertbranchSumReceiver=Paiement::where('branch_id',$user->branch_id)->where('user_id',$user->id)->where('transfert_id','!=',NULL)->orWhere('transaction_id','!=',NULL)->whereDay('created_at', '=', date('d'))->sum('receiver_payer');
 
     $transfertbranchCount=Paiement::where('branch_id',$user->branch_id)->where('user_id',$user->id)->whereDate('created_at', Carbon::today())->count();
 
-    $branch_transactions=Paiement::where('branch_id',$user->branch_id)->where('user_id',$user->id)->with('branch','transfert.sender','rdv.sender','agent')->whereDate('created_at', Carbon::today())->orderBy('id','DESC')->paginate(getPaginate());
+    $branch_transactions=Paiement::where('branch_id',$user->branch_id)->where('user_id',$user->id)->with('branch','transaction','transfert.sender','rdv.sender','agent')->whereDate('created_at', Carbon::today())->orderBy('id','DESC')->paginate(getPaginate());
     
     $emptyMessage="Aucune Transaction";
     
@@ -93,7 +99,7 @@ class BilanController extends Controller
     $user = Auth::user();
     $emptyMessage="Aucune Transactions en cours";
 
-    $branch_transactions=Paiement::where('branch_id',$user->branch_id)->where('user_id',$user->id_)->where('deleted_at',NULL)->with('branch','transfert.sender','rdv.sender','agent')->orderBy('id','DESC')->paginate(getPaginate());
+    $branch_transactions=Paiement::where('branch_id',$user->branch_id)->where('user_id',$user->id_)->where('deleted_at',NULL)->with('branch','transaction','transfert.sender','rdv.sender','agent')->orderBy('id','DESC')->paginate(getPaginate());
 
         return view('staff.bilan.alltranslist', compact('pageTitle','branch_transactions','emptyMessage'));
 
@@ -152,10 +158,8 @@ class BilanController extends Controller
       $ajoutdepense->description =$request->description;
       if($request->idmission){
       $ajoutdepense->mission_id =$request->idmission;
-      $ajoutdepense->cat_id =10;
-      }else{
-        $ajoutdepense->cat_id =$request->cat_id;
       }
+      $ajoutdepense->cat_id =$request->cat_id;
       $ajoutdepense->save();
       if($request->idmission){
       $notify[] = ['success', 'Depense Enregistrée'];
@@ -546,7 +550,7 @@ class BilanController extends Controller
         $transfertbranchSumReceiver = Paiement::where('branch_id', $user->branch_id)->where('transfert_id', '!=', NULL)->whereDate('created_at', Carbon::today())->sum('receiver_payer');
 
         $transfertbranchCount = Paiement::where('branch_id', $user->branch_id)->whereDate('created_at', Carbon::today())->count();
-        $branch_transactions = Paiement::where('branch_id', $user->branch_id)->with('branch', 'transfert.sender', 'rdv.sender', 'agent')->whereDate('created_at', Carbon::today())->orderBy('id', 'DESC')->paginate(getPaginate());
+        $branch_transactions = Paiement::where('branch_id', $user->branch_id)->with('branch','transaction','transfert.sender', 'rdv.sender', 'agent')->whereDate('created_at', Carbon::today())->orderBy('id', 'DESC')->paginate(getPaginate());
 
         $emptyMessage = "Aucune Transaction";
 
@@ -740,6 +744,20 @@ class BilanController extends Controller
        $courierPayment = TransfertPayment::where('transfert_id', $paymentTransfert->transfert_id)->first();
        $code = '<img src="data:image/png;base64,' . DNS1D::getBarcodePNG($courierInfo->code, 'C128') . '" alt="barcode"   />' . "<br>" . $courierInfo->code;
        return view('staff.transfert.recu', compact('pageTitle', 'courierInfo', 'courierProductRef', 'courierProductInfos', 'courierPayment', 'userInfo', 'code','paymentTransfert'));
+       
+    }
+
+    public function recupaiementrans($id)
+    {
+        $pageTitle = "Reçu de paiement";
+       $userInfo = Auth::user();
+       $paymentTransfert=Paiement::where('refpaiement',decrypt($id))->first();
+       $courierInfo = Transaction::where('id', $paymentTransfert->transaction_id)->first();
+       $courierProductInfos = TransactionProduct::where('transaction_id', $paymentTransfert->transaction_id)->with('type')->get();
+       $courierProductRef = TransfertRef::where('transaction_id', $paymentTransfert->transaction_id)->get();
+       $courierPayment = TransactionFacture::where('transaction_id', $paymentTransfert->transaction_id)->first();
+       $code = '<img src="data:image/png;base64,' . DNS1D::getBarcodePNG($courierInfo->code, 'C128') . '" alt="barcode"   />' . "<br>" . $courierInfo->code;
+       return view('staff.transactions.recu', compact('pageTitle', 'courierInfo', 'courierProductRef', 'courierProductInfos', 'courierPayment', 'userInfo', 'code','paymentTransfert'));
        
     }
 

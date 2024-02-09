@@ -64,7 +64,112 @@
 
 
                 @endif
+
+                @if(auth()->user()->branch->country == 'CIV')
+                <li class="sidebar-menu-item {{menuActive('staff.transfert.receive')}}">
+                    <a href="{{route('staff.transfert.receive')}}" class="nav-link"
+                       data-default-url="{{ route('staff.transfert.receive') }}">
+                        <i class="menu-icon las la-share"></i>
+                        <span class="menu-title">@lang('Transfert Reçu')</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item {{menuActive('staff.colis.nonpayes')}}">
+                    <a href="{{route('staff.colis.nonpayes')}}" class="nav-link"
+                       data-default-url="{{ route('staff.colis.nonpayes') }}">
+                        <i class="menu-icon las la-clipboard-list"></i>
+                        <span class="menu-title">@lang('Transferts Non Payes')</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item {{menuActive('staff.bilan.encoursabidjan')}}">
+                    <a href="{{route('staff.bilan.encoursabidjan')}}" class="nav-link"
+                       data-default-url="{{ route('staff.bilan.encoursabidjan') }}">
+                        <i class="menu-icon las la-euro-sign"></i>
+                        <span class="menu-title">@lang('Encours')</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item {{menuActive('staff.transfert.delivery')}}">
+                    <a href="{{route('staff.transfert.delivery')}}" class="nav-link"
+                       data-default-url="{{ route('staff.transfert.delivery') }}">
+                        <i class="menu-icon las la-archive"></i>
+                        <span class="menu-title">@lang('Transferts Livrés')</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item {{menuActive('staff.prospect*')}}">
+                    <a href="{{route('staff.prospect.list')}}" class="nav-link"
+                       data-default-url="{{ route('staff.prospect.list') }}">
+                        <i class="menu-icon las la-luggage-cart"></i>
+                        <span class="menu-title">@lang('Reclamations')</span>
+                    </a>
+                </li>
+                @endif
+                 <li class="sidebar-menu-item {{menuActive('staff.transaction.list')}} ">
+                                <a href="{{route('staff.transaction.list')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Mon Bilan Journalier')</span>
+                                </a>
+                            </li>
+                @if(auth()->user()->username == 'christian' || auth()->user()->username == 'aminata' || auth()->user()->username == 'kanga' || auth()->user()->username == 'bertin' || auth()->user()->username == 'bagate' || auth()->user()->username == 'fatou' || auth()->user()->username == 'mouna' )
+                            <li class="sidebar-menu-item {{menuActive('staff.transaction.agencelist')}} ">
+                                <a href="{{route('staff.transaction.agencelist')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Bilan Agence')</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-menu-item {{menuActive('staff.transaction.depense')}} ">
+                                <a href="{{route('staff.transaction.depense')}}" class="nav-link">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">@lang('Depenses')</span>
+                                </a>
+                            </li>
+                            @endif
+                            <li class="sidebar-menu-item {{menuActive('staff.sms.rapport')}}">
+                    <a href="{{route('staff.sms.rapport')}}" class="nav-link"
+                       data-default-url="{{ route('staff.sms.rapport') }}">
+                        <i class="menu-icon las la-sms"></i>
+                        <span class="menu-title">@lang('Sms Rapport')</span>
+                    </a>
+                </li>
+                @if( auth()->user()->username == 'bagate' || auth()->user()->username == 'mouna' )
+                <li class="sidebar-menu-item {{menuActive('staff.customer.list')}}">
+                    <a href="{{route('staff.customer.list')}}" class="nav-link"
+                       data-default-url="{{ route('staff.customer.list') }}">
+                        <i class="menu-icon las la-truck-loading"></i>
+                        <span class="menu-title">@lang('Clients')</span>
+                    </a>
+                </li>
+                @endif
+                @if(auth()->user()->branch->country == 'FRA')
+                <li class="sidebar-menu-item {{menuActive('staff.container*')}}">
+                    <a href="{{route('staff.container.liste')}}" class="nav-link"
+                       data-default-url="{{ route('staff.container.liste') }}">
+                        <i class="menu-icon las la-ship"></i>
+                        <span class="menu-title">@lang('Chargement')</span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item {{menuActive('staff.suivi*')}}">
+                    <a href="{{route('staff.suivi.liste')}}" class="nav-link"
+                       data-default-url="{{ route('staff.suivi.liste') }}">
+                        <i class="menu-icon las la-ship"></i>
+                        <span class="menu-title">@lang('Suivi Conteneur')</span>
+                    </a>
+                </li>
                 <li class="sidebar-menu-item {{ menuActive('staff.courier.sent.queue') }}">
+                    <a href="{{ route('staff.courier.sent.queue') }}" class="nav-link ">
+                        <i class="menu-icon las la-hourglass-start"></i>
+                        <span class="menu-title">@lang('Sent In Queue')</span>
+                    </a>
+                </li>
+                @endif
+                @if(auth()->user()->branch->country == 'CIV')
+                <li class="sidebar-menu-item {{menuActive('staff.container.liste_decharge')}}">
+                    <a href="{{route('staff.container.liste_decharge')}}" class="nav-link"
+                       data-default-url="{{ route('staff.container.liste_decharge') }}">
+                        <i class="menu-icon las la-code-branch"></i>
+                        <span class="menu-title">@lang('Conteneurs')</span>
+                    </a>
+                </li>
+                @endif
+                <!-- <li class="sidebar-menu-item {{ menuActive('staff.courier.sent.queue') }}">
                     <a href="{{ route('staff.courier.sent.queue') }}" class="nav-link ">
                         <i class="menu-icon las la-hourglass-start"></i>
                         <span class="menu-title">@lang('Sent In Queue')</span>
@@ -110,7 +215,7 @@
                             </li>
                         </ul>
                     </div>
-                </li>
+                </li> -->
                 <!-- <li class="sidebar-menu-item {{ menuActive('staff.courier.create') }}">
                     <a href="{{ route('staff.courier.create') }}" class="nav-link ">
                         <i class="menu-icon las la-shipping-fast"></i>

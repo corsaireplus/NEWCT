@@ -126,8 +126,8 @@
                                     <thead>
                                         <tr>
                                             <th>@lang('Description')</th>
-                                            <th>@lang('Frais')</th>
                                             <th>@lang('Qté')</th>
+                                             <th>@lang('Frais')</th>
                                             <th>@lang('Sous-total')</th>
                                         </tr>
                                     </thead>
@@ -135,9 +135,8 @@
                                         @foreach ($courierInfo->products as $courierProductInfo)
                                             <tr>
                                                 <td>{{ __($courierProductInfo->type->name) }}</td>
-                                                <td>{{ showAmount($courierProductInfo->fee) }} {{ $general->cur_sym }}</td>
-                                                <td>{{ $courierProductInfo->qty }}
-                                                    {{ __(@$courierProductInfo->type->unit->name) }}</td>
+                                                <td>{{ $courierProductInfo->qty }}{{ __(@$courierProductInfo->type->unit->name) }}</td>
+                                                <td>{{ showAmount($courierProductInfo->fee/$courierProductInfo->qty) }} {{ $general->cur_sym }}</td>
                                                 <td>{{ showAmount($courierProductInfo->fee) }} {{ $general->cur_sym }}</td>
                                             </tr>
                                         @endforeach
@@ -149,7 +148,7 @@
                 </div>
             </div>
 
-            <div class="row mb-30">
+            <!-- <div class="row mb-30">
                 <div class="col-lg-12 mt-2">
                     <div class="card border--dark">
                         <h5 class="card-header bg--dark">@lang('Facture Information')</h5>
@@ -222,7 +221,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <div class="row mb-30">
                 <div class="col-lg-12 mt-2">
                     <div class="card border--dark">
@@ -321,7 +320,7 @@
                                         @else
                                         <td>N/A</td>
                                         @endif
-                                        <td>                                            <a href="{{route('staff.transaction.recu', encrypt($payment->refpaiement))}}"><span class="badge badge--primary">@lang('reçu')</span></a>
+                                        <td>                                            <a href="{{route('staff.transaction.recutrans', encrypt($payment->refpaiement))}}"><span class="badge badge--primary">@lang('reçu')</span></a>
 
                                     </tr>
 
@@ -363,23 +362,39 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="" lass="modal-title" id="exampleModalLabel">@lang('Payment Confirmation')</h5>
+                    <h5 class="" lass="modal-title" id="exampleModalLabel">@lang('Ajouter Paiement')</h5>
                     <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                         <i class="las la-times"></i>
                     </button>
                 </div>
-                <form action="{{ route('staff.courier.payment') }}" method="POST">
-                    @csrf
-                    @method('POST')
+                <form action="{{route('staff.transactions.payment')}}" method="POST">
+                @csrf
+                @method('POST')
+                <div class="modal-body">
                     <input type="hidden" name="code">
-                    <div class="modal-body">
-                        <p>@lang('Are you sure to collect this amount?')</p>
+                    <p>@lang('Entrer les Informations de paiement')</p>
+                    <div class="form-group">
+                        <div class="form-group col-lg-6">
+                            <select class="form-control form-control-lg" id="mode" name="mode">
+                                <option>@lang('Choisir Mode')</option>
+                                <option value="1">ESPECE</option>
+                                <option value="2">CHEQUE</option>
+                                <option value="3">CARTE BANCAIRE</option>
+                                <option value="4">VIREMENT</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-lg-6">
+                            <input type="numeric" class="form-control form-control-lg" name="montant_payer" id="montant_payer" placeholder="Montant Payer">
+                        </div>
+
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('No')</button>
-                        <button type="submit" class="btn btn--primary">@lang('Yes')</button>
+                   <div class="modal-footer">
+                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('Annuler')</button>
+                        <button type="submit" class="btn btn--primary">@lang('Payer')</button>
                     </div>
-                </form>
+            </form>
+                
             </div>
         </div>
     </div>
@@ -413,7 +428,7 @@
 @endsection
 
 @push('breadcrumb-plugins')
-    <x-back route="{{ route('staff.transactions.index') }}" />
+    <x-back route="{{ url()->previous()  }}" />
 
     <a href="{{ route('staff.transactions.invoice', encrypt($courierInfo->id)) }}" title=""
         class="btn btn-sm btn-outline--info">
@@ -429,7 +444,7 @@
 
     @if ($courierInfo->status <= 1 )
             <button class="btn btn-sm btn-outline--success payment"
-                data-code="{{ $courierInfo->code }}"><i class="las la-credit-card"></i>
+                data-code="{{ $courierInfo->trans_id }}"><i class="las la-credit-card"></i>
                 @lang('Payer')</button>
     @endif
 

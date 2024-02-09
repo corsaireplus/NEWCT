@@ -2,22 +2,7 @@
 @section('panel')
     <div class="row mt-50 mb-none-30">
     @if(auth()->user()->branch->country == 'FRA')
-        <!-- <div class="col-xl-3 col-lg-6 col-sm-6 mb-30">
-            <div class="dashboard-w1 bg--19 b-radius--10 box-shadow" >
-                <div class="icon">
-                    <i class="fa fa-wallet"></i>
-                </div>
-                <div class="details">
-                    <div class="numbers">
-                        <span class="amount">{{$rdvbranchCount}}</span>
-                    </div>
-                    <div class="desciption">
-                        <span>@lang('Total RDV Transactions')</span>
-                    </div>
-                    <a href="{{route('staff.send.courier.list')}}" class="btn btn-sm text--small bg--white text--black box--shadow3 mt-3">@lang('Voir Tout')</a>
-                </div>
-            </div>
-        </div> -->
+        
 
         <div class="col-xl-3 col-lg-6 col-sm-6 mb-30">
             <div class="dashboard-w1 bg--3 b-radius--10 box-shadow" >
@@ -132,25 +117,36 @@
                                 </td>
 
                                 <td data-label="@lang('Client')">
+                                
                                     @if($trans->transfert)
                                     <span>
                                     {{__($trans->transfert->sender->nom)}}
                                    
                                     </span><br>
                                     {{__($trans->transfert->sender->contact)}}
-                                     @else
+                                     @elseif($trans->rdv)
                                      <span>
                                      {{__($trans->rdv->sender->nom)}}
                                         </span><br>
                                         {{__($trans->rdv->sender->contact)}}
+                                      @else
+                                        {{__($trans->transaction->sender->nom)}}
+                                    </span><br>
+                                    {{__($trans->transaction->sender->contact)}}
                                     @endif
                                     
                                 </td>
                                 <td data-label="@lang('Type')">
-                                    @if($trans->transfert)
+                                   @if($trans->transaction)
+                                    <span>
+                                    TRANSACTION
+                                   </span><br>
+                                    {{$trans->transaction->trans_id}}
+                                    </span>
+                                    @elseif($trans->transfert)
                                     <span>
                                     TRANSFERT
-                                   </span><br>
+                                    </span><br>
                                     {{$trans->transfert->reference_souche}}
                                     </span>
                                      @else

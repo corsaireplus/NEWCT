@@ -22,5 +22,14 @@ class TransactionFacture extends Model
     protected static $logOnlyDirty = true;
     protected static $logName = 'transaction_factures';
 
+     public function transaction(){
+        return $this->belongsTo(Transaction::class, 'transaction_id');
+    }
+
+     public function payments(){
+        return $this->hasMany(Paiement::class,'transaction_id','transaction_id');
+
+    }
+
 
 }

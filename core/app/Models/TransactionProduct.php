@@ -24,6 +24,6 @@ class TransactionProduct extends Model
 
     public function type()
     {
-        return $this->belongsTo(Type::class, 'type_cat_id');
+        return $this->belongsTo(Type::class, 'transaction_type_id');
     }
 }

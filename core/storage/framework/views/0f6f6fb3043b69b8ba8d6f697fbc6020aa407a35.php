@@ -147,7 +147,7 @@
                                              </a>
                                                 <?php endif; ?>
                                             <?php if($courierInfo->status  == 0 && (auth()->user()->username == 'bagate') && $courierInfo->ship_status != - 1): ?> 
-                                              <a href="javascript:void(0)"  class="icon-btn btn--danger ml-1 deletePaiement" data-refpaiement="<?php echo e($courierInfo->id); ?>"><i class="las la-trash"></i></a>
+                                              <a href="javascript:void(0)"  class="icon-btn btn--danger ml-1 deleteTransaction" data-refpaiement="<?php echo e($courierInfo->trans_id); ?>"><i class="las la-trash"></i></a>
                                     
                                               <?php endif; ?>
                                             <?php endif; ?>
@@ -172,6 +172,32 @@
             </div>
         </div>
     </div>
+    <div id="branchModel" class="modal fade" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><?php echo app('translator')->get('SUPPRIMER ENVOI'); ?></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+   
+                <form action="<?php echo e(route('staff.transactions.delete')); ?>" method="POST">
+                    <?php echo csrf_field(); ?>
+                    <input type="hidden" name="refpaiement" id="refpaiement" >
+                    <div class="modal-body">
+                    <p><?php echo app('translator')->get('Êtes vous sûr de vouloir Supprimer cet envoi ?'); ?></p>
+                </div>
+
+                   
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal"><?php echo app('translator')->get('Annuler'); ?></button>
+                        <button type="submit" class="btn btn--danger"><?php echo app('translator')->get('Supprimer'); ?></button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('style-lib'); ?>
@@ -184,6 +210,15 @@
 <?php $__env->stopPush(); ?>
 
 <?php $__env->startPush('script'); ?>
+<script>
+    "use strict";
+    $('.deleteTransaction').on('click', function() {
+        var modal = $('#branchModel');
+        modal.find('input[name=refpaiement]').val($(this).data('refpaiement'))
+        modal.modal('show');
+    });
+    
+</script>
     <script>
         (function($) {
             "use strict";

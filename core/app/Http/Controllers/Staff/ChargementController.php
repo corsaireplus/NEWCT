@@ -45,6 +45,7 @@ use App\Exports\ContainerNbcolisExportMapping;
 use App\Exports\TransfertPaymentExportMapping;
 use Maatwebsite\Excel\Facades\Excel;
 
+use App\Models\Transaction;
 
 class ChargementController extends Controller
 {
@@ -87,9 +88,16 @@ class ChargementController extends Controller
       $mission = Container::findOrFail(decrypt($id));
       $colis_dispo = Transfert::where('status','<',2)->with('sender')->with('transfertDetail', function ($query){
          $query->where('status',0);
-     })->orderBy('created_at', 'DESC')->paginate(getPaginate());      $pageTitle = "Ajouter colis au Conteneur du " . date('d-m-Y', strtotime($mission->date)) . " - N°: " . $mission->numero;
+      })->orderBy('created_at', 'DESC')->paginate(getPaginate());
+       $trans_dispo = Transaction::where('ship_status','=',0)->orWhere('ship_status','=',11)->with('sender')->with('transfertDetail', function ($query){
+         $query->where('status',0);
+      })->orderBy('created_at', 'DESC')->paginate(getPaginate());
+
+   // dd($trans_dispo);
+
+      $pageTitle = "Ajouter colis au Conteneur du " . date('d-m-Y', strtotime($mission->date)) . " - N°: " . $mission->numero;
       //dd($colis_dispo);
-      return view('staff.chargement.assign', compact('pageTitle', 'colis_dispo', 'mission', 'emptyMessage'));
+      return view('staff.chargement.assign', compact('pageTitle', 'colis_dispo', 'mission', 'emptyMessage','trans_dispo'));
    }
 
    public function decharge()
@@ -102,70 +110,129 @@ class ChargementController extends Controller
       // dd($missions);
       return view('staff.dechargement.index', compact('pageTitle', 'missions', 'emptyMessage'));
    }
+
    public function storecolis(Request $request)
    {
+
+
       $request->validate([
          'nbcolis'=>'numeric|gt:0'
       ]);
       try {
+         if($request->idrdv){
          $check=ContainerNbcolis::where('container_id',$request->idmission)->where('id_colis',$request->idrdv)->first();
          
+         }else{
+         $check=ContainerNbcolis::where('container_id',$request->idmission)->where('id_transaction',$request->transid)->first();
+
+         }
+
          if($check){
             $notify[] = ['error', 'Colis dejà Ajouté au Conteneur'];
-         return back()->withNotify($notify);
+            return back()->withNotify($notify);
          }else{
-                        $rdv = Transfert::find($request->idrdv);
+                        if($request->idrdv){
+                        $refnum= Transfert::find($request->idrdv);
+                        $count=TransfertRef::where('transfert_id',$request->idrdv)->count();
+                        $trans=$refnum->reference_souche;
+                        }else{
+                        $refnum= Transaction::find($request->transid);
+                        $count=TransfertRef::where('transaction_id',$request->transid)->count();
+                        $trans=$refnum->reftrans;
+                        }
                         $nb=$request->nbcolis;
                      
-                        $count=TransfertRef::where('transfert_id',$request->idrdv)->count();
+                       
 
                      // dd($count);
                         if($count >= 2){
-                           $refnum=Transfert::find($request->idrdv);
-                              $trans=$refnum->reference_souche;
-                           // dd($trans);
+
+                           if($request->idrdv){
                               $trans_ref =TransfertRef::where('transfert_id',$request->idrdv)->where('status',0)->first();
-                              $ref=$trans_ref->ref_souche_part;
-                           // dd($ref);
-                              $lastChar = substr($ref, -1);
-                              //dd($lastChar);
-                              $int_value = (int) $lastChar;
-                           for($i = 0; $i < $nb;$i++){
-                           
-                              $refer=$trans.'-'.($int_value + $i);
-                              // dd($refer);
-                              $update=TransfertRef::where('ref_souche_part',$refer)->update(array('status' => '1'));
-                              
-                  
-                           }
-                           $count=TransfertRef::where('transfert_id',$request->idrdv)->where('status',0)->count();
-                           if($count > 0){
-                              $rdv = Transfert::find($request->idrdv);
-                              //dd($rdv);
-                              $rdv->status = '1';
-                              $rdv->save();
+
                            }else{
+                              $trans_ref =TransfertRef::where('transaction_id',$request->transid)->where('status',0)->first();
+
+                           }
+                              $ref=$trans_ref->ref_souche_part;
+                           
+                              $lastChar = substr($ref, -1);
+                              $nb=$request->nbcolis;
+                              $int_value = (int) $lastChar;
+                              for($i = 0; $i < $nb;$i++){
+                                $refer=$trans.'-'.($int_value + $i);
+                                $update=TransfertRef::where('ref_souche_part',$refer)->update(array('status' => '1'));
+                           
+                                }
+
+                           if($request->idrdv){
+                           $count=TransfertRef::where('transfert_id',$request->idrdv)->where('status',0)->count();
+                                    if($count > 0){
+                                       $rdv = Transfert::find($request->idrdv);
+                                       //dd($rdv);
+                                       $rdv->status = '1';
+                                       $rdv->save();
+                                    }else{
+                                       $rdv = Transfert::find($request->idrdv);
+                                       //dd($rdv);
+                                       $rdv->status = '2';
+                                       $rdv->save();
+                                    }
+                           }else{
+                            $count=TransfertRef::where('transaction_id',$request->transid)->where('status',0)->count();
+                            if($count > 0){
+                                       $rdv = Transaction::find($request->transid);
+                                       //dd($rdv);
+                                       $rdv->ship_status = '11';
+                                       $rdv->save();
+                                    }else{
+                                       $rdv = Transaction::find($request->transid);
+                                       //dd($rdv);
+                                       $rdv->ship_status = '1';
+                                       $rdv->save();
+                                    }
+                           }
+                           
+                        }else{ 
+                              if($request->idrdv){
                               $rdv = Transfert::find($request->idrdv);
                               //dd($rdv);
                               $rdv->status = '2';
                               $rdv->save();
-                           }
-                           
-                        }else{
-                           $rdv = Transfert::find($request->idrdv);
-                           //dd($rdv);
-                           $rdv->status = '2';
-                           $rdv->save();
-                           $update=TransfertRef::where('transfert_id',$request->idrdv)->update(array('status' => '1'));
+                              $update=TransfertRef::where('transfert_id',$request->idrdv)->update(array('status' => '1'));
+                              }else{
+                                 $rdv = Transaction::find($request->transid);
+                              //dd($rdv);
+                              $rdv->ship_status = '1';
+                              $rdv->save();
+                              $update=TransfertRef::where('transaction_id',$request->idrdv)->update(array('status' => '1'));
+                              }
                         }
                         
+                        if($request->idrdv){                        
+                           $newold=ContainerNbcolis::where('id_colis',$request->idrdv)->count();
+                        }else{
+                           $newold=ContainerNbcolis::where('id_transaction',$request->idrdv)->count();
+
+                        }
+                       if($newold > 0){
+                        $newold = 2;
+                       }else{
+                        $newold = 1;
+                       }
+
 
                         $manifest=new ContainerNbcolis();
                         $manifest->container_id =$request->idmission;
+                        if($request->idrdv){  
                         $manifest->id_colis =$request->idrdv;
+                        }else{
+                        $manifest->id_transaction =$request->transid;
+                        }
                         $manifest->nb_colis =$request->nbcolis;
+                        $manifest->newold =$newold;
                         $manifest->save();
-                        // $rdv_mission = DB::INSERT("INSERT INTO `missions_rdvs`(`mission_idmission`, `rdv_idrdv`) VALUES ('$request->idmission','$request->idrdv')");
+
                         $notify[] = ['success', 'Colis Ajouté au Conteneur'];
                         return back()->withNotify($notify);
                      }
@@ -304,82 +371,31 @@ class ChargementController extends Controller
     $totalPaye = Paiement::where('branch_id', 1)
         ->where('sender_branch_id', 1)
         ->whereIn('transfert_id', $uniqueColisIdsInC1)
-        ->sum('sender_payer');
-
-
-   /* 
-    $totalPaye = Paiement::where('branch_id', '1')
-    ->where('sender_branch_id', '1')
-    ->whereIn('transfert_id', function ($query) use ($ct) {
-        $query->select('id_colis')
-            ->from('conatainer_nbcolis')
-            ->where('container_id', $ct)
-            ->groupBy('id_colis')
-            ->havingRaw('COUNT(*) = 1');
-    })->sum('sender_payer');
-        */
-      
+        ->sum('sender_payer');      
        
        $colisIds = ContainerNbcolis::where('container_id', $ct)
     ->groupBy('id_colis')
     ->havingRaw('COUNT(*) = 1')
     ->pluck('id_colis');
 
-    // $totalValeur = TransfertPayment::whereIn('transfert_id', $colisIds)
-  //  ->sum('sender_amount');
-
-    //   $totalValeur=TransfertPayment::whereHas('container_nbcolis',function($q) use ($ct){
-    //      $q->where('container_id', $ct);
-    //   })->sum('transfert_payments.sender_amount');
-//$totalPaye=ContainerNbcolis::with('payments','transfert_payments')->where('container_id',$ct)->withSum('payments as totalPaye','sender_payer')->first();
-   //    $totalPaye= DB::table('paiements')
-   // ->join('transfert_payments','paiements.transfert_id','=','transfert_payments.transfert_id')
-   // ->join('conatainer_nbcolis','paiements.transfert_id','=','conatainer_nbcolis.id_colis')
-   // ->where('conatainer_nbcolis.container_id',$ct)
-   // ->where('conatainer_nbcolis.deleted_at',NULL)
-   // ->where('transfert_payments.status',2)
-   // ->where('paiements.branch_id', 1)
-   // ->where('paiements.sender_branch_id', 1)
-   // ->where('paiements.transfert_id', '!=', NULL)
-   // ->where('paiements.deleted_at',NULL)
-   // ->sum('sender_payer');
+   
    $totalPartiel=0;
-   // $totalPartiel= DB::table('paiements')
-   // ->join('transfert_payments','paiements.transfert_id','=','transfert_payments.transfert_id')
-   // ->join('conatainer_nbcolis','paiements.transfert_id','=','conatainer_nbcolis.id_colis')
-   // ->where('conatainer_nbcolis.container_id',$ct)
-   // ->where('conatainer_nbcolis.deleted_at',NULL)
-   // ->where('transfert_payments.status',1)
-   // ->where('paiements.branch_id', 1)
-   // ->where('paiements.sender_branch_id', 1)
-   // ->where('paiements.transfert_id', '!=', NULL)
-   // ->where('paiements.deleted_at',NULL)
-   // ->sum('sender_payer');
+   
    $totalNonPaye=0;
-   // $totalNonPaye= DB::table('transfert_payments')
-   // ->join('conatainer_nbcolis','transfert_payments.transfert_id','=','conatainer_nbcolis.id_colis')
-   // ->where('conatainer_nbcolis.container_id',$ct)
-   // ->where('conatainer_nbcolis.deleted_at',NULL)
-   // ->where('transfert_payments.status',0)
-   // ->where('transfert_payments.deleted_at',NULL)
-   // ->sum('sender_amount');
-  // $totalValeur=0;
-   // $totalValeur=DB::table('transfert_payments')
-   // ->join('conatainer_nbcolis','transfert_payments.transfert_id','=','conatainer_nbcolis.id_colis')
-   // ->where('conatainer_nbcolis.container_id',$ct)
-   // ->where('conatainer_nbcolis.deleted_at',NULL)
-   // ->where('transfert_payments.deleted_at',NULL)
-   // ->sum('sender_amount');
+  
    DB::enableQueryLog();
-      $rdv_chauf=ContainerNbcolis::where('container_id',$ct)->with('colis','colis.sender','colis.transfertDetail','colis.paymentInfo')->paginate(getPaginate());
+      $rdv_chauf=ContainerNbcolis::where('container_id',$ct)->with('transaction','colis','colis.sender','colis.transfertDetail','colis.paymentInfo')->paginate(getPaginate());
       // dd(DB::getQueryLog());
       //dd($rdv_chauf);
       $pageTitle = "Details Conteneur du " . date('d-m-Y', strtotime($mission->date)) . " - Numero : " . $mission->numero;
       return view('staff.chargement.detail', compact('pageTitle', 'rdv_chauf', 'mission', 'emptyMessage','totalValeur','totalNonPaye','totalPartiel','totalPaye','ct'));
    }
 
+
+
+
    public function getContainerData(Request $request,$id){
-      $containers=ContainerNbcolis::where('container_id',$id)->with('colis','colis.sender','colis.transfertDetail','colis.paymentInfo');
+      $containers=ContainerNbcolis::where('container_id',$id)->with('colis','colis.sender','colis.transfertDetail','colis.paymentInfo','transaction');
 
       return DataTables::of($containers)
       ->editColumn('created_at', function ($container) {
@@ -468,56 +484,9 @@ class ChargementController extends Controller
         ->whereIn('transfert_id', $newColisInContainer)
         ->sum('receiver_payer');
         
-       // dd('valeur '.$totalValeur.' payer a abidjan '.$totalPartiel.' total payer '.$totalPaye.' reste à payer '.($totalValeur-$totalPaye));
-      // "valeur 18926256.00 payer a abidjan 1432624.00 total payer 15052496.00 reste à payer 3873760"
-        
-        // $totalPartiel=Paiement::where('branch_id','2')->where('sender_branch_id','1')->whereHas('container_nbcolis', function ($q) use ($ct) {
-        // $q->where('container_id', $ct);
-       //})->sum('paiements.receiver_payer');
-       // $totalValeur=TransfertPayment::whereHas('container_nbcolis',function($q) use ($ct){
-        // $q->where('container_id', $ct);
-       //})->sum('transfert_payments.receiver_amount');
       
-      // $totalPaye= DB::table('paiements')
-      // ->join('transfert_payments','paiements.transfert_id','=','transfert_payments.transfert_id')
-      // ->join('conatainer_nbcolis','paiements.transfert_id','=','conatainer_nbcolis.id_colis')
-      // ->where('conatainer_nbcolis.container_id',$ct)
-      // ->where('conatainer_nbcolis.deleted_at',NULL)
-      // ->where('transfert_payments.status',2)
-      // ->where('paiements.sender_branch_id', 1)
-      // ->where('paiements.transfert_id', '!=', NULL)
-      // ->where('paiements.deleted_at',NULL)
-      // ->sum('receiver_payer');
-     // $totalPaye=Paiement::where('sender_branch_id','1')->whereHas('container_nbcolis', function ($q) use ($ct) {
-     //    $q->where('container_id', $ct);
-     //  })->sum('paiements.receiver_payer');
-      // $totalPartiel=0;
-      
-      // $totalPartiel= DB::table('paiements')
-      // ->join('transfert_payments','paiements.transfert_id','=','transfert_payments.transfert_id')
-      // ->join('conatainer_nbcolis','paiements.transfert_id','=','conatainer_nbcolis.id_colis')
-      // ->where('conatainer_nbcolis.container_id',$ct)
-      // ->where('conatainer_nbcolis.deleted_at',NULL)
-      // ->where('transfert_payments.status',1)
-      // ->where('paiements.sender_branch_id', 1)
-      // ->where('paiements.transfert_id', '!=', NULL)
-      // ->where('paiements.deleted_at',NULL)
-      // ->sum('receiver_payer');
       $totalNonPaye=0;
-      // $totalNonPaye= DB::table('transfert_payments')
-      // ->join('conatainer_nbcolis','transfert_payments.transfert_id','=','conatainer_nbcolis.id_colis')
-      // ->where('conatainer_nbcolis.container_id',$ct)
-      // ->where('conatainer_nbcolis.deleted_at',NULL)
-      // ->where('transfert_payments.status',0)
-      // ->where('transfert_payments.deleted_at',NULL)
-      // ->sum('receiver_amount');
-     
-      // $totalValeur=DB::table('transfert_payments')
-      // ->join('conatainer_nbcolis','transfert_payments.transfert_id','=','conatainer_nbcolis.id_colis')
-      // ->where('conatainer_nbcolis.container_id',$ct)
-      // ->where('conatainer_nbcolis.deleted_at',NULL)
-      // ->where('transfert_payments.deleted_at',NULL)
-      // ->sum('receiver_amount');
+      
    
          $rdv_chauf=ContainerNbcolis::where('container_id',$ct)->with('colis','colis.sender','colis.transfertDetail')->with(['colis.paymentInfo' => function ($q){
             $q->orderBy('status', 'ASC'); }])->paginate(getPaginate());

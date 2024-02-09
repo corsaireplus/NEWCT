@@ -53,8 +53,16 @@
                                     @elseif($rdv->transfert->paymentInfo->status == 2)
                                     <a href="{{route('staff.transfert.detail', encrypt($rdv->transfert->id))}}" title="" > <span class="badge badge--success">{{$rdv->transfert->reference_souche}}</span></a>
                                     @endif
-                                        
                                         @endif
+                                         @if($rdv->transaction)
+                                        @if($rdv->transaction->status == 0 )
+                                        <a href="{{route('staff.transactions.details', encrypt($rdv->transaction->id))}}" title="" > <span class="badge badge--danger">{{ isset($rdv->transaction->reftrans) ? $rdv->transaction->reftrans : $rdv->transaction->trans_id }}</span></a>
+                                    @elseif($rdv->transaction->status == 1 )
+                                    <a href="{{route('staff.transactions.details', encrypt($rdv->transaction->id))}}" title="" > <span class="badge badge--warning">{{ isset($rdv->transaction->reftrans) ? $rdv->transaction->reftrans : $rdv->transaction->trans_id }}</span></a>
+                                    @elseif($rdv->transaction->status == 2)
+                                    <a href="{{route('staff.transactions.details', encrypt($rdv->transaction->id))}}" title="" > <span class="badge badge--success">{{ isset($rdv->transaction->reftrans) ? $rdv->transaction->reftrans : $rdv->transaction->trans_id }}</span></a>
+                                    @endif
+                                    @endif
                                         @if($rdv->depot)
                                         <span class="badge badge--primary"> Depot {{$rdv->depot->refpaiement}}</span>
                                         @endif

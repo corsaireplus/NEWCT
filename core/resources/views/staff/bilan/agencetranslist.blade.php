@@ -2,23 +2,6 @@
 @section('panel')
     <div class="row mt-50 mb-none-30">
     @if(auth()->user()->branch->country == 'FRA')
-        <!-- <div class="col-xl-3 col-lg-6 col-sm-6 mb-30">
-            <div class="dashboard-w1 bg--19 b-radius--10 box-shadow" >
-                <div class="icon">
-                    <i class="fa fa-wallet"></i>
-                </div>
-                <div class="details">
-                    <div class="numbers">
-                        <span class="amount">{{$rdvbranchCount}}</span>
-                    </div>
-                    <div class="desciption">
-                        <span>@lang('Total RDV Transactions')</span>
-                    </div>
-                    <a href="{{route('staff.send.courier.list')}}" class="btn btn-sm text--small bg--white text--black box--shadow3 mt-3">@lang('Voir Tout')</a>
-                </div>
-            </div>
-        </div> -->
-
         <div class="col-xl-3 col-lg-6 col-sm-6 mb-30">
             <div class="dashboard-w1 bg--3 b-radius--10 box-shadow" >
                 <div class="icon">
@@ -131,30 +114,38 @@
                                 </td>
 
                                 <td data-label="@lang('Client')">
-                                    @if($trans->transfert)
-                                    @if(auth()->user()->branch_id == $trans->transfert->sender_branch_id)
-                                    <span>
-                                    {{$trans->transfert->sender->nom}}
-                                   
-                                    </span><br>
-                                    {{$trans->transfert->sender->contact}}
-                                    @else
-                                    <span>
-                                    {{$trans->transfert->receiver->nom}}
-                                   
-                                    </span><br>
-                                    {{$trans->transfert->receiver->contact}}
-                                    @endif
+                                    @if($trans->transaction)
+                                        @if(auth()->user()->branch_id == $trans->transaction->branch_id)
+                                        <span>{{$trans->transaction->sender->nom}}</span><br>
+                                        {{$trans->transaction->sender->contact}}
+                                        @else
+                                        <span>{{$trans->transaction->receiver->nom}}</span><br>
+                                        {{$trans->transaction->receiver->contact}}
+                                        @endif
+                                    @elseif($trans->transfert)
+
+                                        @if(auth()->user()->branch_id == $trans->transfert->sender_branch_id)
+                                        <span>{{$trans->transfert->sender->nom}}</span><br>
+                                        {{$trans->transfert->sender->contact}}
+                                        @else
+                                        <span>{{$trans->transfert->receiver->nom}}</span><br>
+                                        {{$trans->transfert->receiver->contact}}
+                                        @endif
+
                                      @elseif($trans->rdv)
-                                     <span>
-                                     {{__($trans->rdv->sender->nom)}}
-                                        </span><br>
+                                      <span>{{__($trans->rdv->sender->nom)}}</span><br>
                                         {{$trans->rdv->sender->contact}}
-                                    @endif
+                                     @endif
                                     
                                 </td>
                                 <td data-label="@lang('Type')">
-                                    @if($trans->transfert)
+                                    @if($trans->transaction)
+                                    <span>
+                                    TRANSACTION
+                                   </span><br>
+                                    {{$trans->transaction->trans_id}}
+                                    </span>
+                                    @elseif($trans->transfert)
                                     <span>
                                     TRANSFERT
                                    </span><br>

@@ -67,6 +67,15 @@
                                                  <?php endif; ?>
                                         
                                         <?php endif; ?>
+                                         <?php if($rdv->transaction): ?>
+                                            <?php if($rdv->transaction->status == 0 ): ?>
+                                            <a href="<?php echo e(route('staff.transactions.details', encrypt($rdv->transaction->id))); ?>" title="" > <span class="badge badge--danger"><?php echo e(isset($rdv->transaction->reftrans) ? $rdv->transaction->reftrans : $rdv->transaction->trans_id); ?></span></a>
+                                            <?php elseif($rdv->transaction->status == 1 ): ?>
+                                            <a href="<?php echo e(route('staff.transactions.details', encrypt($rdv->transaction->id))); ?>" title="" > <span class="badge badge--warning"><?php echo e(isset($rdv->transaction->reftrans) ? $rdv->transaction->reftrans : $rdv->transaction->trans_id); ?></span></a>
+                                            <?php elseif($rdv->transaction->status == 2): ?>
+                                            <a href="<?php echo e(route('staff.transactions.details', encrypt($rdv->transaction->id))); ?>" title="" > <span class="badge badge--success"><?php echo e(isset($rdv->transaction->reftrans) ? $rdv->transaction->reftrans : $rdv->transaction->trans_id); ?></span></a>
+                                            <?php endif; ?>
+                                        <?php endif; ?>
                                         <a href="<?php echo e(route('staff.rdv.detail', encrypt($rdv->idrdv))); ?>" title="" class="icon-btn btn--info ml-1 delivery" data-code="<?php echo e($rdv->idrdv); ?>"> Detail</a>
                                         <span class="badge badge-pill bg--success"><?php echo app('translator')->get('Terminé'); ?></span>
                                     <?php endif; ?>
@@ -98,6 +107,26 @@
 
 <?php $__env->stopSection(); ?>
 <?php $__env->startPush('breadcrumb-plugins'); ?>
+<?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.back','data' => ['route' => ''.e(url()->previous()).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('back'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['route' => ''.e(url()->previous()).'']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
+ <a href="<?php echo e(route('staff.transactions.newrdv', $mission_id)); ?>" title=""
+        class="btn btn-sm btn-outline--info">
+        <i class="las la-file-invoice"></i>
+        <?php echo app('translator')->get('Ajouter RDV Dans ce Programme'); ?>
+    </a>
 <!-- <a href="javascript:void(0)" class="btn btn-sm btn--secondary box--shadow1 text--small sendSms" onclick="sendSms(<?php echo e(encrypt($mission->idmission)); ?>,<?php echo e($mission->contact); ?>)" data-idmission="<?php echo e(encrypt($mission->idmission)); ?>" data-contact="<?php echo e($mission->contact); ?>"><i class="las la-phone"></i><?php echo app('translator')->get('Sms'); ?></a> -->
 
 <!-- <a href="<?php echo e(route('staff.mission.send_sms',encrypt($mission->idmission))); ?>" class="btn btn-sm btn--secondary box--shadow1 text--small"><i class="las la-phone"></i> <?php echo app('translator')->get('Envoyer SMS'); ?></a> -->

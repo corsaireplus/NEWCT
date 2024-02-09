@@ -7,7 +7,7 @@
                     <div class="d-flex justify-content-between">
                         <div class="fw-bold">
                         <address class="m-t-5 m-b-5">
-                            <strong class="text-inverse">CHALLENGES TRANSIT</strong><br>
+                            <strong class="text-inverse">CHALLENGE TRANSIT</strong><br>
                            
                             90 Rue Edouard Branly Montreuil<br>
                             Tél: 0179751616 - 0619645428<br>
@@ -53,7 +53,7 @@
                             <b>@lang('Transaction Id'):</b> {{ $courierInfo->code }}<br>
                             <b>@lang('Paiement Status'):</b>
                             @if ($courierInfo->status == 2)
-                                <span class="badge badge--success">@lang('Pauyé')</span>
+                                <span class="badge badge--success">@lang('Payé')</span>
                             @else
                                 <span class="badge badge--danger">@lang('Non Payé')</span>
                             @endif
@@ -95,8 +95,8 @@
                                     <tr>
                                         <th>#</th>
                                         <th>@lang('Description')</th>
-                                        <th>@lang('Prix')</th>
                                         <th>@lang('Qté')</th>
+                                        <th>@lang('Prix')</th>
                                         <th>@lang('Sous-total')</th>
                                     </tr>
                                 </thead>
@@ -104,9 +104,9 @@
                                     @foreach ($courierInfo->products as $courierProductInfo)
                                         <tr>
                                             <td>{{ $loop->iteration }}</td>
-                                            <td> @if($courierProductInfo->type_cat_id == 2){{__('DEPOT')}} @else {{__('ENVOI')}} @endif {{ __(@$courierProductInfo->type->name) }}</td>
-                                            <td>{{ showAmount($courierProductInfo->fee) }} {{ $general->cur_sym }}</td>
+                                            <td>{{ __(@$courierProductInfo->type->name) }}</td>
                                             <td>{{ $courierProductInfo->qty }} {{ __(@$courierProductInfo->type->unit->name) }}</td>
+                                            <td>{{ showAmount($courierProductInfo->fee/$courierProductInfo->qty ) }} {{ $general->cur_sym }}</td>
                                             <td>{{ showAmount($courierProductInfo->fee) }} {{ $general->cur_sym }}</td>
                                         </tr>
                                     @endforeach
@@ -153,11 +153,11 @@
                 <div class="col-sm-12">
                     <div class="float-sm-end">
                         @if(!$courierInfo->paymentInfo)
-                            <td>@lang('Unpaid')</td>
+                            <td>@lang('Non Payé')</td>
                         @else
                             @if ($courierInfo->status <= 1 )
                                 <button type="button" class="btn btn-outline--success m-1 payment"
-                                    data-code="{{ $courierInfo->code }}">
+                                    data-code="{{ $courierInfo->trans_id }}">
                                     <i class="fa fa-credit-card"></i> @lang('Ajouter Paiement')
                                 </button>
                             @endif
@@ -177,30 +177,45 @@
         <div class="modal-dialog" role="document">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="" lass="modal-title" id="exampleModalLabel">@lang('Payment Confirmation')</h5>
+                    <h5 class="" lass="modal-title" id="exampleModalLabel">@lang('Ajouter Paiement')</h5>
                     <button type="button" class="close" data-bs-dismiss="modal">
                         <i class="las la-times"></i> </button>
                 </div>
 
-                <form action="{{ route('staff.courier.payment') }}" method="POST">
-                    @csrf
-                    @method('POST')
+               <form action="{{route('staff.transactions.payment')}}" method="POST">
+                @csrf
+                @method('POST')
+                <div class="modal-body">
                     <input type="hidden" name="code">
-                    <div class="modal-body">
-                        <p>@lang('Are you sure to collect this amount?')</p>
+                    <p>@lang('Entrer les Informations de paiement')</p>
+                    <div class="form-group">
+                        <div class="form-group col-lg-6">
+                            <select class="form-control form-control-lg" id="mode" name="mode">
+                                <option>@lang('Choisir Mode')</option>
+                                <option value="1">ESPECE</option>
+                                <option value="2">CHEQUE</option>
+                                <option value="3">CARTE BANCAIRE</option>
+                                <option value="4">VIREMENT</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group col-lg-6">
+                            <input type="numeric" class="form-control form-control-lg" name="montant_payer" id="montant_payer" placeholder="Montant Payer">
+                        </div>
+
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('No')</button>
-                        <button type="submit" class="btn btn--primary">@lang('Yes')</button>
+                   <div class="modal-footer">
+                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal">@lang('Annuler')</button>
+                        <button type="submit" class="btn btn--primary">@lang('Payer')</button>
                     </div>
-                </form>
+            </form>
             </div>
         </div>
     </div>
 @endsection
 
 @push('breadcrumb-plugins')
-
+ <x-back route="{{ url()->previous()  }}" />
 @endpush
 
 @push('script')

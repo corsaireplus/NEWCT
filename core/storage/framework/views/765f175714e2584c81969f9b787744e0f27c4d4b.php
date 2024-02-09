@@ -18,7 +18,7 @@
         </div><!-- dashboard-w1 end -->
         <div class="col-xxl-4 col-sm-6">
             <div class="card bg--cyan has-link box--shadow2">
-                <a href="<?php echo e(route('staff.courier.upcoming')); ?>" class="item-link"></a>
+                <a href="<?php echo e(route('staff.transactions.index')); ?>" class="item-link"></a>
                 <div class="card-body">
                     <div class="row align-items-center">
                         <div class="col-4">

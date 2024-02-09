@@ -13,8 +13,6 @@
                     <div class="desciption">
                         <span>@lang('Total a Payer')</span>
                     </div>
-
-                    <!-- <a href="{{route('staff.cash.income')}}" class="btn btn-sm text--small bg--white text--black box--shadow3 mt-3">@lang('Voir Tout')</a> -->
                 </div>
             </div>
         </div>
@@ -34,27 +32,7 @@
                 </div>
             </div>
         </div>
-        <!-- <div class="col-xl-3 col-lg-6 col-sm-6 mb-30">
-            <div class="dashboard-w1 bg--6 b-radius--10 box-shadow">
-                <div class="icon">
-                    <i class="fa fa-hand-holding-usd"></i>
-                </div>
-                <div class="details">
-                    <div class="numbers">
-                  
-                        <span class="amount"> {{getAmount($totalPartiel)}}{{ auth()->user()->branch->currencie }}</span>
-                     
-
-                   
-                    </div>
-                    <div class="desciption">
-                        <span>@lang('Total Colis payé Partiel')</span>
-                    </div>
-
-                    <a href="#" class="btn btn-sm text--small bg--white text--black box--shadow3 mt-3">@lang('Voir Tout')</a>
-                </div>
-            </div>
-        </div> -->
+       
         <div class="col-xl-4 col-lg-6 col-sm-6 mb-30">
             <div class="dashboard-w1 bg--12 b-radius--10 box-shadow" >
                 <div class="icon">
@@ -67,7 +45,6 @@
                     <div class="desciption">
                         <span>@lang('Total reste à payer') </span>
                     </div>
-                    <!-- <a href="{{route('staff.transaction.depense')}}" class="btn btn-sm text--small bg--white text--black box--shadow3 mt-3">@lang('Voir Tout')</a> -->
                 </div>
             </div>
         </div>
@@ -79,20 +56,8 @@
                 <div class="card-body p-0">
                     <div id="impri" class="table-responsive--sm  table-responsive">
                     <table class="table table-bordered " id="colis-table" name="colis-table">
-        <!-- <thead>
-            <tr>
-        
-                <th>Date</th>
-                <th>Reference</th>
-                <th>Nb Colis</th>
-                <th>Charge</th>
-                <th>client</th>
-                <th>contact</th>
-                <th>frais</th>
-                <th>Action</th>
-            </tr>
-        </thead> -->
-    </table>
+       
+                     </table>
                          <table class="table table--light style--two">
                             <thead>
                                 <tr>

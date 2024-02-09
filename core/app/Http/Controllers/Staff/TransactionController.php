@@ -63,13 +63,8 @@ class TransactionController extends Controller
                         // })
                         ->orderBy('id', 'DESC')
                         ->paginate(getPaginate());
-//dd($courierLists);
         return view('staff.transactions.index', compact('pageTitle', 'courierLists'));
-        // $pageTitle = "Liste des transactions";
-        // $emptyMessage = "Aucun Colis";
-        // $user = Auth::user();
-        // $transferts = Transaction::where('branch_id', $user->branch_id)->with('sender', 'receiver', 'paymentInfo')->withSum('paiement as payer','sender_payer')->orderBy('id', 'DESC')->paginate(getPaginate());
-        // return view('staff.transactions.index', compact('transferts', 'user', 'pageTitle', 'emptyMessage'));
+       
     }
 
     public static function generateUniqueInvoiceId()
@@ -96,7 +91,7 @@ class TransactionController extends Controller
     public function transactionStore(Request $request)
     {
 
-
+   
         $request->validate([
             'branch' => 'required|exists:branches,id',
             'receiver_name' => 'max:100',
@@ -104,17 +99,17 @@ class TransactionController extends Controller
             'receiver_phone' => 'max:22',
             'receiver_address' => 'max:255',
             'reference' => 'max:20',
-            'courierName.*' => 'required_with:quantity|exists:types,id',
-            'quantity.*' => 'required_with:courierName|integer|gt:0',
-            'amount' => 'required|array',
-            'amount.*' => 'numeric|gt:0',
+           // 'courierName.*' => 'required_with:quantity|exists:types,id',
+            //'quantity.*' => 'required_with:courierName|integer|gt:0',
+            //'amount' => 'required|array',
+            //'amount.*' => 'numeric|gt:0',
             'total_payer' => 'numeric|gt:0',
             'montant_payer' => 'numeric',
             'mode' => 'numeric',
             'message' => 'max:1024',
             'refrdv' => 'max:100'
         ]);
-        // dd($request);
+     
 
     try {
             DB::beginTransaction();
@@ -131,35 +126,44 @@ class TransactionController extends Controller
 
             //SUPPRIMER ELEMENT RDV POUR METTRE A JOUR 
             $delete_product =RdvProduct::where('rdv_idrdv',$rdv->idrdv)->delete();
-            for ($i = 0; $i < count($request->courierName); $i++) 
-            {
-                $courierType = Type::where('id', $request->courierName[$i])->where('status', 1)->firstOrFail();
+
+            $data = [];
+            foreach ($request->items as $item) {
+                $courierType = Type::where('id', $item['courierName'])->first();
+                if (!$courierType) {
+                    continue;
+                }
+                $price = $courierType->price * $item['quantity'];
                 
-                if ($request->rdvName[$i] == 2) {
-                    $totalDepotAmount += $request->amount[$i]; 
+
+                 if ($item['rdvName'] == 2) {
+                    $totalDepotAmount += $item['amount']; 
                        
                 } else {
-                    $totalRecupAmount += $request->amount[$i];
+                    $totalRecupAmount += $item['amount'];
                 }
                 
-                $totalAmount += $request->amount[$i];
-                
-                
-                // MISE A JOUR DES ELEMENTS DU RDV 
-                $rdvProduct = new RdvProduct();
-                $rdvProduct->rdv_idrdv = $rdv->idrdv;
-                if ($request->rdvName[$i] == 2){
-                    $rdvProduct->description='3';
-                }
-                $rdvProduct->rdv_type_id = $request->rdvName[$i];
-                $rdvProduct->rdv_product_id = $courierType->id;
-                $rdvProduct->qty = $request->quantity[$i];
-                $rdvProduct->fee =  $request->amount[$i];
-                $rdvProduct->created_at = $date_mission;
-                $rdvProduct->save();
-              
-            }
+                $totalAmount += $item['amount'];
 
+                  if ($item['rdvName'] == 2){
+                    $description='3';
+                   }else{
+                    $description=0;
+                   }
+    
+                $data[] = [
+                    'rdv_idrdv'  => $rdv->idrdv,
+                    'rdv_type_id' => $item['rdvName'],
+                    'rdv_product_id' => $courierType->id,
+                    'qty'             => $item['quantity'],
+                    'fee'             => $price,
+                    'created_at'      => $date_mission,
+                    'description'    => $description,
+                    
+                ];
+            }
+    
+            RdvProduct::insert($data);
 
              // MISE A JOUR MONTANT RDV 
              $montant=$totalAmount;
@@ -167,7 +171,7 @@ class TransactionController extends Controller
              $rdv_update_paiement=RdvPayment::where('rdv_id',$rdv->idrdv)->update(array('rdv_senderid' => $request->sender_id,'amount'=>$totalDepotAmount,'recup_amount'=>$totalRecupAmount));
              
              //ENREGISTREMENT TRANSACTION 
-                 if($request->reference != null){
+                 if($request->reference != null || $totalRecupAmount > 0 ){
                  
                         if($request->receiver_phone == null ){
                             $notify[]=['error','Ajouter  télephone Destinataire'];
@@ -242,19 +246,43 @@ class TransactionController extends Controller
                 }
                 // ENREGISTRER LISTE PRODUIT A ENVOYER
                 $totalRdvAmount = 0;
-                for ($i = 0; $i < count($request->courierName); $i++) {
-                    $courierType = Type::where('id', $request->courierName[$i])->where('status', 1)->firstOrFail();
-                   
-                        $totalRdvAmount += $request->amount[$i];
-                        $courierProduct = new TransactionProduct();
-                        $courierProduct->transaction_id = $transaction->id;
-                        $courierProduct->type_cat_id = $courierType->cat_id;
-                        $courierProduct->qty = $request->quantity[$i];
-                        $courierProduct->fee = $request->amount[$i];
-                        $courierProduct->save();
-                   // }
-                    
+
+                $data = [];
+                
+               foreach ($request->items as $item) {
+                $courierType = Type::where('id', $item['courierName'])->first();
+                if (!$courierType) {
+                    continue;
                 }
+                $price = $courierType->price * $item['quantity'];
+               
+
+                 if ($item['rdvName'] == 2) {
+                    $totalDepotAmount += $item['amount']; 
+                       
+                } else {
+                    $totalRecupAmount += $item['amount'];
+                }
+                
+                $totalRdvAmount += $item['amount'];
+
+                  if ($item['rdvName'] == 2){
+                    $description='3';
+                   }else{
+                    $description=0;
+                   }
+    
+                $data[] = [
+                    'transaction_id' => $transaction->id,
+                    'transaction_type_id' => $courierType->id,
+                    'type_cat_id'     => $item['rdvName'] ,
+                    'qty'             => $item['quantity'],
+                    'fee'             => $price,
+                    'created_at'       => now(),
+                ];
+             }
+             TransactionProduct::insert($data);
+
                 // Créez une nouvelle instance de TransactionFacture
                 $transactionFacture = new TransactionFacture();
                 // Attribuez les valeurs individuellement
@@ -268,7 +296,11 @@ class TransactionController extends Controller
                 // Sauvegardez la nouvelle transaction facture dans la base de données
                 $transactionFacture->save();
 
-                $q = DB::table('transfert_product')->where('transfert_id', $transaction->id)->where('type_cat_id',1)->sum('qty');
+
+                if($totalRecupAmount > 0){
+
+              
+                $q = DB::table('transaction_product')->where('transaction_id', $transaction->id)->where('type_cat_id',1)->sum('qty');
                 if ($q == 1) {
                     $transfertRef = new TransfertRef();
                     $transfertRef->transaction_id = $transaction->id;
@@ -279,20 +311,20 @@ class TransactionController extends Controller
                     for ($i = 0; $i < $q; $i++) {
                         $refsouch = $i+1;
                         $transfertRef = new TransfertRef();
-                        $transfertRef->transaction_id = $transaction-->id;
+                        $transfertRef->transaction_id = $transaction->id;
                         $transfertRef->ref_souche_part = $request->reference . '-'.$refsouch.'/'.$q;
                         $transfertRef->status = 0;
                         $transfertRef->save();
                     }
+                 }
                 }
-
                 $adminNotification = new AdminNotification();
                 $adminNotification->user_id = $user->id;
                 $adminNotification->title = 'New Transaction Enregistrée ' . $user->username;
                 $adminNotification->click_url = urlPath('admin.courier.info.details', $id);
                 $adminNotification->save();
-
-                      // enregistrement paiement en une seule fois avec branche transaction
+               // dd($totalRdvAmount);
+            // enregistrement paiement en une seule fois avec branche transaction
             if($request->montant_payer > 0){
                 if($request->montant_payer > $totalRdvAmount){
                     $notify[]=['error','Montant Superieur Veuillez Corriger'];
@@ -315,7 +347,6 @@ class TransactionController extends Controller
                 $payer->mode_paiement = $request->mode;
                 $payer->save();
 
-                $rdv_update = Rdv::where('code', $request->refrdv)->update(array('status' => '3','encaisse' =>$request->montant_payer));
 
                 if($request->montant_payer < $totalRdvAmount){
                     $trans_status = 1 ;
@@ -338,9 +369,7 @@ class TransactionController extends Controller
                 
 
             }
-             
-            
-        
+            $rdv_update = Rdv::where('code', $request->refrdv)->update(array('status' => '3','encaisse' =>$request->montant_payer));
 
             DB::commit();
             $rdv=Rdv::where('code',$request->refrdv)->first();
@@ -442,7 +471,7 @@ class TransactionController extends Controller
             $delete_product =TransactionProduct::where('transaction_id',$request->transfert_id)->delete();
            // dd( $request->courierName[0]);
            $courierType = Type::where('id', $request->courierName[0])->where('status', 1)->firstOrFail();
-          dd( $courierType);
+         /// dd( $courierType);
 
             for ($i = 0; $i < count($request->courierName); $i++) {
 
@@ -455,6 +484,7 @@ class TransactionController extends Controller
                 }
                     $courierProduct = new TransactionProduct();
                     $courierProduct->transaction_id = $courier->id;
+                    $courierProduct->transaction_type_id = $courierType->id;
                     $courierProduct->type_cat_id = $courierType->cat_id;
                     $courierProduct->qty = $request->quantity[$i];
                     $courierProduct->fee = $request->amount[$i];
@@ -463,7 +493,7 @@ class TransactionController extends Controller
                 
             }
 
-            dd($user->branch->country);
+           // dd($user->branch->country);
             $courierPayment =TransactionFacture::where('transaction_id',$request->transfert_id)->firstOrFail();
            
             //SMS MODIFICATION 
@@ -504,6 +534,8 @@ class TransactionController extends Controller
                     // return back()->withNotify($notify);
                 }
 
+                $transactionFacture = TransactionFacture::where('transaction_id',$request->transfert_id)->firstOrFail();
+                $update = TransactionFacture::where('transaction_id', $request->transfert_id)->update(array('amount' => $request->total_payer,'final_amount' =>$request->total_payer,'sender_amount'=>$request->total_payer,'receiver_amount'=>$request->total_payer * 656));
                
             }
 
@@ -619,7 +651,7 @@ class TransactionController extends Controller
     {
         $courierInfo = Transaction::where('id', decrypt($id))->with('receiver_adresse')->first();
         $admin = Auth::user();
-        $courierProductInfos = TransactionProduct::where('transaction_id', $courierInfo->id)->with('type')->get();
+        $courierProductInfos = TransactionProduct::where('transaction_id', $courierInfo->id)->with('type','type.unit')->get();
         $courierProductRef = TransfertRef::where('transaction_id', $courierInfo->id)->get();
         $courierPayment = TransactionFacture::where('transaction_id', $courierInfo->id)->first();
         $branchs = Branch::where('status', 1)->where('id', '!=', $admin->branch_id)->latest()->get();
@@ -628,16 +660,7 @@ class TransactionController extends Controller
        
         
         $pageTitle   = 'Modifier Transaction';
-        // $id          = decrypt($id);
-        // $branches    = Branch::active()->where('id', '!=', auth()->user()->branch_id)->orderBy('name')->get();
-        // $types       = Type::active()->with('unit')->orderBy('name')->get();
-        // $user        = auth()->user();
-        // $courierInfo = CourierInfo::with('products.type', 'payment', 'senderCustomer', 'receiverCustomer')->where('sender_branch_id', $user->branch_id)->where('id', $id)->firstOrFail();
-
-        // if ($courierInfo->status != ) {
-        //     $notify[] = ['error', "You can update only sent in queue courier."];
-        //     return back()->with($notify);
-        // }
+        
         return view('staff.transactions.edit', compact('pageTitle', 'courierInfo', 'courierProductRef', 'courierProductInfos', 'courierPayment','branchs','types','deja_payer'));
     }
 
@@ -645,7 +668,7 @@ class TransactionController extends Controller
     {
         $pageTitle   = 'Details Transaction';
         $userInfo = Auth::user();
-        $courierInfo = Transaction::with('products.type.unit', 'sender', 'receiver','paymentInfo','paiement')->findOrFail(decrypt($id));
+        $courierInfo = Transaction::with('products.type.unit','products','sender', 'receiver','paymentInfo','paiement','paiement.agent','paiement.modepayer')->findOrFail(decrypt($id));
         $staff = auth()->user();
         $deja_payer_receiver=Paiement::where('transaction_id',decrypt($id))->where('branch_id',1)->sum('receiver_payer');
         $deja_payer_sender=Paiement::where('transaction_id',decrypt($id))->where('branch_id',1)->sum('sender_payer');
@@ -659,6 +682,219 @@ class TransactionController extends Controller
         $courierInfo = Transaction::with('products.type.unit', 'paiement', 'sender', 'receiver','paymentInfo')->findOrFail(decrypt($id));
         return view('staff.transactions.invoice', compact('pageTitle', 'courierInfo'));
     }
+    public function payment(Request $request)
+    {
+        //dd($request);
+        $user = Auth::user();
+        $transfert = Transaction::where('trans_id', $request->code)->first();
+        $transfertPayment = TransactionFacture::where('transaction_id', $transfert->id)->first();
+        $amount = $request->montant_payer;
+        // dd($transfertPayment);
+        if ($user->branch_id == $transfert->branch_id) {
+
+            if ($user->branch->country == 'CIV') {
+                $sender_payer = $request->montant_payer;
+                $receiver_payer = $request->montant_payer / 656;
+                $totpayer = DB::table('paiements')
+                    ->where('transaction_id', $transfert->id)
+                    ->get(DB::raw('SUM(sender_payer) AS deja_payer'));
+            } else {
+                $sender_payer = $request->montant_payer;
+                $receiver_payer = $request->montant_payer * 656;
+                $totpayer = DB::table('paiements')
+                    ->where('transaction_id', $transfert->id)
+                    ->get(DB::raw('SUM(sender_payer) AS deja_payer'));
+                $total_amount = $totpayer;
+
+            }
+        } else {
+            if ($user->branch->country == 'CIV') {
+                $receiver_payer = $request->montant_payer;
+                $sender_payer = $request->montant_payer / 656;
+                $totpayer = DB::table('paiements')
+                    ->where('transaction_id', $transfert->id)
+                    ->get(DB::raw('SUM(receiver_payer) AS deja_payer'));
+            } else {
+                $receiver_payer = $request->montant_payer;
+                $sender_payer = $request->montant_payer * 656;
+                $totpayer = DB::table('paiements')
+                    ->where('transaction_id', $transfert->id)
+                    ->get(DB::raw('SUM(receiver_payer) AS deja_payer'));
+            }
+        }
+        if ($transfertPayment->final_amount ==  $total_amount) {
+            $notify[] = ['error', 'Paiement dejà enregistré'];
+        } else {
+            DB::beginTransaction();
+            try {
+                $user = Auth::user();
+                // $rdvmontant->status='3';
+                //$rdvmontant->save();
+                $payment = TransactionFacture::where('transaction_id', $transfert->id)->first();
+
+                $date_paiement = date('Y-m-d');
+                $payer = new Paiement();
+                $payer->user_id = $user->id;
+                $payer->branch_id = $user->branch_id;
+                $payer->sender_branch_id = $payment->transaction->branch_id;
+                $payer->transaction_id = $payment->transaction_id;
+                $payer->refpaiement = getTrx();
+                $payer->sender_payer = $sender_payer;
+                $payer->receiver_payer = $receiver_payer;
+                $payer->mode_paiement = $request->mode;
+                $payer->date_paiement = $date_paiement;
+                $payer->status = 0;
+                $payer->save();
+
+                if($payer){
+                    activity('Nouveau Paiement')
+                    ->performedOn($payer)
+                    ->causedBy($user)
+                    ->withProperties(['customProperty' => 'customValue'])
+                    ->log('Paiement de '.$sender_payer.' Euro ajouté par ' . $user->username);
+    
+                }
+                //$payment->chauffeur_id=
+                //  $payment->status= $payer->status;
+                //  $payment->save();
+
+                $branchtransaction = new BranchTransaction();
+                $branchtransaction->branch_id = $user->branch_id;
+                $branchtransaction->type = 'credit';
+                $branchtransaction->amount = $amount;
+                $branchtransaction->reff_no = getTrx();
+                $branchtransaction->operation_date = $date_paiement;
+                //$branchtransaction->rdv_id=$payment->rdv_id;
+                $branchtransaction->created_by = $user->id;
+                $branchtransaction->transaction_id = $payment->refrdv;
+                $branchtransaction->transaction_payment_id = $payer->id;
+                $branchtransaction->type_transaction = '2';
+                $branchtransaction->save();
+
+                $totalpayer = DB::table('paiements')
+                    ->where('transaction_id', $transfert->id)
+                    ->where('deleted_at',NULL)
+                    ->get(DB::raw('SUM(receiver_payer) AS deja_payer'));
+                //dd($totalpayer[0]->deja_payer );
+                // $status_paye='';
+                if ($totalpayer[0]->deja_payer < $payment->receiver_amount) {
+                    $status_paye = '1';
+                    // dd($status_paye);
+                } elseif ($totalpayer[0]->deja_payer   == $payment->receiver_amount) {
+                    $status_paye = '2';
+                    // dd($status_paye); 
+                } else {
+                    $notify[] = ['error', 'Montant incorrect'];
+                    DB::rollback();
+                    return back()->withNotify($notify);
+                }
+
+                $update = Transaction::where('id', $transfert->id)->update(array('status' => $status_paye));
+
+
+                $adminNotification = new AdminNotification();
+                $adminNotification->user_id = $payment->transaction->sender_id;
+                $adminNotification->title = 'Paiement Frais Envoi '; //. $payment->transfert->client->nom
+                $adminNotification->click_url = urlPath('staff.transactions.details', $payment->transaction_id);
+                $adminNotification->save();
+                DB::commit();
+                // }
+                $notify[] = ['success', 'Paiement validé '];
+            } catch (Exception $e) {
+
+                DB::rollback();
+            }
+        }
+        return back()->withNotify($notify);
+    }
+
+     public function delete(Request $request)
+     {
+                 $user = Auth::user();
+
+     try {
+
+              DB::beginTransaction();
+                 $rdv_code = Transaction::where('trans_id',$request->refpaiement)->first(); 
+                 $rdv_restore=Rdv::where('idrdv',$rdv_code->rdv_id)->first();
+
+            //VERIFICATION COLIS EXISTE DANS CONTENEUR
+            $conteneur=ContainerNbcolis::where('id_colis',$rdv_code->id)->first();
+            if($conteneur){
+                $notify[] = ['danger', 'Impossible de Supprimer le colis dans un conteneur'];
+
+                activity('Echec Suppression de transfert colis')
+                ->performedOn($rdv_code)
+                ->causedBy($user)
+                //->withProperties(['customProperty' => 'customValue'])
+                ->log('Echec de suppression Tranfert par ' . $user->username);
+            return back()->withNotify($notify);
+            }else{
+                if($rdv_restore){
+                        $rdv_restore->status ='2';
+                        $rdv_restore->save();
+                        $rdv_payment=RdvPayment::where('rdv_id',$rdv_code->rdv_id)->firstOrFail();
+                        $rdv_payment->status='1';
+                        
+                        $rdv_payment->save();
+                        $paiementrdv=Paiement::where('rdv_id',$rdv_restore->idrdv)->first();
+                        if($paiementrdv)
+                          {
+                                $branchtransaction=BranchTransaction::where('transaction_payment_id',$paiementrdv->id)->delete();
+                                $paiementrdv->delete();
+
+                                activity('Suppression de paiement pour depot RDV')
+                                ->performedOn($paiementrdv)
+                                ->causedBy($user)
+                                //->withProperties(['customProperty' => 'customValue'])
+                                ->log('Suppression de paiement pour depot de rdv  par ' . $user->username);
+            
+                                $adminNotification = new AdminNotification();
+                                $adminNotification->user_id = $user->id;
+                                $adminNotification->title = 'Rdv restoré paiement supprimé ' . $user->username;
+                                $adminNotification->click_url = urlPath('admin.courier.info.details', $rdv_code->facture_idfacture);
+                                $adminNotification->save();
+                             }
+                      }
+           
+                        $trans = Transaction::where('trans_id',$request->refpaiement)->first();
+                        $courier = Transaction::where('trans_id',$request->refpaiement)->delete();
+                        $courierPayment =TransactionFacture::where('transaction_id',$trans->id)->delete();
+
+                        $adminNotification = new AdminNotification();
+                        $adminNotification->user_id = $user->id;
+                        $adminNotification->title = 'Transaction Supprimée' . $user->username;
+                        $adminNotification->click_url = urlPath('admin.courier.info.details', $request->refpaiement);
+                        $adminNotification->save();
+                        
+                        activity('Suppression transfert')
+                        ->performedOn($trans)
+                        ->causedBy($user)
+                       // ->withProperties(['customProperty' => 'customValue'])
+                        ->log('Suppression Tranfert par ' . $user->username);
+                    }
+
+                  DB::commit();
+                  $notify[] = ['success', 'Envoi supprimé avec succès'];
+                  return back()->withNotify($notify);
+
+            } catch (Exception $e) {
+
+                DB::rollback();
+            }
+
+       }
+
+       public function newrdv($id){
+
+        $pageTitle = "Creer RDV dans le programme";
+        $branchs = Branch::where('status', 1)->latest()->get();
+        $types = Type::where('status', 1)->with('unit')->latest()->get();
+        $chauffeur =User::where('user_type','staff')->get();
+        $mission_id = $id;
+        return view('staff.transactions.createrdv', compact('pageTitle', 'branchs', 'types','chauffeur','mission_id'));
+
+       }
 
 
     }

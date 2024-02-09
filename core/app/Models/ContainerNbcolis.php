@@ -20,6 +20,10 @@ class ContainerNbcolis extends Model
         return $this->belongsTo(Transfert::class,'id_colis');
 
     }
+    public function transaction(){
+        return $this->belongsTo(Transaction::class,'id_transaction');
+
+    }
     public function payments(){
         return $this->hasMany(Paiement::class,'transfert_id','id_colis');
 
