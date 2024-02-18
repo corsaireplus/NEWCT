@@ -335,7 +335,7 @@
                 <div class="card border--dark">
                     <h5 class="card-header bg--dark">@lang('Details Conteneur')</h5>
                     <div class="card-body">
-                        <div class="table-responsive--md  table-responsive">
+                       <div class="table-responsive--md  table-responsive">
                             <table class="table table--light style--two">
                                 <thead>
                                     <tr>
@@ -358,7 +358,7 @@
                                         @if($courier->date_livraison ==  NULL)
                                         <td data-label="@lang('Livraison')">
                                         <span class="badge badge--danger">@lang('Non Livré')</span>
-</td>
+                                        </td>
                                         @else
                                         <td data-label="@lang('Livraison')">
 

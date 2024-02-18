@@ -37,4 +37,25 @@ class ContainerNbcolis extends Model
     public function livraison(){
         return $this->hasOne(Livraison::class,'colis_id','id_colis');
     }
+     public function translivraison(){
+        return $this->hasOne(Livraison::class,'transaction_id','id_transaction');
+    }
+
+   public function transaction_factures(){
+       return $this->hasMany(TransactionFacture::class,'transaction_id','id_transaction');
+    }
+    public function paiements(){
+        return $this->hasMany(Paiement::class,'transaction_id','id_transaction');
+
+    }
+
+    public function getTotalValeurColis()
+    {
+        return $this->transaction_factures()->sum('final_amount');
+    }
+
+    public function getTotalPaiements()
+    {
+        return $this->paiements()->sum('amount');
+    }
 }

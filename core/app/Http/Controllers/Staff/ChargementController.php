@@ -105,7 +105,7 @@ class ChargementController extends Controller
       $pageTitle = "Liste des Conteneurs";
       $emptyMessage = "Aucun Conteneur";
       $admin = Auth::user();
-      $missions = Container::where('desti_id', '=', $admin->branch_id)->orderBy('date', 'desc')->with('destination','envois')->orderBy('date', 'desc')->paginate(getPaginate());
+      $missions = Container::where('desti_id', '=', $admin->branch_id)->where('newold','!=',1)->orderBy('date', 'desc')->with('destination','envois')->orderBy('date', 'desc')->paginate(getPaginate());
 
       // dd($missions);
       return view('staff.dechargement.index', compact('pageTitle', 'missions', 'emptyMessage'));

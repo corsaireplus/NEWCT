@@ -166,13 +166,13 @@
                         <table class="table table--light style--two">
                             <thead>
                                 <tr>
-                                    <th>@lang('Sender Branch - Staff')</th>
-                                    <th>@lang('Receiver Branch - Staff')</th>
-                                    <th>@lang('Amount - Order Number')</th>
-                                    <th>@lang('Creations Date')</th>
-                                    <th>@lang('Payment Status')</th>
+                                    <th>@lang('Agence - Agent')</th>
+                                    <th>@lang('Client - Contact')</th>
+                                    <th>@lang('Montant - Reference')</th>
+                                    <th>@lang('Date Creation')</th>
+                                    <th>@lang('Paiement Status')</th>
                                     <th>@lang('Status')</th>
-                                    <th>@lang('Action')</th>
+                                    <!-- <th>@lang('Action')</th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -186,22 +186,22 @@
                                         <td>
                                             <span>
                                                 @if ($courierInfo->receiver_branch_id)
-                                                    {{ __($courierInfo->receiverBranch->name) }}
+                                                    {{ __($courierInfo->receiver->nom) }}
                                                 @else
-                                                    @lang('N/A')
+                                                    <span>{{ __($courierInfo->sender->nom) }}<span>
                                                 @endif
                                             </span>
                                             <br>
-                                            @if ($courierInfo->receiver_staff_id)
-                                                {{ __($courierInfo->receiverStaff->fullname) }}
+                                            @if ($courierInfo->receiver_branch_id)
+                                                {{ __($courierInfo->receiver->contact) }}
                                             @else
-                                                <span>@lang('N/A')</span>
+                                                <span>{{ __($courierInfo->sender->contact) }}</span>
                                             @endif
                                         </td>
                                         <td>
                                             <span class="fw-bold">{{ getAmount($courierInfo->paymentInfo->final_amount) }}
                                                 {{ __($general->cur_text) }}</span><br>
-                                            <span>{{ $courierInfo->code }}</span>
+                                            <span>{{ $courierInfo->trans_id }}</span>
                                         </td>
                                         <td>
                                             <span>{{ showDateTime($courierInfo->created_at, 'd M Y') }}</span><br>
@@ -230,8 +230,8 @@
                                             @endif
                                         </td>
 
-                                        <td>
-                                            @if ($courierInfo->status == Status::COURIER_DELIVERYQUEUE &&
+                                        <!--td>
+                                            < @if ($courierInfo->status == Status::COURIER_DELIVERYQUEUE &&
                                                 $courierInfo->paymentInfo->status == Status::COURIER_UPCOMING)
                                                 <a href="javascript:void(0)" title=""
                                                     class="btn btn-sm btn-outline--secondary  delivery"
@@ -251,8 +251,8 @@
                                                     class="las la-file-invoice"></i> @lang('Invoice')</a>
                                             <a href="{{ route('staff.courier.details', encrypt($courierInfo->id)) }}"
                                                 title="" class="btn btn-sm btn-outline--primary "> <i
-                                                    class="las la-info-circle"></i>@lang('Details')</a>
-                                        </td>
+                                                    class="las la-info-circle"></i>@lang('Details')</a> >
+                                        </td-->
                                     </tr>
                                 @empty
                                     <tr>

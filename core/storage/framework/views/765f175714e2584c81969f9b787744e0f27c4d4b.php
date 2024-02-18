@@ -165,13 +165,13 @@
                         <table class="table table--light style--two">
                             <thead>
                                 <tr>
-                                    <th><?php echo app('translator')->get('Sender Branch - Staff'); ?></th>
-                                    <th><?php echo app('translator')->get('Receiver Branch - Staff'); ?></th>
-                                    <th><?php echo app('translator')->get('Amount - Order Number'); ?></th>
-                                    <th><?php echo app('translator')->get('Creations Date'); ?></th>
-                                    <th><?php echo app('translator')->get('Payment Status'); ?></th>
+                                    <th><?php echo app('translator')->get('Agence - Agent'); ?></th>
+                                    <th><?php echo app('translator')->get('Client - Contact'); ?></th>
+                                    <th><?php echo app('translator')->get('Montant - Reference'); ?></th>
+                                    <th><?php echo app('translator')->get('Date Creation'); ?></th>
+                                    <th><?php echo app('translator')->get('Paiement Status'); ?></th>
                                     <th><?php echo app('translator')->get('Status'); ?></th>
-                                    <th><?php echo app('translator')->get('Action'); ?></th>
+                                    <!-- <th><?php echo app('translator')->get('Action'); ?></th> -->
                                 </tr>
                             </thead>
                             <tbody>
@@ -186,25 +186,25 @@
                                         <td>
                                             <span>
                                                 <?php if($courierInfo->receiver_branch_id): ?>
-                                                    <?php echo e(__($courierInfo->receiverBranch->name)); ?>
+                                                    <?php echo e(__($courierInfo->receiver->nom)); ?>
 
                                                 <?php else: ?>
-                                                    <?php echo app('translator')->get('N/A'); ?>
+                                                    <span><?php echo e(__($courierInfo->sender->nom)); ?><span>
                                                 <?php endif; ?>
                                             </span>
                                             <br>
-                                            <?php if($courierInfo->receiver_staff_id): ?>
-                                                <?php echo e(__($courierInfo->receiverStaff->fullname)); ?>
+                                            <?php if($courierInfo->receiver_branch_id): ?>
+                                                <?php echo e(__($courierInfo->receiver->contact)); ?>
 
                                             <?php else: ?>
-                                                <span><?php echo app('translator')->get('N/A'); ?></span>
+                                                <span><?php echo e(__($courierInfo->sender->contact)); ?></span>
                                             <?php endif; ?>
                                         </td>
                                         <td>
                                             <span class="fw-bold"><?php echo e(getAmount($courierInfo->paymentInfo->final_amount)); ?>
 
                                                 <?php echo e(__($general->cur_text)); ?></span><br>
-                                            <span><?php echo e($courierInfo->code); ?></span>
+                                            <span><?php echo e($courierInfo->trans_id); ?></span>
                                         </td>
                                         <td>
                                             <span><?php echo e(showDateTime($courierInfo->created_at, 'd M Y')); ?></span><br>
@@ -233,8 +233,8 @@
                                             <?php endif; ?>
                                         </td>
 
-                                        <td>
-                                            <?php if($courierInfo->status == Status::COURIER_DELIVERYQUEUE &&
+                                        <!--td>
+                                            < <?php if($courierInfo->status == Status::COURIER_DELIVERYQUEUE &&
                                                 $courierInfo->paymentInfo->status == Status::COURIER_UPCOMING): ?>
                                                 <a href="javascript:void(0)" title=""
                                                     class="btn btn-sm btn-outline--secondary  delivery"
@@ -254,8 +254,8 @@
                                                     class="las la-file-invoice"></i> <?php echo app('translator')->get('Invoice'); ?></a>
                                             <a href="<?php echo e(route('staff.courier.details', encrypt($courierInfo->id))); ?>"
                                                 title="" class="btn btn-sm btn-outline--primary "> <i
-                                                    class="las la-info-circle"></i><?php echo app('translator')->get('Details'); ?></a>
-                                        </td>
+                                                    class="las la-info-circle"></i><?php echo app('translator')->get('Details'); ?></a> >
+                                        </td-->
                                     </tr>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                     <tr>

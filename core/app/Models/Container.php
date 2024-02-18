@@ -6,10 +6,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\DB;
+use App\Constants\Status;
+use App\Traits\Searchable;
+use App\Traits\GlobalStatus;
 
 class Container extends Model
 {
     use SoftDeletes;
+     use Searchable, GlobalStatus;
     protected $dates = ['deleted_at'];
     protected $table = "containers";
     protected $primaryKey = 'idcontainer';

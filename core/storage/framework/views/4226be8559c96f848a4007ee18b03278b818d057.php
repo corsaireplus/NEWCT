@@ -67,6 +67,13 @@
 
                 <?php if(auth()->user()->branch->country == 'CIV'): ?>
                 <li class="sidebar-menu-item <?php echo e(menuActive('staff.transfert.receive')); ?>">
+                    <a href="<?php echo e(route('staff.transactions.receive')); ?>" class="nav-link"
+                       data-default-url="<?php echo e(route('staff.transactions.receive')); ?>">
+                        <i class="menu-icon las la-hourglass-start"></i>
+                        <span class="menu-title"><?php echo app('translator')->get('Liste Transactions'); ?></span>
+                    </a>
+                </li>
+                <li class="sidebar-menu-item <?php echo e(menuActive('staff.transfert.receive')); ?>">
                     <a href="<?php echo e(route('staff.transfert.receive')); ?>" class="nav-link"
                        data-default-url="<?php echo e(route('staff.transfert.receive')); ?>">
                         <i class="menu-icon las la-share"></i>
@@ -139,6 +146,13 @@
                 </li>
                 <?php endif; ?>
                 <?php if(auth()->user()->branch->country == 'FRA'): ?>
+                <li class="sidebar-menu-item <?php echo e(menuActive('staff.conteneurs*')); ?>">
+                    <a href="<?php echo e(route('staff.conteneurs.index')); ?>" class="nav-link"
+                       data-default-url="<?php echo e(route('staff.conteneurs.index')); ?>">
+                        <i class="menu-icon las la-ship"></i>
+                        <span class="menu-title"><?php echo app('translator')->get('Conteneurs'); ?></span>
+                    </a>
+                </li>
                 <li class="sidebar-menu-item <?php echo e(menuActive('staff.container*')); ?>">
                     <a href="<?php echo e(route('staff.container.liste')); ?>" class="nav-link"
                        data-default-url="<?php echo e(route('staff.container.liste')); ?>">
@@ -153,14 +167,20 @@
                         <span class="menu-title"><?php echo app('translator')->get('Suivi Conteneur'); ?></span>
                     </a>
                 </li>
-                <li class="sidebar-menu-item <?php echo e(menuActive('staff.courier.sent.queue')); ?>">
+                <!-- <li class="sidebar-menu-item <?php echo e(menuActive('staff.courier.sent.queue')); ?>">
                     <a href="<?php echo e(route('staff.courier.sent.queue')); ?>" class="nav-link ">
                         <i class="menu-icon las la-hourglass-start"></i>
                         <span class="menu-title"><?php echo app('translator')->get('Sent In Queue'); ?></span>
                     </a>
-                </li>
+                </li> -->
                 <?php endif; ?>
                 <?php if(auth()->user()->branch->country == 'CIV'): ?>
+                <li class="sidebar-menu-item <?php echo e(menuActive('staff.conteneurs.conteneureceive')); ?>">
+                    <a href="<?php echo e(route('staff.conteneurs.conteneureceive')); ?>" class="nav-link ">
+                        <i class="menu-icon las la-hourglass-start"></i>
+                        <span class="menu-title"><?php echo app('translator')->get('Déchargements'); ?></span>
+                    </a>
+                </li>
                 <li class="sidebar-menu-item <?php echo e(menuActive('staff.container.liste_decharge')); ?>">
                     <a href="<?php echo e(route('staff.container.liste_decharge')); ?>" class="nav-link"
                        data-default-url="<?php echo e(route('staff.container.liste_decharge')); ?>">

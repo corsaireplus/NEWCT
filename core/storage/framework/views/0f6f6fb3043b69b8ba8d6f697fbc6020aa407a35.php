@@ -116,16 +116,16 @@
                                             <?php if($courierInfo->reftrans): ?>
                                                 <?php if($courierInfo->ship_status == 0): ?>
                                                     <span class="badge badge--warning"><?php echo app('translator')->get('En Entrepôt'); ?></span>
-                                                <?php elseif($courierInfo->status >= 1): ?>
-                                                    <?php if(auth()->user()->branch_id == $courierInfo->sender_branch_id): ?>
-                                                        <span class="badge badge--warning"><?php echo app('translator')->get('Chargé'); ?></span>
-                                                    <?php else: ?>
-                                                        <span class="badge badge--primary"><?php echo app('translator')->get('Upcoming'); ?></span>
-                                                    <?php endif; ?>
-                                                <?php elseif($courierInfo->status == Status::COURIER_DELIVERYQUEUE): ?>
-                                                    <span class="badge badge--danger"><?php echo app('translator')->get('Delivery in queue'); ?></span>
-                                                <?php elseif($courierInfo->status == Status::COURIER_DELIVERED): ?>
-                                                    <span class="badge badge--success"><?php echo app('translator')->get('Delivery'); ?></span>
+                                                <?php elseif($courierInfo->ship_status == 1): ?>
+                                                  
+                                                    <span class="badge badge--warning"><?php echo app('translator')->get('Chargé'); ?></span>
+                                                                                                    
+                                                <?php elseif($courierInfo->ship_status ==  11): ?>
+                                                    <span class="badge badge--danger"><?php echo app('translator')->get('Chargé partiellement'); ?></span>
+                                                <?php elseif($courierInfo->ship_status ==  2): ?>
+                                                    <span class="badge badge--success"><?php echo app('translator')->get('Arrivé a Destination'); ?></span>
+                                                <?php elseif($courierInfo->ship_status ==  22): ?>
+                                                    <span class="badge badge--success"><?php echo app('translator')->get('Arrivé partiellement'); ?></span>
                                                 <?php endif; ?>
                                              <?php else: ?>
                                              <span class="badge badge--primary"><?php echo app('translator')->get('RDV'); ?></span>

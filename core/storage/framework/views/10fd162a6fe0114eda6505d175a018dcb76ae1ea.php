@@ -115,37 +115,32 @@
 
                                 <td data-label="<?php echo app('translator')->get('Client'); ?>">
                                     <?php if($trans->transaction): ?>
-                                    <?php if(auth()->user()->branch_id == $trans->transaction->branch_id): ?>
-                                    <span><?php echo e($trans->transaction->sender->nom); ?></span><br>
-                                    <?php echo e($trans->transaction->sender->contact); ?>
+                                        <?php if(auth()->user()->branch_id == $trans->transaction->branch_id): ?>
+                                        <span><?php echo e($trans->transaction->sender->nom); ?></span><br>
+                                        <?php echo e($trans->transaction->sender->contact); ?>
 
-                                    <?php else: ?>
-                                    <span><?php echo e($trans->transaction->receiver->nom); ?></span><br>
-                                    <?php echo e($trans->transaction->receiver->contact); ?>
+                                        <?php else: ?>
+                                        <span><?php echo e($trans->transaction->receiver->nom); ?></span><br>
+                                        <?php echo e($trans->transaction->receiver->contact); ?>
 
-                                    <?php endif; ?>
-                                    <?php endif; ?>
+                                        <?php endif; ?>
+                                    <?php elseif($trans->transfert): ?>
 
-                                    <?php if($trans->transfert): ?>
+                                        <?php if(auth()->user()->branch_id == $trans->transfert->sender_branch_id): ?>
+                                        <span><?php echo e($trans->transfert->sender->nom); ?></span><br>
+                                        <?php echo e($trans->transfert->sender->contact); ?>
 
-                                    <?php if(auth()->user()->branch_id == $trans->transfert->sender_branch_id): ?>
-                                    <span><?php echo e($trans->transfert->sender->nom); ?></span><br>
-                                    <?php echo e($trans->transfert->sender->contact); ?>
+                                        <?php else: ?>
+                                        <span><?php echo e($trans->transfert->receiver->nom); ?></span><br>
+                                        <?php echo e($trans->transfert->receiver->contact); ?>
 
-                                    <?php else: ?>
-                                    <span><?php echo e($trans->transfert->receiver->nom); ?></span><br>
-                                    <?php echo e($trans->transfert->receiver->contact); ?>
-
-                                    <?php endif; ?>
+                                        <?php endif; ?>
 
                                      <?php elseif($trans->rdv): ?>
-                                     <span>
-                                     <?php echo e(__($trans->rdv->sender->nom)); ?>
-
-                                        </span><br>
+                                      <span><?php echo e(__($trans->rdv->sender->nom)); ?></span><br>
                                         <?php echo e($trans->rdv->sender->contact); ?>
 
-                                    <?php endif; ?>
+                                     <?php endif; ?>
                                     
                                 </td>
                                 <td data-label="<?php echo app('translator')->get('Type'); ?>">
@@ -180,7 +175,7 @@
                                         <?php endif; ?>
                                     <?php else: ?>
                                     <span class="font-weight-bold"> <?php echo e(getAmount($trans->sender_payer)); ?> <?php echo e(auth()->user()->branch->currencie); ?></span><br>
-<?php endif; ?>
+                                    <?php endif; ?>
                                     <span><?php echo e($trans->refpaiement); ?></span>
                                 </td>
 
@@ -282,6 +277,36 @@
 
 <?php $__env->stopPush(); ?>
 <?php $__env->startPush('breadcrumb-plugins'); ?>
+<?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.search-form','data' => ['placeholder' => 'Recherche...']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('search-form'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['placeholder' => 'Recherche...']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
+<?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.date-filter','data' => ['placeholder' => 'Date Debut - Date Fin']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component->withName('date-filter'); ?>
+<?php if ($component->shouldRender()): ?>
+<?php $__env->startComponent($component->resolveView(), $component->data()); ?>
+<?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
+<?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
+<?php endif; ?>
+<?php $component->withAttributes(['placeholder' => 'Date Debut - Date Fin']); ?>
+<?php echo $__env->renderComponent(); ?>
+<?php endif; ?>
+<?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
+<?php $component = $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4; ?>
+<?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
+<?php endif; ?>
 <!-- <a href="<?php echo e(route('staff.bilan.export_list',['null','null','null'])); ?>" class="btn btn-sm btn--secondary box--shadow1 text--small"><i class="las la-printer"></i> <?php echo app('translator')->get('Imprimer'); ?></a> -->
 <?php $__env->stopPush(); ?>
 <?php $__env->startPush('script-lib'); ?>

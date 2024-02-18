@@ -22,6 +22,8 @@
                                     <option value="11">@lang('Chargé partiellement')</option>
                                     <option value="2">@lang('Colis à Destination')</option>
                                     <option value="22">@lang('Colis partiel à Destination')</option>
+                                    <option value="3">@lang('Livré')</option>
+                                    <option value="33">@lang('Livré partiellement')</option>
                                 </select>
                                 <!-- 0 entrepot 1 chargé en conteneur 11 chargé partiellement 2 colis arrivé 22 colis partiellement arrivé 3 colis livré 33 colis partiellement livré 4 terminé -->
                             </div>
@@ -109,17 +111,21 @@
                                         <td>
                                             @if($courierInfo->reftrans)
                                                 @if ($courierInfo->ship_status == 0)
-                                                    <span class="badge badge--warning">@lang('En Entrepôt')</span>
-                                                @elseif ($courierInfo->status >= 1)
-                                                    @if (auth()->user()->branch_id == $courierInfo->sender_branch_id)
-                                                        <span class="badge badge--warning">@lang('Chargé')</span>
-                                                    @else
-                                                        <span class="badge badge--primary">@lang('Upcoming')</span>
-                                                    @endif
-                                                @elseif ($courierInfo->status == Status::COURIER_DELIVERYQUEUE)
-                                                    <span class="badge badge--danger">@lang('Delivery in queue')</span>
-                                                @elseif($courierInfo->status == Status::COURIER_DELIVERED)
-                                                    <span class="badge badge--success">@lang('Delivery')</span>
+                                                    <span class="badge badge--danger">@lang('En Entrepôt')</span>
+                                                @elseif ($courierInfo->ship_status == 1)
+                                                  
+                                                    <span class="badge badge--success">@lang('Chargé')</span>
+                                                                                                    
+                                                @elseif ($courierInfo->ship_status ==  11)
+                                                    <span class="badge badge--warning">@lang('Chargé partiellement')</span>
+                                                @elseif($courierInfo->ship_status ==  2)
+                                                    <span class="badge badge--success">@lang('Arrivé a Destination')</span>
+                                                @elseif($courierInfo->ship_status ==  22)
+                                                    <span class="badge badge--warning">@lang('Arrivé partiellement')</span>
+                                                @elseif($courierInfo->ship_status ==  3)
+                                                    <span class="badge badge--success">@lang('Livré')</span>
+                                                @elseif($courierInfo->ship_status ==  33)
+                                                    <span class="badge badge--warning">@lang('Livré partiellement')</span>
                                                 @endif
                                              @else
                                              <span class="badge badge--primary">@lang('RDV')</span>

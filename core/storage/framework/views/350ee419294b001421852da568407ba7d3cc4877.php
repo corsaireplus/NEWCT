@@ -1,5 +1,5 @@
 <?php $__env->startSection('panel'); ?>
-   <div class="row mb-none-30">
+<div class="row mb-none-30">
     <div class="col-lg-12">
         <div class="card b-radius--10 ">
             <div class="card-body">
@@ -31,7 +31,7 @@
                         </div>
                     </div>
                     <div class="row">
-                    <div class="form-group col-md-6">
+                      <div class="form-group col-md-6">
                             <label for="priority"><?php echo app('translator')->get('Destination'); ?></label>
                             <select name="desti_id" class="form-control form-control-lg">
                                 <?php $__currentLoopData = $branch; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $type): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
@@ -42,11 +42,6 @@
 
                     </div>
 
-                    <div class="col-md-12">
-                        <div class="row form-group">
-
-                        </div>
-                    </div>
 
                     <div class="form-group">
                         <button type="submit" class="btn btn--primary btn-block" id="recaptcha"><i class="fa fa-fw fa-paper-plane"></i> <?php echo app('translator')->get('Enregistrer'); ?></button>
@@ -55,6 +50,7 @@
             </div>
         </div>
     </div>
+</div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('breadcrumb-plugins'); ?>

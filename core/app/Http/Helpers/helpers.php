@@ -15,6 +15,9 @@ use App\Models\GeneralSetting;
 use App\Lib\GoogleAuthenticator;
 use App\Models\Customer;
 use Illuminate\Support\Facades\Cache;
+use PHPMailer\PHPMailer\Exception;
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
 
 function systemDetails()
 {
@@ -113,13 +116,13 @@ function getAmount($amount, $length = 2)
     return $amount + 0;
 }
 
-function showAmount($amount, $decimal = 2, $separate = true, $exceptZeros = false)
+function showAmount($amount, $decimal = 0, $separate = true, $exceptZeros = false)
 {
     $separator = '';
     if ($separate) {
-        $separator = ',';
+        $separator = '.';
     }
-    $printAmount = number_format($amount, $decimal, '.', $separator);
+    $printAmount = number_format($amount, $decimal, ',', $separator);
     if ($exceptZeros) {
         $exp = explode('.', $printAmount);
         if ($exp[1] * 1 == 0) {
@@ -446,4 +449,78 @@ function gs()
         Cache::put('GeneralSetting', $general);
     }
     return $general;
+}
+
+function sendGeneralEmail($email, $subject, $message, $receiver_name = '')
+{
+
+    $general = GeneralSetting::first();
+
+
+    if ($general->en != 1 || !$general->email_from) {
+        return;
+    }
+
+
+    $message = shortCodeReplacer("{{message}}", $message, $general->email_template);
+    $message = shortCodeReplacer("{{fullname}}", $receiver_name, $message);
+    $message = shortCodeReplacer("{{username}}", $email, $message);
+
+    $config = $general->mail_config;
+
+    if ($config->name == 'php') {
+        sendPhpMail($email, $receiver_name, $subject, $message, $general);
+    } else if ($config->name == 'smtp') {
+        sendSmtpMail($config, $email, $receiver_name, $subject, $message, $general);
+    } else if ($config->name == 'sendgrid') {
+        sendSendGridMail($config, $email, $receiver_name,$subject, $message,$general);
+    } else if ($config->name == 'mailjet') {
+        sendMailjetMail($config, $email, $receiver_name,$subject, $message, $general);
+    }
+}
+
+function shortCodeReplacer($shortCode, $replace_with, $template_string)
+{
+    return str_replace($shortCode, $replace_with, $template_string);
+}
+
+function sendPhpMail($receiver_email, $receiver_name, $subject, $message,$general)
+{
+    $headers = "From: $general->sitename <$general->email_from> \r\n";
+    $headers .= "Reply-To: $general->sitename <$general->email_from> \r\n";
+    $headers .= "MIME-Version: 1.0\r\n";
+    $headers .= "Content-Type: text/html; charset=utf-8\r\n";
+    @mail($receiver_email, $subject, $message, $headers);
+}
+
+function sendSmtpMail($config, $receiver_email, $receiver_name, $subject, $message,$general)
+{
+    $mail = new PHPMailer(true);
+
+    try {
+        //Server settings
+        $mail->isSMTP();
+        $mail->Host       = $config->host;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = $config->username;
+        $mail->Password   = $config->password;
+        if ($config->enc == 'ssl') {
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+        }else{
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+        }
+        $mail->Port       = $config->port;
+        $mail->CharSet = 'UTF-8';
+        //Recipients
+        $mail->setFrom($general->email_from, $general->sitename);
+        $mail->addAddress($receiver_email, $receiver_name);
+        $mail->addReplyTo($general->email_from, $general->sitename);
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $message;
+        $mail->send();
+    } catch (Exception $e) {
+        throw new Exception($e); 
+    }
 }

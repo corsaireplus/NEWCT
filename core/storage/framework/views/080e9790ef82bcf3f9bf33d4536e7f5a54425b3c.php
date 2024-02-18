@@ -108,14 +108,14 @@
 <?php $__env->stopSection(); ?>
 <?php $__env->startPush('breadcrumb-plugins'); ?>
 <?php if (isset($component)) { $__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4 = $component; } ?>
-<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.back','data' => ['route' => ''.e(url()->previous()).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
+<?php $component = Illuminate\View\AnonymousComponent::resolve(['view' => 'components.back','data' => ['route' => ''.e(route('staff.mission.index')).'']] + (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag ? (array) $attributes->getIterator() : [])); ?>
 <?php $component->withName('back'); ?>
 <?php if ($component->shouldRender()): ?>
 <?php $__env->startComponent($component->resolveView(), $component->data()); ?>
 <?php if (isset($attributes) && $attributes instanceof Illuminate\View\ComponentAttributeBag && $constructor = (new ReflectionClass(Illuminate\View\AnonymousComponent::class))->getConstructor()): ?>
 <?php $attributes = $attributes->except(collect($constructor->getParameters())->map->getName()->all()); ?>
 <?php endif; ?>
-<?php $component->withAttributes(['route' => ''.e(url()->previous()).'']); ?>
+<?php $component->withAttributes(['route' => ''.e(route('staff.mission.index')).'']); ?>
 <?php echo $__env->renderComponent(); ?>
 <?php endif; ?>
 <?php if (isset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4)): ?>
@@ -123,14 +123,16 @@
 <?php unset($__componentOriginalc254754b9d5db91d5165876f9d051922ca0066f4); ?>
 <?php endif; ?>
  <a href="<?php echo e(route('staff.transactions.newrdv', $mission_id)); ?>" title=""
-        class="btn btn-sm btn-outline--info">
+        class="btn btn-sm btn-outline--danger">
         <i class="las la-file-invoice"></i>
         <?php echo app('translator')->get('Ajouter RDV Dans ce Programme'); ?>
     </a>
-<!-- <a href="javascript:void(0)" class="btn btn-sm btn--secondary box--shadow1 text--small sendSms" onclick="sendSms(<?php echo e(encrypt($mission->idmission)); ?>,<?php echo e($mission->contact); ?>)" data-idmission="<?php echo e(encrypt($mission->idmission)); ?>" data-contact="<?php echo e($mission->contact); ?>"><i class="las la-phone"></i><?php echo app('translator')->get('Sms'); ?></a> -->
+    <a href="<?php echo e(route('staff.mission.print',encrypt($mission->idmission))); ?>" title=""
+        class="btn btn-sm btn-outline--info">
+        <i class="las la-download"></i>
+        <?php echo app('translator')->get('Imprimer'); ?>
+    </a>
 
-<!-- <a href="<?php echo e(route('staff.mission.send_sms',encrypt($mission->idmission))); ?>" class="btn btn-sm btn--secondary box--shadow1 text--small"><i class="las la-phone"></i> <?php echo app('translator')->get('Envoyer SMS'); ?></a> -->
-<a href="<?php echo e(route('staff.mission.print',encrypt($mission->idmission))); ?>" class="btn btn-sm btn--secondary box--shadow1 text--small"><i class="las la-printer"></i> <?php echo app('translator')->get('Imprimer'); ?></a> <a href="<?php echo e(route('staff.mission.index')); ?>" class="btn btn-sm btn--primary box--shadow1 text--small"><i class="las la-angle-double-left"></i> <?php echo app('translator')->get('Retour'); ?></a>
 <?php $__env->stopPush(); ?>
 <?php $__env->startPush('script'); ?>
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

@@ -17,6 +17,7 @@
         "laravel/sanctum": "^2.14.1",
         "laravel/tinker": "^2.7",
         "laravel/ui": "^3.4",
+        "maatwebsite/excel": "*",
         "mailjet/mailjet-apiv3-php": "^1.4",
         "messagebird/php-rest-api": "^1.20",
         "milon/barcode": "^9.0",

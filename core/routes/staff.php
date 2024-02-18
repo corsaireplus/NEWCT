@@ -101,9 +101,42 @@ Route::middleware('auth')->group(function () {
                 Route::post('payment','payment')->name('payment');
                 Route::post('delete','delete')->name('delete');
                 Route::get('newrdv/{id}','newrdv')->name('newrdv');
+                Route::get('receive','receive')->name('receive');
+                Route::get('livraison/{id}/{container_id}','livraison')->name('livraison');
+                Route::post('livrercolis','livrercolis')->name('livraison_validate');
+                Route::get('livraison_invoice/{id}/{container_id}','livraison_invoice')->name('livraison_invoice');
+
 
             });
             Route::post('/open-modal', 'MissionController@openModal')->name('open-modal');
+            // nouveaux conateneurs
+
+            Route::controller('ConteneurController')->name('conteneurs.')->prefix('conteneurs.')->group(function(){
+                Route::get('/','index')->name('index');
+                Route::get('create','create')->name('create');
+                Route::post('store','store')->name('store');
+                Route::get('assign/{id}','assign')->name('assign');
+                Route::post('storeone','storeone')->name('storeone');
+                Route::post('storemulti','storemulti')->name('storemulti');
+                Route::get('conteneurliste/{id}','conteneurliste')->name('conteneurliste');
+                Route::get('coliscancel/{idcolis}/{idcontainer}','coliscancel')->name('coliscancel');
+                Route::post('conteneur/chargé','EndConteneur')->name('conteneurcharge');
+                Route::get('conteneur/print/charge/{id}','printcharge')->name('printcharge');
+                Route::post('conteneur/sendsms','smsConteneur')->name('conteneursms');
+                Route::post('conteneur/reopen','reopencontainer')->name('reopen');
+                Route::get('listenonpaye/{id}','listenonpaye')->name('listenonpaye');
+                //conteneur arrivé
+                Route::get('conteneureceive','conteneureceive')->name('conteneureceive');
+                Route::post('end','DechargeContainer')->name('decharger');
+                Route::get('listereceive/{id}','listereceive')->name('listereceive');
+                Route::get('listereceivenonpaye/{id}','listereceivenonpaye')->name('listereceivenonpaye');
+                Route::get('conteneur/export_restapayer/{id}', 'export_nonpayer')->name('export_nonpayer') ;
+
+
+
+
+
+            });
 
 
             //RDV

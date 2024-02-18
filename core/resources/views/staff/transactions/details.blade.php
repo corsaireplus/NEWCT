@@ -148,11 +148,59 @@
                 </div>
             </div>
 
-            <!-- <div class="row mb-30">
+            <div class="row mb-30">
                 <div class="col-lg-12 mt-2">
                     <div class="card border--dark">
-                        <h5 class="card-header bg--dark">@lang('Facture Information')</h5>
-                        <div class="card-body">
+                        <h5 class="card-header bg--dark">@lang('Conteneurs Informations')</h5>
+                         <div class="card-body">
+                            <div class="table-responsive--md  table-responsive">
+                                <table class="table table--light style--two">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">@lang('Date')</th>
+                                        <th scope="col">@lang('Numero Conteneur')</th>
+                                        <th scope="col">@lang('Nb Chargé')</th>
+                                        <th scope="col">@lang('Livraison')</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($conteneur as $courier)
+                                    <tr>
+                                        <td data-label="@lang('Date')">
+                                            {{date('d-m-Y', strtotime($courier->conteneur->date))}}
+                                        </td>
+                                        <td data-label="@lang('Numero')">{{$courier->conteneur->numero}}</td>
+
+                                        <td data-label="@lang('Nb Chargé')">{{$courier->nb_colis}}</td>
+                                        @if($courier->date_livraison ==  NULL )
+                                        <td data-label="@lang('Livraison')">
+                                           @if($userInfo->branch_id != $courierInfo->branch_id )
+                                               @if(($courier->transaction->ship_status == 2 || $courier->transaction->ship_status == 22) && ($courier->transaction->status == 2 || $courier->transaction->status == 1 ))
+                                        
+                                              <a href="{{route('staff.transactions.livraison',[encrypt($courier->transaction->id),encrypt($courier->container_id)])}}"><button class="btn btn-sm btn-outline--info"><i class="las la-truck"></i>@lang('Delivery')</button></a>
+                                           
+                                              @else
+                                               <span class="badge badge--danger">@lang('Colis en route')</span>
+                                              @endif
+
+                                            @else
+                                            <span class="badge badge--success">@lang('Livraison en Attente')</span>
+
+                                            @endif
+                                        </td>
+                                        @else
+                                        <td data-label="@lang('Livraison')">
+                                        <span class="badge badge--success"><a href="{{route('staff.transfert.livraison_invoice',[encrypt($courierInfo->id),encrypt($courier->container_id)])}}" title="" class="ml-1 livraison_invoice" data-container_id="{{$courier->container_id}}" data-colis_id="{{$courierInfo->id}}">@lang('Dejà Livré')</a></span>
+                                        </td>
+                                        @endif
+                                    </tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                        </div>
+                        <!-- <div class="card-body">
                             <ul class="list-group">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     @lang('Payment Received By ')
@@ -218,10 +266,10 @@
                                     @endif
                                 </li>
                             </ul>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
-            </div> -->
+            </div>
             <div class="row mb-30">
                 <div class="col-lg-12 mt-2">
                     <div class="card border--dark">
@@ -425,6 +473,8 @@
             </div>
         </div>
     </div>
+
+    
 @endsection
 
 @push('breadcrumb-plugins')
@@ -436,9 +486,9 @@
         @lang('Facture')
     </a>
 
-    <!-- @if ($courierInfo->status <= 1 )
-        <button class="btn btn-sm btn-outline--info delivery"
-            data-code="{{ $courierInfo->code }}"><i class="las la-truck"></i>
+    <!-- @if ($courierInfo->ship_status > 1 )
+        <button class="btn btn-sm btn-outline--info open-modal-btn"
+            data-code="livraison"><i class="las la-truck"></i>
             @lang('Delivery')</button>
     @endif -->
 
@@ -489,6 +539,12 @@
                 modal.find('input[name=code]').val($(this).data('code'))
                 modal.modal('show');
             });
+
+            
         })(jQuery)
-    </script>
+         </script>
+
+
+
+
 @endpush

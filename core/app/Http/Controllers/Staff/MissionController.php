@@ -548,6 +548,9 @@ class MissionController extends Controller
                      $idmission = $request->input('idmission');
                   
                      return view('staff.modal.reopen', compact('modalData','idmission'));
+                  }elseif($code =="livraison"){
+                      $modalData="'Livraison'";
+                     return view('staff.modal.livraison', compact('modalData'));
                   }
 
                   // Vous pouvez ajouter ici la logique nécessaire pour obtenir les données nécessaires

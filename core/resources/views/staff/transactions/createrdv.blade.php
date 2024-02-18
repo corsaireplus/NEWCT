@@ -4,7 +4,7 @@
     <div class="col-lg-12 col-md-12 mb-30">
         <div class="card">
             <div class="card-body">
-                <form action="{{route('staff.transactions.store')}}" method="POST">
+                 <form action="{{route('staff.transactions.store')}}" method="POST">
                     @csrf
                     <input type="hidden" name="mission_id" id="mission_id" value="{{$mission_id}}">
                     <div class="row">
@@ -15,7 +15,7 @@
                                     <div class="row">
                                         <div class="form-group col-lg-6">
                                             <label>@lang('Contact')</label>
-                                            <input type="text" class="form-control" id="phone" value="{{old('sender_phone')}}" name="sende_phone" maxlength="40" required="">
+                                            <input type="text" class="form-control" id="phone" value="{{old('sender_phone')}}" name="sender_phone" maxlength="40" required="">
                                            
 
                                         </div>
@@ -47,7 +47,7 @@
                                     <div class="row">
                                         <div class="form-group col-lg-6">
                                             <label>@lang('Reference')</label>
-                                            <input type="text" style="background-color : green; color: #ffffff" class="form-control form-control-lg" id="reference" name="reference" value="{{old('reference')}}" maxlength="40" required="">
+                                            <input type="text" style="background-color : green; color: #ffffff" class="form-control form-control-lg" id="reference" name="reference" value="{{old('reference')}}" maxlength="40">
                                         </div>
                                         <div class="form-group col-lg-6">
                                             <label>@lang('Type Envoi')</label>
@@ -73,11 +73,11 @@
 
                                         <div class="form-group col-lg-12">
                                             <label>@lang('Contact')</label>
-                                            <input type="text" class="form-control" id="receiver_phone" name="receiver_phone" value="{{old('receiver_phone')}}" required="">
+                                            <input type="text" class="form-control" id="receiver_phone" name="receiver_phone" value="{{old('receiver_phone')}}">
                                         </div>
                                         <div class="form-group col-lg-12">
                                             <label>Nom</label>
-                                            <input type="text" class="form-control" id="receiver_name" name="receiver_name" value="{{old('receiver_name')}}" maxlength="40" required="">
+                                            <input type="text" class="form-control" id="receiver_name" name="receiver_name" value="{{old('receiver_name')}}" maxlength="40">
                                         </div>
                                     </div>
 
@@ -105,94 +105,59 @@
                         <div class="col-lg-12">
                             <div class="card border--primary mt-3">
                                 <h5 class="card-header bg--primary  text-white">@lang('Information Colis')
-                                <button type="button" class="btn btn-sm btn-outline-light float-end addUserData"><i
-                                            class="la la-fw la-plus"></i>@lang('Ajouter')
-                                    </button>
+                                <button type="button" class="btn btn-sm btn-outline-light float-end addUserData"><i class="la la-fw la-plus"></i>@lang('Ajouter')</button>
                                 </h5>
 
                                 <div class="card-body">
-                                    <div class="row addedField">
-                                        <div class="row single-item gy-2">
-                                                <div class="col-md-2">
-                                                    <select class="form-control rdvtype selected_type" id="rdv_type_0" name="rdvName[]" onChange="getType(this.value,0);">
-                                                        <option>@lang('Choisir Type')</option>
-                                                        <option value="1">RECUP</option>
-                                                        <option value="2">DEPOT</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <select class="form-control select3 selected_type" id="courier_type_0"   onchange="currierType(0)" name="courierName[]">
-                                                        <option>Choisir Objet</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="input-group mb-3">
-                                                        <input type="text" class="form-control  currier_quantity_0" placeholder="@lang('Qté')"  name="quantity[]" onkeyup="courierQuantity(0)" aria-label="objet" aria-describedby="basic-addon2" required="">
-                                                        <span class="input-group-text unit"><i
-                                                                        class="las la-balance-scale"></i></span>
-                                                    </div>
-                                                </div>
-
-                                                <div class="col-md-3">
-                                                    <div class="input-group mb-3">
-                                                        <input type="text" id="amount" class="form-control  currier_fee_0" placeholder="@lang('Prix')"  name="amount[]" aria-label="Prix Objet" aria-describedby="basic-addon2" required="">
-                                                        <span class="input-group-text">{{ __($general->cur_text) }}</span>
-                                                    </div>
-                                                </div>
-                                                 <div class="col-md-1">
-                                                 <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
-                                                  <i class="fa fa-times"></i>
-                                                 </button>
-                                                  </div>
+                                            <div class="row addedField" id="addedField">
+                                                
                                             </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
                     <div class="row mb-30">
                         <div class="col-lg-12">
                             <div class="card border--primary mt-3">
-                                <h5 class="card-header bg--primary text-white">@lang('Information Paiement')
-                                   
-                                </h5>
+                                <h5 class="card-header bg--primary text-white">@lang('Information Paiement')</h5>
                                 <div class="card-body">
                                 <div class="row">
-                    <div class="form-group col-lg-4">
-                        <label>@lang('TOTAL A PAYER')</label>
-                        <input type="text" style="background-color :red; color :#ffffff" class="form-control" id="total_paye" value="{{old('total_paye')}}" name="total_payer" placeholder="@lang(" Total a Payer")" maxlength="40" required="">
-                    </div>
-                    <div class="form-group col-lg-4">
-                        <label>@lang('MONTANT PAYER')</label>
-                        <input type="text" style="background-color : green; color :#ffffff" class="form-control" id="montant_payer" name="montant_payer" value="{{old('montant_payer')}}" placeholder="@lang(" Montant Payer ")" maxlength="40" required="">
-                    </div>
-                    <div class="form-group col-lg-4">
-                        <label>@lang('MODE PAIEMENT')</label>
-                        <select class="form-control" id="mode" name="mode" required>
-                            <option value="1">ESPECE</option>
-                            <option value="2">CHEQUE</option>
-                            <option value="3">CARTE BANCAIRE</option>
-                            <option value="3">VIREMENT</option>
-                        </select>
-                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>@lang('TOTAL A PAYER')</label>
+                                        <input type="text" style="background-color :red; color :#ffffff" class="form-control" id="total_paye" value="{{old('total_paye')}}" name="total_payer" placeholder="@lang(" Total a Payer")" maxlength="40" required="">
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>@lang('MONTANT PAYER')</label>
+                                        <input type="text" style="background-color : green; color :#ffffff" class="form-control" id="montant_payer" name="montant_payer" value="{{old('montant_payer')}}" placeholder="@lang(" Montant Payer ")" maxlength="40" required="">
+                                    </div>
+                                    <div class="form-group col-lg-4">
+                                        <label>@lang('MODE PAIEMENT')</label>
+                                        <select class="form-control" id="mode" name="mode" required>
+                                            <option value="1">ESPECE</option>
+                                            <option value="2">CHEQUE</option>
+                                            <option value="3">CARTE BANCAIRE</option>
+                                            <option value="3">VIREMENT</option>
+                                        </select>
+                                    </div>
 
-                </div>
-                                    <div class="row">
+                                </div>
+                                <div class="row">
                                         <div class="form-group col-lg-12">
                                             <label for="inputMessage">@lang('Note')</label>
                                             <textarea name="message" id="observation" rows="6" class="form-control form-control-lg" placeholder="@lang('Observation ou Note')">{{old('message')}}</textarea>
                                         </div>
-                                    </div>
-                                    <button type="submit" class="btn btn--primary h-45 w-100 Submitbtn"> @lang('Submit')</button>
-
                                 </div>
                             </div>
                         </div>
                     </div>
+                 </div>
+                    <button type="submit" class="btn btn--primary h-45 w-100 Submitbtn"> @lang('Submit')</button>
+
+                             
+                </div>
                    
-                </form>
+            </form>
             </div>
         </div>
     </div>
@@ -201,10 +166,17 @@
 
 @push('breadcrumb-plugins')
 
-<a href="{{ url()->previous() }}" class="btn btn-sm btn--primary box--shadow1 text--small"><i class="las la-angle-double-left"></i> @lang('Retour')</a>
+    <x-back route="{{ url()->previous()  }}" />
 
 @endpush
+@push('script-lib')
+    <script src="{{asset('assets/viseradmin/js/vendor/datepicker.min.js')}}"></script>
+    <script src="{{asset('assets/viseradmin/js/vendor/datepicker.en.js')}}"></script>
+@endpush
 
+@push('style-lib')
+    <link  rel="stylesheet" href="{{asset('assets/viseradmin/css/vendor/datepicker.min.css')}}">
+@endpush
 @push('script')
 <script>
     
@@ -270,7 +242,7 @@
             $(this).closest('.user-data').remove();
         });
     });
-
+    
     $('.montant').keyup(function() {
         var sum = 0;
         $('.montant').each(function(i, e) {
@@ -281,10 +253,6 @@
         });
         $("#total_paye").val(sum);
     });
-
-    $('.select2-basic').select2({});
-
-
     $('#receiver_phone').keyup(function() {
         var queryreciever = $(this).val();
 
@@ -301,14 +269,41 @@
                     console.log(response);
                     if (response) {
                         $("#receiver_name").val(response.nom);
-                        $("#receiver_address").val(response.adresse);
-                        //  $("#receiver_code").val(response.code_postal);
+                        $("#receiver_adresse").val(response.adresse);
+                        // $("#sender_code_postal").val(response.code_postal);
                     }
 
                 }
             });
         }
     });
+
+     function currierType(id) {
+        let unit = $("#courier_type_" + id).find(':selected').data('unit');
+        let price = $("#courier_type_" + id).find(':selected').data('price');
+        $("#unit_" + id).html(unit);
+
+        if ($('#courier_type_' + id).val()) {
+            $(".currier_quantity_" + id).removeAttr("disabled");
+        }
+    }
+
+    function courierQuantity(id) {
+        let quantity = $(".currier_quantity_" + id).val();
+        let price = $("#courier_type_" + id).find(':selected').data('price');
+        $(".currier_pu_" + id).val(price);
+        $(".currier_fee_" + id).val(quantity * price);
+
+        var sum = 0;
+        // or $( 'input[name^="ingredient"]' )
+        $('.montant').each(function(i, e) {
+            var v = parseInt($(e).val());
+            if (!isNaN(v))
+                sum += v;
+            console.log('total apres ' + sum);
+        });
+        $("#total_paye").val(sum);
+    }
 
     function getType(val, id) {
         var base_url = "{{ url('/') }}";
@@ -325,20 +320,7 @@
                 //$("#opt_"+id).hide();
                 $("#courier_type_" + id).html(data);
             }
-        }); 
-    }
-</script>
-<script>
-    "use strict";
-
-    function currierType(id) {
-        let unit = $("#courier_type_" + id).find(':selected').data('unit');
-        let price = $("#courier_type_" + id).find(':selected').data('price');
-        $("#unit_" + id).html(unit);
-
-        if ($('#courier_type_' + id).val()) {
-            $(".currier_quantity_" + id).removeAttr("disabled");
-        }
+        });
     }
 
     function changeMontant(id) {
@@ -353,73 +335,144 @@
         $("#total_paye").val(sum);
     }
 
-    function courierQuantity(id) {
-        let quantity = $(".currier_quantity_" + id).val();
-        let price = $("#courier_type_" + id).find(':selected').data('price');
-        $(".currier_fee_" + id).val(quantity * price);
-        $(".currier_fee_" + id).removeAttr("disabled");
 
-        var sum = 0;
-        // or $( 'input[name^="ingredient"]' )
-        $('.montant').each(function(i, e) {
-            var v = parseInt($(e).val());
-            if (!isNaN(v))
-                sum += v;
-            console.log('total apres ' + sum);
-        });
-        $("#total_paye").val(sum);
-    }
+</script>
 
-     $(document).ready(function() {
-        let id = 0;
-        $('.addUserData').on('click', function() {
-            id++;
-            let html = `<div class="row single-item gy-2 user-data">
-                          
-                                <div class="col-md-2">
-                                                            <select class="form-control rdvtype selected_type" id="rdv_type_${id}"  name="rdvName[]" onChange="getType(this.value,${id});">
-                                                                <option>@lang('Choisir Type')</option>
-                                                                <option value="1" >RECUP</option>
-                                                                <option value="2" >DEPOT</option>
-                                                            </select>
-                                                        </div>
-                                    <div class="col-md-3">
-                                        <select class="form-control select_${id} selected_type" id="courier_type_${id}" onchange="currierType(${id})" name="courierName[]" required="">
-                                            <option>@lang('Choisir Objet')</option>    
+<script>
+    "use strict";
+    (function ($) {
+
+        $('.addUserData').on('click', function () {
+            let length=$("#addedField").find('.single-item').length;
+            let html = `
+            <div class="row single-item gy-2">
+            <div class="col-md-2">
+            <select class="form-control" id="rdv_type_${length}"  name="items[${length}][rdvName]"  onChange="getType(this.value,${length});" required="">
+                                            <option>@lang('Choisir')</option>
+                                               <option value="1" >ENVOI</option>
+                                               <option value="0" >FRAIS</option>
+                                                <option value="2" >DEPOT</option>
                                         </select>
-                                    </div>
-                                    <div class="col-md-3">
-                                        <div class="input-group mb-3">
-                                            <input type="text" class="form-control currier_quantity_${id}" placeholder="@lang('Qté')"  onkeyup="courierQuantity(${id})" name="quantity[]" aria-label="Qté" aria-describedby="basic-addon2" required="">
-                                            <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
+            </div>
+                <div class="col-md-3">
+                    <select class="form-control select_${length} select2 selected_type" id="courier_type_${length}" onchange="currierType(${length})" name="items[${length}][courierName]" required>
+                        <option disabled selected value="">@lang('Choisir')</option>
+                           
+                    </select>
+                </div>
 
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-3">
-                                       <div class="input-group">
-                                            <input type="text" id="amount" class="form-control currier_fee_${id} montant"  onkeyup="changeMontant(${id})" placeholder="@lang('Prix')" name="amount[]" aria-label="Frais" aria-describedby="basic-addon2" required="" >
-                                            <span class="input-group-text">{{__($general->cur_text)}}</span>
-
-                                        </div>
-                                    </div>
-
-                                    <div class="col-md-1">
+                <div class="col-md-3">
+                    <div class="input-group mb-3">
+                        <input type="number" class="form-control quantity currier_quantity_${length}" placeholder="@lang('Quantité')" onkeyup="courierQuantity(${length})" disabled name="items[${length}][quantity]"  required>
+                        <span class="input-group-text unit"><i class="las la-balance-scale"></i></span>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="input-group">
+                        <input type="text" id="amount"  class="form-control single-item-amount currier_fee_${length}  montant"  onkeyup="changeMontant(${length})" placeholder="@lang('Prix')"  name="items[${length}][amount]" required>
+                        <span class="input-group-text">{{__($general->cur_text)}}</span>
+                    </div>
+                </div>
+                <div class="col-md-1">
                     <button class="btn btn--danger w-100 removeBtn w-100 h-45" type="button">
                         <i class="fa fa-times"></i>
                     </button>
                 </div>
-                        </div>`;
-            $('.addedField').append(html)
-            $(".select_"+id).select2({
+            </div>`;
+            $('#addedField').append(html)
+
+             $(".select_"+length).select2({
             allowClear:true,
             tags:true,
             placeholder:""});
+
         });
-        $(document).on('click', '.removeBtn', function() {
-            $(this).closest('.user-data').remove();
+
+        $('#addedField').on('change', '.selected_type', function (e) {
+            let unit = $(this).find('option:selected').data('unit');
+            let parent = $(this).closest('.single-item');
+            $(parent).find('.quantity').attr('disabled', false);
+            $(parent).find('.unit').html(`${unit || '<i class="las la-balance-scale"></i>'}`);
+            calculation();
         });
-    });
+
+        $('#addedField').on('click', '.removeBtn', function (e) {
+            let length=$("#addedField").find('.single-item').length;
+            if(length <= 1){
+                notify('warning',"@lang('At least one item required')");
+            }else{
+                $(this).closest('.single-item').remove();
+            }
+            $('.discount').trigger('change');
+            calculation();
+        });
+
+        let discount=0;
+
+        $('.discount').on('input change',function (e) {
+            this.value = this.value.replace(/^\.|[^\d\.]/g, '');
+             discount=parseFloat($(this).val() || 0);
+             if(discount >=100){
+                discount=100;
+                notify('warning',"@lang('Discount can not bigger than 100 %')");
+                $(this).val(discount);
+             }
+            calculation();
+        });
+
+        $('#addedField').on('input', '.quantity', function (e) {
+            this.value = this.value.replace(/^\.|[^\d\.]/g, '');
+
+            let quantity = $(this).val();
+            if (quantity <= 0) {
+                quantity = 0;
+            }
+            quantity=parseFloat(quantity);
+
+            let parent   = $(this).closest('.single-item');
+            let price    = parseFloat($(parent).find('.selected_type option:selected').data('price') || 0);
+            let subTotal = price*quantity;
+
+            $(parent).find('.single-item-amount').val(subTotal.toFixed(2));
+
+
+            var sum = 0;
+                // or $( 'input[name^="ingredient"]' )
+                $('.montant').each(function(i, e) {
+                    var v = parseInt($(e).val());
+                    if (!isNaN(v))
+                        sum += v;
+                    console.log('total apres ' + sum);
+                });
+                $("#total_paye").val(sum);
+        });
+
+        function calculation ( ) {
+            let items    = $('#addedField').find('.single-item');
+            let subTotal = 0;
+
+            $.each(items, function (i, item) {
+                let price = parseFloat($(item).find('.selected_type option:selected').data('price') || 0);
+                let quantity = parseFloat($(item).find('.quantity').val() || 0);
+                subTotal+=price*quantity;
+            });
+
+            subTotal=parseFloat(subTotal);
+
+            let discountAmount = (subTotal/100)*discount;
+            let total          = subTotal-discountAmount;
+
+            $('.subtotal').text(subTotal.toFixed(2));
+            $('.total').text(total.toFixed(2));
+        };
+
+        $('.date').datepicker({
+            language  : 'en',
+            dateFormat: 'yyyy-mm-dd',
+            minDate   : new Date()
+        });
+
+    })(jQuery);
 </script>
 <script>
     $(document).ready(function () {
@@ -488,4 +541,28 @@
     });
 });
 </script>
+@endpush
+@push('style')
+    <style>
+        .border-line-area {
+            position: relative;
+            text-align: center;
+            z-index: 1;
+        }
+        .border-line-area::before {
+            position: absolute;
+            content: '';
+            top: 50%;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background-color: #e5e5e5;
+            z-index: -1;
+        }
+        .border-line-title {
+            display: inline-block;
+            padding: 3px 10px;
+            background-color: #fff;
+        }
+    </style>
 @endpush

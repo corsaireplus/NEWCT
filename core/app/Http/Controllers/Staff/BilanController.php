@@ -550,11 +550,16 @@ class BilanController extends Controller
         $transfertbranchSumReceiver = Paiement::where('branch_id', $user->branch_id)->where('transfert_id', '!=', NULL)->whereDate('created_at', Carbon::today())->sum('receiver_payer');
 
         $transfertbranchCount = Paiement::where('branch_id', $user->branch_id)->whereDate('created_at', Carbon::today())->count();
-        $branch_transactions = Paiement::where('branch_id', $user->branch_id)->with('branch','transaction','transfert.sender', 'rdv.sender', 'agent')->whereDate('created_at', Carbon::today())->orderBy('id', 'DESC')->paginate(getPaginate());
+        $branch_transactions = Paiement::with('branch','transaction','transfert.sender','rdv','rdv.sender','transaction.sender', 'agent')
+                                                    ->dateFilter()
+                                                    //->searchable(['transaction.reftrans','transaction.trans_id','transfert.sender.nom','transfert.sender.contact','transfert.reference','rdv.code'])
+                                                    ->where('branch_id', $user->branch_id)
+                                                    ->whereDate('created_at', Carbon::today())
+                                                    ->orderBy('id', 'DESC')->paginate(getPaginate());
 
         $emptyMessage = "Aucune Transaction";
 
-        // dd($branch_transactions);
+        /// dd($branch_transactions);
         return view('staff.bilan.agencetranslist', compact('branch_transactions', 'pageTitle', 'rdvbranchSum', 'rdvbranchCount', 'transfertbranchCount', 'Senderpaiment', 'Receiverpaiment', 'emptyMessage', 'Depenses'));
     }
 

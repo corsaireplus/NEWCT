@@ -85,7 +85,7 @@
                                         <button class="btn btn-sm btn--primary h-45 w-100 " id="dispatch_all"> <i
                                                 class="las la-arrow-circle-right "></i> @lang('Ajouter Au Programme')</button>
                                     </td>
-                                </tr>
+                            </tr>
 
                             </tbody>
                             <tfoot>

@@ -14,4 +14,8 @@
                <p>NB: SMS non valable les dimanches et jour ferié</p>
                     <p><?php echo app('translator')->get('Êtes vous sûr de vouloir envoyer les sms?'); ?></p>
                 </div>
+                <div class="modal-footer">
+                        <button type="button" class="btn btn--dark" data-bs-dismiss="modal"><?php echo app('translator')->get('Close'); ?></button>
+                        <button type="submit" class="btn btn--primary"><?php echo app('translator')->get('Envoyer Sms'); ?></button>
+                </div>
     <form><?php /**PATH /Applications/MAMP/htdocs/NEWCT/core/resources/views/staff/modal/sms.blade.php ENDPATH**/ ?>

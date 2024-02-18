@@ -62,7 +62,7 @@
                             <tbody>
                             @forelse($rdv_chauf as $rdv)
                              
-                            @if($rdv->colis->container_id < 2 || $rdv->colis->container_id == NULL  )
+                           
                                 <tr>
                                
                                     <td data-label="@lang('Date')">
@@ -118,7 +118,7 @@
                                     
                                     </td>
                                 </tr>
-                               @endif
+                          
                                
                             @empty
                                 <tr>

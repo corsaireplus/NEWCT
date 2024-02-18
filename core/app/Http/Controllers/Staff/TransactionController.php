@@ -67,6 +67,30 @@ class TransactionController extends Controller
        
     }
 
+    public function receive(){
+        $user         = auth()->user();
+        $pageTitle    = 'Toutes Les Transactions';
+
+        $courierLists = Transaction::where('receiver_branch_id', $user->branch_id)
+                        ->Where('ship_status','>',2)
+                        ->with('sender', 'receiver', 'paymentInfo','senderBranch','senderStaff')
+                        ->withSum('paiement as payer','receiver_payer')
+                        ->dateFilter()
+                        ->searchable(['trans_id','reftrans','code', 'receiverBranch:name', 'senderBranch:name', 'sender:contact', 'receiver:contact','sender:nom','receiver:nom'])
+                        ->filter(['ship_status','status','receiver_branch_id','branch_id'])
+                        // ->where(function ($q) {
+                        //     $q->OrWhereHas('payment', function ($myQuery) {
+                        //         if(request()->payment_status != null){
+                        //             $myQuery->where('status',request()->payment_status);
+                        //         }
+                        //     });
+                        // })
+                        ->orderBy('id', 'DESC')
+                        ->paginate(getPaginate());
+        return view('staff.transactions.receive', compact('pageTitle', 'courierLists'));
+       
+    }
+
     public static function generateUniqueInvoiceId()
     {
         
@@ -91,7 +115,7 @@ class TransactionController extends Controller
     public function transactionStore(Request $request)
     {
 
-   
+
         $request->validate([
             'branch' => 'required|exists:branches,id',
             'receiver_name' => 'max:100',
@@ -114,14 +138,134 @@ class TransactionController extends Controller
     try {
             DB::beginTransaction();
             // INITILISATION DES VARIABLES
+
             $user = Auth::user();
+          
+            //VERFIER SI ID MISSION ALORS NOUVEAU RDV  A CREER AVANT
+
+            if($request->mission_id){
+
+                       $mission_id=decrypt($request->mission_id);
+                       $mission = Mission::where('idmission',decrypt($request->mission_id))->first();
+                       $date_mission = date('Y-m-d h:i:s', strtotime($mission->date));
+
+
+            
+                         //creer un nouveau rdv et attribuer la mission au chauffeur
+                           $sender_user=Client::where('contact',$request->sender_phone)->first();
+                           // dd($sender_user);
+                           if( !isset($sender_user) )
+                           {
+                            $sender = new Client();
+                            $sender->nom=strtoupper($request->sender_name);
+                            $sender->contact=$request->sender_phone;
+                            $sender->country_id =$user->branch_id;
+                            $sender->save();
+                            $sende_id= $sender->id;
+                    
+                            $adresse= new RdvAdresse();
+                            $adresse->client_id =$sende_id;
+                            $adresse->adresse =$request->sender_address;
+                            $adresse->code_postal=$request->sender_code_postal;
+                            $adresse->save();
+                           }else{
+                              
+                               $sende_id= $sender_user->id;
+
+                           }
+                            $request->sender_id = $sende_id;
+                           
+                            $rdv= new Rdv();
+                            $rdv->sender_idsender=$sende_id;
+                            $rdv->status='1';
+                            $rdv->code = getTrx();
+                            $rdv->user_id=$user->id;
+                            $rdv->mission_id =$mission_id;
+                            $rdv->date=$mission->date;
+                           // $rdv->observation=$request->observation;
+                            $rdv->save();
+                            
+                            $refrdv = $rdv->code;
+                            $request->refrdv = $refrdv;
+                              
+                                $totalDepotAmount = 0;
+                                $totalRecupAmount = 0 ;
+                                $totalServiceAmount = 0; // Total montant du service depot comme recup pour avoir le montant total
+
+
+                                $data = [];
+                                foreach ($request->items as $item) {
+                                    $courierType = Type::where('id', $item['courierName'])->first();
+                                    if (!$courierType) {
+                                        continue;
+                                    }
+                                    $price = $courierType->price * $item['quantity'];
+                                    
+
+                                    if ($item['rdvName'] == 2) {
+                                        $totalDepotAmount += $item['amount']; 
+                                        
+                                    } else {
+                                        $totalRecupAmount += $item['amount'];
+                                    }
+                                    
+                                    $totalServiceAmount +=$item['amount'];
+
+
+                                    if ($item['rdvName'] == 2){
+                                        $description='3';
+                                    }else{
+                                        $description=0;
+                                    }
+                        
+                                    $data[] = [
+                                        'rdv_idrdv'  => $rdv->idrdv,
+                                        'rdv_type_id' => $item['rdvName'],
+                                        'rdv_product_id' => $courierType->id,
+                                        'qty'             => $item['quantity'],
+                                        'fee'             => $item['amount'],
+                                        'created_at'      => $date_mission,
+                                        'description'    => $description,
+                                        
+                                    ];
+                                }
+                                RdvProduct::insert($data);
+                                
+                                $rdv->montant=$totalDepotAmount + $totalRecupAmount;
+                                $rdv->save();
+                                 
+                                $date_paiement = date('Y-m-d');
+                                
+                                $courierPayment = new RdvPayment();
+                                $courierPayment->rdv_id = $rdv->idrdv;
+                                $courierPayment->rdv_senderid = $sende_id;
+                                $courierPayment->amount = $totalDepotAmount;
+                                $courierPayment->date=$date_paiement;
+                                $courierPayment->recup_amount =$totalRecupAmount;
+                                $courierPayment->refrdv=getTrx();
+                                if($totalDepotAmount == 0){
+                                    $courierPayment->status =2;  
+                                }else{  $courierPayment->status =0; }
+                               
+                                $courierPayment->save();
+                
+                      
+
+            }
+            //FIN CREATION NOUVEAU RDV
+
+
+          
             $totalAmount=0;
             $totalRecupAmount = 0;
             $totalDepotAmount = 0;
 
             $date_paiement = date('Y-m-d');
-            $rdv = Rdv::where('code', $request->refrdv)->first();
-            $mission = Mission::where('idmission',$rdv->mission_id)->first();
+            if(!$request->mission_id){
+               $rdv = Rdv::where('code', $request->refrdv)->first();
+               $mission = Mission::where('idmission',$rdv->mission_id)->first();
+            }
+          
             $date_mission = date('Y-m-d h:i:s', strtotime($mission->date));
 
             //SUPPRIMER ELEMENT RDV POUR METTRE A JOUR 
@@ -156,13 +300,16 @@ class TransactionController extends Controller
                     'rdv_type_id' => $item['rdvName'],
                     'rdv_product_id' => $courierType->id,
                     'qty'             => $item['quantity'],
-                    'fee'             => $price,
+                    'fee'             => $item['amount'],
                     'created_at'      => $date_mission,
                     'description'    => $description,
                     
                 ];
             }
-    
+            if($request->reference == null && $totalRecupAmount > 0 ){
+                                    $notify[]=['error','Ajouter reference !!'];
+                                    return back()->withNotify($notify);
+            }
             RdvProduct::insert($data);
 
              // MISE A JOUR MONTANT RDV 
@@ -199,7 +346,7 @@ class TransactionController extends Controller
                 $transaction->code = getTrx();
                 $transaction->trans_id = $this->generateUniqueInvoiceId();
                 $transaction->rdv_id = $rdv->idrdv;
-                if($request->reference)
+                if($request->reference && $totalRecupAmount > 0)
                 {
                 $transaction->reftrans = $request->reference;
                 }
@@ -277,7 +424,7 @@ class TransactionController extends Controller
                     'transaction_type_id' => $courierType->id,
                     'type_cat_id'     => $item['rdvName'] ,
                     'qty'             => $item['quantity'],
-                    'fee'             => $price,
+                    'fee'             => $item['amount'],
                     'created_at'       => now(),
                 ];
              }
@@ -657,7 +804,7 @@ class TransactionController extends Controller
         $branchs = Branch::where('status', 1)->where('id', '!=', $admin->branch_id)->latest()->get();
         $types = Type::where('status', 1)->where('cat_id','<',2)->with('unit')->latest()->get();
         $deja_payer=Paiement::where('transaction_id',decrypt($id))->where('branch_id',$admin->branch_id)->sum('sender_payer');
-       
+
         
         $pageTitle   = 'Modifier Transaction';
         
@@ -672,8 +819,10 @@ class TransactionController extends Controller
         $staff = auth()->user();
         $deja_payer_receiver=Paiement::where('transaction_id',decrypt($id))->where('branch_id',1)->sum('receiver_payer');
         $deja_payer_sender=Paiement::where('transaction_id',decrypt($id))->where('branch_id',1)->sum('sender_payer');
+        $conteneur=ContainerNbcolis::where('id_transaction',decrypt($id))->with('conteneur','transaction')->get();
 
-        return view('staff.transactions.details', compact('pageTitle', 'courierInfo', 'staff','userInfo','deja_payer_receiver','deja_payer_sender'));
+
+        return view('staff.transactions.details', compact('pageTitle', 'courierInfo', 'staff','userInfo','deja_payer_receiver','deja_payer_sender','conteneur'));
     }
 
     public function invoice($id)
@@ -895,6 +1044,72 @@ class TransactionController extends Controller
         return view('staff.transactions.createrdv', compact('pageTitle', 'branchs', 'types','chauffeur','mission_id'));
 
        }
+
+    public function livraison($id,$container_id)
+    {
+        $ct=(decrypt($container_id));
+        $userInfo = Auth::user();
+        $pageTitle = "Livraison Transaction";
+        $courierInfo = Transaction::where('id', decrypt($id))->with('paiement.agent', 'paiement.modepayer')->first();
+        $courierProductInfos = TransactionProduct::where('transaction_id', $courierInfo->id)->with('type')->get();
+        $courierProductRef = TransfertRef::where('transaction_id', $courierInfo->id)->get();
+        $courierPayment = TransactionFacture::where('transaction_id', $courierInfo->id)->first();
+        $deja_payer_sender=Paiement::where('transaction_id',decrypt($id))->where('branch_id',$userInfo->branch_id)->sum('sender_payer');
+        $deja_payer_receiver=Paiement::where('transaction_id',decrypt($id))->where('branch_id',$userInfo->branch_id)->sum('receiver_payer');
+        $conteneur=ContainerNbcolis::where('id_transaction',decrypt($id))->where('container_id',decrypt($container_id))->with('conteneur')->get();
+        
+       
+         
+        return view('staff.transactions.livraison', compact('pageTitle', 'userInfo', 'courierInfo', 'courierProductRef', 'courierProductInfos', 'courierPayment','deja_payer_sender','deja_payer_receiver','conteneur','ct'));
+    }
+
+       public function livrercolis(Request $request){
+       // dd($request);
+        $user = Auth::user();
+        $date_livraison = date('Y-m-d');
+
+        $livraison= new Livraison();
+        $livraison->user_id=$user->id;
+        $livraison->nom=$request->nom;
+        $livraison->telephone=$request->telephone;
+        $livraison->piece_id=$request->piece_id;
+        $livraison->transaction_id=$request->colis_id;
+        $livraison->date=$date_livraison;
+        $livraison->description=$request->description;
+        $livraison->save();
+
+        $transfert=Transaction::where('id',$request->colis_id)->get();
+        $status=$transfert[0]->ship_status;
+        if($status == 2){
+            $transfert_update=Transaction::where('id',$request->colis_id)->update(array('ship_status'=>'3'));
+        }elseif($status == 22){
+            $transfert_update=Transaction::where('id',$request->colis_id)->update(array('ship_status'=>'33'));
+        }
+        $container_update=ContainerNbcolis::where('container_id',$request->container_id)->where('id_transaction',$request->colis_id)->update(array('date_livraison' => $date_livraison));
+
+        $adminNotification = new AdminNotification();
+        $adminNotification->user_id = $user->id;
+        $adminNotification->title = 'Livraison Colis ' . $user->username;
+        $adminNotification->click_url = urlPath('admin.courier.info.details', $request->colis_id);
+        $adminNotification->save();
+        $notify[] = ['success', 'Colis Livré avec succès'];
+        return redirect()->route('staff.transactions.livraison_invoice',[encrypt($request->colis_id),encrypt($request->container_id)])->withNotify($notify);
+
+
+
+    }
+
+    public function livraison_invoice($colis_id,$container_id){
+       // dd(decrypt($colis_id));
+       $livraison=ContainerNbcolis::where('container_id',decrypt($container_id))->where('id_transaction',decrypt($colis_id))->with('conteneur','translivraison','transaction')->first();
+       $code = '<img src="data:image/png;base64,' . DNS1D::getBarcodePNG($livraison->transaction->reftrans, 'C128') . '" alt="barcode"   />' . "<br> #" . $livraison->transaction->reftrans;
+
+       
+
+       //dd($livraison);
+        return view('staff.transactions.livraison_invoice', compact('livraison','code'));
+
+     }
 
 
     }

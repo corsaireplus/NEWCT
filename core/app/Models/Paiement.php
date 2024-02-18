@@ -5,10 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\Searchable;
+use App\Traits\GlobalStatus;
 
 class Paiement extends Model
 {
     use SoftDeletes;
+    use Searchable, GlobalStatus;
     protected $dates = ['deleted_at'];
     protected $table = "paiements";
     protected $primaryKey = 'id';
@@ -20,6 +23,7 @@ class Paiement extends Model
     public function transfert(){
         return $this->belongsTo(Transfert::class,'transfert_id');
     }
+    
      public function transaction(){
         return $this->belongsTo(Transaction::class,'transaction_id');
     }

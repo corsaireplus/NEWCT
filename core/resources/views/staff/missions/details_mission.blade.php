@@ -106,16 +106,18 @@
 
 @endsection
 @push('breadcrumb-plugins')
-<x-back route="{{ url()->previous()  }}" />
+<x-back route="{{route('staff.mission.index')}}" />
  <a href="{{ route('staff.transactions.newrdv', $mission_id) }}" title=""
-        class="btn btn-sm btn-outline--info">
+        class="btn btn-sm btn-outline--danger">
         <i class="las la-file-invoice"></i>
         @lang('Ajouter RDV Dans ce Programme')
     </a>
-<!-- <a href="javascript:void(0)" class="btn btn-sm btn--secondary box--shadow1 text--small sendSms" onclick="sendSms({{encrypt($mission->idmission)}},{{$mission->contact}})" data-idmission="{{encrypt($mission->idmission)}}" data-contact="{{$mission->contact}}"><i class="las la-phone"></i>@lang('Sms')</a> -->
+    <a href="{{route('staff.mission.print',encrypt($mission->idmission))}}" title=""
+        class="btn btn-sm btn-outline--info">
+        <i class="las la-download"></i>
+        @lang('Imprimer')
+    </a>
 
-<!-- <a href="{{route('staff.mission.send_sms',encrypt($mission->idmission))}}" class="btn btn-sm btn--secondary box--shadow1 text--small"><i class="las la-phone"></i> @lang('Envoyer SMS')</a> -->
-<a href="{{route('staff.mission.print',encrypt($mission->idmission))}}" class="btn btn-sm btn--secondary box--shadow1 text--small"><i class="las la-printer"></i> @lang('Imprimer')</a> <a href="{{route('staff.mission.index')}}" class="btn btn-sm btn--primary box--shadow1 text--small"><i class="las la-angle-double-left"></i> @lang('Retour')</a>
 @endpush
 @push('script')
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>

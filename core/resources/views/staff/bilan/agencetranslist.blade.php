@@ -167,7 +167,7 @@
                                         @endif
                                     @else
                                     <span class="font-weight-bold"> {{getAmount($trans->sender_payer)}} {{ auth()->user()->branch->currencie  }}</span><br>
-@endif
+                                    @endif
                                     <span>{{$trans->refpaiement}}</span>
                                 </td>
 
@@ -268,6 +268,8 @@
 
 @endpush
 @push('breadcrumb-plugins')
+<x-search-form placeholder="Recherche..." />
+<x-date-filter placeholder="Date Debut - Date Fin" />
 <!-- <a href="{{route('staff.bilan.export_list',['null','null','null'])}}" class="btn btn-sm btn--secondary box--shadow1 text--small"><i class="las la-printer"></i> @lang('Imprimer')</a> -->
 @endpush
 @push('script-lib')

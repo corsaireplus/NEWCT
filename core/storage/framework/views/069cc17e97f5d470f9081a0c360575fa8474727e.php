@@ -54,6 +54,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="col-lg-12">
                             <div class="card border--primary mt-3">
                                 <h5 class="card-header bg--primary  text-white"><?php echo app('translator')->get('Information RDV'); ?>

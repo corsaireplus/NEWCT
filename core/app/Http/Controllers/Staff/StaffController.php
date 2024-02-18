@@ -31,7 +31,8 @@ class StaffController extends Controller
         $totalSent       = CourierInfo::where('sender_staff_id', $user->id)->whereIn('status', [Status::COURIER_DISPATCH, Status::COURIER_DELIVERYQUEUE, Status::COURIER_DELIVERED])->count();
         $totalDelivery   = CourierInfo::where('receiver_staff_id', $user->id)->where('status', Status::COURIER_DELIVERED)->count();
 
-        $courierDelivery = CourierInfo::upcoming()->orderBy('id', 'DESC')->with('senderBranch', 'receiverBranch', 'senderStaff', 'receiverStaff', 'paymentInfo')->take(5)->get();
+       // $courierDelivery = CourierInfo::upcoming()->orderBy('id', 'DESC')->with('senderBranch', 'receiverBranch', 'senderStaff', 'receiverStaff', 'paymentInfo')->take(5)->get();
+        $courierDelivery = Transaction::where('branch_id', $user->branch_id)->orWhere('receiver_branch_id', $user->branch_id)->with('sender', 'receiver', 'paymentInfo','senderBranch','senderStaff')->withSum('paiement as payer','sender_payer')->take(5)->get();
         $totalCourier    = CourierInfo::where('sender_branch_id', $user->branch_id)->orWhere('receiver_branch_id', $user->branch_id)->count();
 
         return view('staff.dashboard', compact('pageTitle', 'branchCount', 'deliveryInQueue', 'totalSent', 'upcomingCourier', 'sentInQueue', 'dispatchCourier', 'cashCollection', 'totalDelivery', 'courierDelivery', 'totalCourier','sentInNext'));

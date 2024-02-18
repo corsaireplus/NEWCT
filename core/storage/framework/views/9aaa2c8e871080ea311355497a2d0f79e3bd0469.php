@@ -147,11 +147,60 @@
                 </div>
             </div>
 
-            <!-- <div class="row mb-30">
+            <div class="row mb-30">
                 <div class="col-lg-12 mt-2">
                     <div class="card border--dark">
-                        <h5 class="card-header bg--dark"><?php echo app('translator')->get('Facture Information'); ?></h5>
-                        <div class="card-body">
+                        <h5 class="card-header bg--dark"><?php echo app('translator')->get('Conteneurs Informations'); ?></h5>
+                         <div class="card-body">
+                            <div class="table-responsive--md  table-responsive">
+                                <table class="table table--light style--two">
+                                <thead>
+                                    <tr>
+                                        <th scope="col"><?php echo app('translator')->get('Date'); ?></th>
+                                        <th scope="col"><?php echo app('translator')->get('Numero Conteneur'); ?></th>
+                                        <th scope="col"><?php echo app('translator')->get('Nb Chargé'); ?></th>
+                                        <th scope="col"><?php echo app('translator')->get('Livraison'); ?></th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $__currentLoopData = $conteneur; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $courier): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <tr>
+                                        <td data-label="<?php echo app('translator')->get('Date'); ?>">
+                                            <?php echo e(date('d-m-Y', strtotime($courier->conteneur->date))); ?>
+
+                                        </td>
+                                        <td data-label="<?php echo app('translator')->get('Numero'); ?>"><?php echo e($courier->conteneur->numero); ?></td>
+
+                                        <td data-label="<?php echo app('translator')->get('Nb Chargé'); ?>"><?php echo e($courier->nb_colis); ?></td>
+                                        <?php if($courier->date_livraison ==  NULL ): ?>
+                                        <td data-label="<?php echo app('translator')->get('Livraison'); ?>">
+                                           <?php if($userInfo->branch_id != $courierInfo->branch_id ): ?>
+                                               <?php if(($courier->transaction->ship_status == 2 || $courier->transaction->ship_status == 22) && ($courier->transaction->status == 2 || $courier->transaction->status == 1 )): ?>
+                                        
+                                              <a href="<?php echo e(route('staff.transactions.livraison',[encrypt($courier->transaction->id),encrypt($courier->container_id)])); ?>"><button class="btn btn-sm btn-outline--info"><i class="las la-truck"></i><?php echo app('translator')->get('Delivery'); ?></button></a>
+                                           
+                                              <?php else: ?>
+                                               <span class="badge badge--danger"><?php echo app('translator')->get('Colis en route'); ?></span>
+                                              <?php endif; ?>
+
+                                            <?php else: ?>
+                                            <span class="badge badge--success"><?php echo app('translator')->get('Livraison en Attente'); ?></span>
+
+                                            <?php endif; ?>
+                                        </td>
+                                        <?php else: ?>
+                                        <td data-label="<?php echo app('translator')->get('Livraison'); ?>">
+                                        <span class="badge badge--success"><a href="<?php echo e(route('staff.transfert.livraison_invoice',[encrypt($courierInfo->id),encrypt($courier->container_id)])); ?>" title="" class="ml-1 livraison_invoice" data-container_id="<?php echo e($courier->container_id); ?>" data-colis_id="<?php echo e($courierInfo->id); ?>"><?php echo app('translator')->get('Dejà Livré'); ?></a></span>
+                                        </td>
+                                        <?php endif; ?>
+                                    </tr>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </tbody>
+                            </table>
+                        </div>
+                        </div>
+                        <!-- <div class="card-body">
                             <ul class="list-group">
                                 <li class="list-group-item d-flex justify-content-between align-items-center">
                                     <?php echo app('translator')->get('Payment Received By '); ?>
@@ -221,10 +270,10 @@
                                     <?php endif; ?>
                                 </li>
                             </ul>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
-            </div> -->
+            </div>
             <div class="row mb-30">
                 <div class="col-lg-12 mt-2">
                     <div class="card border--dark">
@@ -448,6 +497,8 @@
             </div>
         </div>
     </div>
+
+    
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startPush('breadcrumb-plugins'); ?>
@@ -473,9 +524,9 @@
         <?php echo app('translator')->get('Facture'); ?>
     </a>
 
-    <!-- <?php if($courierInfo->status <= 1 ): ?>
-        <button class="btn btn-sm btn-outline--info delivery"
-            data-code="<?php echo e($courierInfo->code); ?>"><i class="las la-truck"></i>
+    <!-- <?php if($courierInfo->ship_status > 1 ): ?>
+        <button class="btn btn-sm btn-outline--info open-modal-btn"
+            data-code="livraison"><i class="las la-truck"></i>
             <?php echo app('translator')->get('Delivery'); ?></button>
     <?php endif; ?> -->
 
@@ -526,8 +577,14 @@
                 modal.find('input[name=code]').val($(this).data('code'))
                 modal.modal('show');
             });
+
+            
         })(jQuery)
-    </script>
+         </script>
+
+
+
+
 <?php $__env->stopPush(); ?>
 
 <?php echo $__env->make('staff.layouts.app', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /Applications/MAMP/htdocs/NEWCT/core/resources/views/staff/transactions/details.blade.php ENDPATH**/ ?>

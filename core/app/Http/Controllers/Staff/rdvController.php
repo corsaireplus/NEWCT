@@ -545,6 +545,7 @@ class RdvController extends Controller
         //dd($data);
         return response()->json($data);
     }
+    
     public function delete_rdv(Request $request){
         $courierInfo = Rdv::where('idrdv',$request->refpaiement)->delete();
         $rdvPayment =  RdvPayment::where('rdv_id',$request->refpaiement)->delete();
